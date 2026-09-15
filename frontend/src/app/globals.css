@@ -1,0 +1,406 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --sky: #00a5ef;
+  --sky-600: #0084cc;
+}
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #111827;
+  --color-sky: #00a5ef;
+  --color-sky-600: #0084cc;
+  --color-paper: #ffffff;
+  --color-paper-2: #f7f8fa;
+  --color-ink: #0f172b;
+  --color-ink-soft: #314158;
+  --color-muted: #62748e;
+  --color-line: #e2e8f0;
+  --color-accent: #00a5ef;
+  --color-accent-2: #0084cc;
+  --color-gold: #c4a574;
+  --font-sans: var(--font-instrument);
+  --font-display: var(--font-lastik);
+}
+
+html {
+  background: #ffffff;
+  color: #111827;
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d0 transparent;
+}
+
+body {
+  background: #ffffff;
+  color: #111827;
+  font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-lastik,
+.font-display {
+  font-family: var(--font-lastik), "EB Garamond", "Times New Roman", Times, serif;
+}
+
+.hero-sky {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  background: #2563eb;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  pointer-events: none;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.star-twinkle {
+  animation: twinkle 2.8s ease-in-out infinite;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(18deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(420px, 180px, 0) rotate(18deg);
+    opacity: 0;
+  }
+}
+.shooting-star {
+  position: absolute;
+  width: 90px;
+  height: 1.5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
+  animation: shoot 11s ease-in infinite;
+}
+
+@keyframes comet {
+  0% {
+    transform: translate3d(-10vw, -10vh, 0) rotate(28deg);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate3d(80vw, 45vh, 0) rotate(28deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(80vw, 45vh, 0) rotate(28deg);
+    opacity: 0;
+  }
+}
+.comet {
+  position: absolute;
+  top: 6%;
+  left: 10%;
+  z-index: 3;
+  width: 220px;
+  height: 1.5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 40%, rgba(200, 235, 255, 0.85) 90%, #ffffff 100%);
+  box-shadow: 0 0 12px 1.5px rgba(180, 220, 255, 0.65);
+  animation: comet 14s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes proto-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--rot, 0deg));
+  }
+  50% {
+    transform: translateY(-18px) rotate(calc(var(--rot, 0deg) + 2deg));
+  }
+}
+.proto-float {
+  animation: proto-float 7s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(var(--flower-from, -6deg));
+  }
+  50% {
+    transform: rotate(var(--flower-to, 6deg));
+  }
+}
+.flower-sway {
+  transform-origin: 50% 90%;
+  animation: sway 7s ease-in-out infinite;
+}
+
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.marquee-left {
+  animation: marquee-left 50s linear infinite;
+  will-change: transform;
+}
+.marquee-right {
+  animation: marquee-right 56s linear infinite;
+  will-change: transform;
+}
+.marquee-mask:hover .marquee-left,
+.marquee-mask:hover .marquee-right {
+  animation-play-state: paused;
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+.reveal-on-view {
+  animation: fade-rise 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes icon-breathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.03);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.anim-icon-float {
+  animation: icon-breathe 4s ease-in-out infinite;
+}
+
+.anim-icon-float-delayed {
+  animation: icon-breathe 4.6s ease-in-out 1.2s infinite;
+}
+
+.anim-icon-float-late {
+  animation: icon-breathe 4.3s ease-in-out 2.4s infinite;
+}
+
+.anim-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes cta-text-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+.cta-heading {
+  color: transparent;
+  background: linear-gradient(90deg, #111 0% 42%, #5bb8ff 47%, #7aa2ff 52%, #111 57% 100%) 100% 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: cta-text-shimmer 3s linear infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Sakura Petals falling & fluttering animation */
+@keyframes petalFall {
+  0% {
+    transform: translate3d(0, -40px, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(120px, 100vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes petalSway {
+  0% {
+    transform: rotate(0deg) scale(0.9) skewX(0deg);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1) skewX(12deg);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.9) skewX(-12deg);
+  }
+}
+
+/* Lively floating & bouncing for feature icons */
+@keyframes icon-bounce-soft {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(2deg);
+  }
+}
+.anim-icon-active {
+  animation: icon-bounce-soft 3.2s ease-in-out infinite;
+}
+.anim-icon-active-delay-1 {
+  animation: icon-bounce-soft 3.6s ease-in-out 0.8s infinite;
+}
+.anim-icon-active-delay-2 {
+  animation: icon-bounce-soft 3.4s ease-in-out 1.6s infinite;
+}
+
+/* Petals falling naturally from the tree canopy */
+@keyframes petalFallFromTree {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.95;
+    transform: translate3d(15px, 20px, 0) scale(1);
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(var(--dest-x, 160px), 85vh, 0) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes petalFlutter {
+  0% {
+    transform: rotate(0deg) scale(0.85) skewX(-10deg);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15) skewX(15deg);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.85) skewX(-10deg);
+  }
+}
+
+/* Natural, realistic sakura petal falling physics */
+@keyframes petalFallNatural {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.5);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+    transform: translate3d(calc(var(--drift-x, 60px) * 0.15), 18px, 0) scale(1);
+  }
+  80% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(var(--drift-x, 80px), var(--fall-y, 45vh), 0) scale(0.85);
+    opacity: 0;
+  }
+}
+
+@keyframes petalFlutterNatural {
+  0% {
+    transform: rotate(0deg) scale(0.9) skewX(-6deg);
+  }
+  50% {
+    transform: rotate(120deg) scale(1.05) skewX(8deg);
+  }
+  100% {
+    transform: rotate(240deg) scale(0.9) skewX(-6deg);
+  }
+}
+
+/* Smooth Scroll-Driven Blur-Motion Animations */
+html {
+  scroll-behavior: smooth;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(28px) scale(0.98);
+  filter: blur(10px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0px);
+}
