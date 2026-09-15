@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description: "Describe what you want, and we handle the rest. From idea to stunning design in seconds.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${lastik.variable} ${instrument.variable} ${geist.variable} h-full antialiased`}>
       <body className="min-h-full bg-background text-foreground">
