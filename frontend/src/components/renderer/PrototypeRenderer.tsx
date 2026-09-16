@@ -5,9 +5,10 @@ import type { DesignDoc, Section, Theme } from "@/lib/design";
 type Props = {
   doc: DesignDoc;
   className?: string;
+  device?: "desktop" | "tablet" | "mobile";
 };
 
-export function PrototypeRenderer({ doc, className = "" }: Props) {
+export function PrototypeRenderer({ doc, className = "", device = "desktop" }: Props) {
   const theme = doc.theme;
   const format = doc.format || "website";
   const isPhone = format === "app" || format === "story";
@@ -30,29 +31,41 @@ export function PrototypeRenderer({ doc, className = "" }: Props) {
       }}
     >
       {doc.nav && !isPhone && !isPoster && format !== "dashboard" && format !== "brand" && (
-        <NavBar nav={doc.nav} theme={theme} />
+        <NavBar nav={doc.nav} theme={theme} isMobile={device === "mobile"} />
       )}
       {doc.sections?.map((section, i) => (
-        <Block key={`${section.kind}-${i}`} section={section} theme={theme} doc={doc} />
+        <Block key={`${section.kind}-${i}`} section={section} theme={theme} doc={doc} isMobile={device === "mobile"} />
       ))}
     </div>
   );
 }
 
-function NavBar({ nav, theme }: { nav: NonNullable<DesignDoc["nav"]>; theme: Theme }) {
+function NavBar({
+  nav,
+  theme,
+  isMobile,
+}: {
+  nav: NonNullable<DesignDoc["nav"]>;
+  theme: Theme;
+  isMobile?: boolean;
+}) {
   return (
     <div
-      className="flex items-center justify-between px-8 py-5 text-[11px] tracking-[0.18em] uppercase"
+      className="flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 text-[11px] tracking-[0.18em] uppercase"
       style={{ borderBottom: `1px solid ${theme.line}` }}
     >
-      <div className="text-[15px] normal-case tracking-normal font-medium">{nav.logo}</div>
-      <div className="hidden sm:flex gap-6" style={{ color: theme.muted }}>
-        {nav.links?.map((link) => (
-          <span key={link}>{link}</span>
-        ))}
+      <div className="text-[14px] sm:text-[15px] normal-case tracking-normal font-medium truncate max-w-[200px]">
+        {nav.logo}
       </div>
+      {!isMobile && (
+        <div className="hidden sm:flex gap-6" style={{ color: theme.muted }}>
+          {nav.links?.map((link) => (
+            <span key={link}>{link}</span>
+          ))}
+        </div>
+      )}
       <span
-        className="px-3 py-1.5 text-[10px]"
+        className="px-3 py-1.5 text-[10px] shrink-0 font-medium"
         style={{
           background: theme.fg,
           color: theme.bg,
@@ -65,20 +78,30 @@ function NavBar({ nav, theme }: { nav: NonNullable<DesignDoc["nav"]>; theme: The
   );
 }
 
-function Block({ section, theme, doc }: { section: Section; theme: Theme; doc: DesignDoc }) {
+function Block({
+  section,
+  theme,
+  doc,
+  isMobile,
+}: {
+  section: Section;
+  theme: Theme;
+  doc: DesignDoc;
+  isMobile?: boolean;
+}) {
   switch (section.kind) {
     case "hero":
-      return <Hero section={section} theme={theme} />;
+      return <Hero section={section} theme={theme} isMobile={isMobile} />;
     case "stats":
-      return <Stats section={section} theme={theme} />;
+      return <Stats section={section} theme={theme} isMobile={isMobile} />;
     case "features":
-      return <Features section={section} theme={theme} />;
+      return <Features section={section} theme={theme} isMobile={isMobile} />;
     case "gallery":
-      return <Gallery section={section} theme={theme} />;
+      return <Gallery section={section} theme={theme} isMobile={isMobile} />;
     case "testimonials":
-      return <Testimonials section={section} theme={theme} />;
+      return <Testimonials section={section} theme={theme} isMobile={isMobile} />;
     case "pricing":
-      return <Pricing section={section} theme={theme} />;
+      return <Pricing section={section} theme={theme} isMobile={isMobile} />;
     case "cta":
       return <Cta section={section} theme={theme} />;
     case "footer":
@@ -128,31 +151,91 @@ function Block({ section, theme, doc }: { section: Section; theme: Theme; doc: D
   }
 }
 
-function Hero({ section, theme }: { section: Section; theme: Theme }) {
+function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const visual = String(section.visual || theme.heroVisual || "editorial");
-  return (
-    <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-8 px-8 py-12 items-center">
-      <div>
+  const layout = String(section.layout || (isMobile ? "centered" : "split"));
+
+  if (layout === "centered") {
+    return (
+      <div className="flex flex-col items-center text-center px-6 sm:px-12 py-12 sm:py-16">
         {section.kicker ? (
           <div
-            className="text-[10px] tracking-[0.22em] uppercase mb-4"
+            className="text-[10px] tracking-[0.24em] uppercase mb-4 font-medium"
             style={{ color: theme.accent }}
           >
             {String(section.kicker)}
           </div>
         ) : null}
         <h1
-          className="text-[42px] leading-[0.95] tracking-[-0.03em] mb-5"
+          className={`${
+            isMobile ? "text-[32px]" : "text-[48px]"
+          } leading-[1.0] tracking-[-0.03em] mb-4 max-w-[22ch]`}
           style={{ fontFamily: "var(--font-fraunces), serif", fontWeight: 450 }}
         >
           {String(section.headline || "")}
         </h1>
-        <p className="text-[14px] leading-relaxed max-w-[36ch] mb-7" style={{ color: theme.muted }}>
+        <p
+          className="text-[14px] leading-relaxed max-w-[42ch] mb-8"
+          style={{ color: theme.muted }}
+        >
           {String(section.sub || "")}
         </p>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-wrap gap-3 items-center justify-center mb-10">
           <span
-            className="px-4 py-2 text-[12px]"
+            className="px-5 py-2.5 text-[12px] font-medium transition shadow-sm"
+            style={{
+              background: theme.accent,
+              color: theme.accentFg,
+              borderRadius: theme.radius,
+            }}
+          >
+            {String(section.cta || "Start")}
+          </span>
+          {section.secondary ? (
+            <span className="text-[12px] opacity-80" style={{ color: theme.muted }}>
+              {String(section.secondary)}
+            </span>
+          ) : null}
+        </div>
+        <div className="w-full max-w-[580px]">
+          <Visual kind={visual} theme={theme} isMobile={isMobile} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`grid ${
+        isMobile ? "grid-cols-1 gap-8 px-6 py-8" : "md:grid-cols-[1.15fr_0.85fr] gap-8 px-8 py-12"
+      } items-center`}
+    >
+      <div>
+        {section.kicker ? (
+          <div
+            className="text-[10px] tracking-[0.22em] uppercase mb-4 font-medium"
+            style={{ color: theme.accent }}
+          >
+            {String(section.kicker)}
+          </div>
+        ) : null}
+        <h1
+          className={`${
+            isMobile ? "text-[32px]" : "text-[42px]"
+          } leading-[1.02] tracking-[-0.03em] mb-5`}
+          style={{ fontFamily: "var(--font-fraunces), serif", fontWeight: 450 }}
+        >
+          {String(section.headline || "")}
+        </h1>
+        <p
+          className="text-[14px] leading-relaxed max-w-[36ch] mb-7"
+          style={{ color: theme.muted }}
+        >
+          {String(section.sub || "")}
+        </p>
+        <div className="flex flex-wrap gap-3 items-center">
+          <span
+            className="px-4 py-2 text-[12px] font-medium"
             style={{
               background: theme.accent,
               color: theme.accentFg,
@@ -168,69 +251,157 @@ function Hero({ section, theme }: { section: Section; theme: Theme }) {
           ) : null}
         </div>
       </div>
-      <Visual kind={visual} theme={theme} />
+      <Visual kind={visual} theme={theme} isMobile={isMobile} />
     </div>
   );
 }
 
-function Visual({ kind, theme }: { kind: string; theme: Theme }) {
-  if (kind === "product") {
+function Visual({ kind, theme, isMobile }: { kind: string; theme: Theme; isMobile?: boolean }) {
+  // 1. Audio Waveform Player
+  if (kind === "waveform" || kind === "audio-card") {
+    const bars = [18, 35, 55, 24, 70, 95, 45, 80, 60, 30, 85, 100, 50, 75, 40, 90, 65, 35, 20];
     return (
       <div
-        className="p-4 min-h-[220px]"
+        className="p-5"
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.line}`,
+          borderRadius: theme.radius || "16px",
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <span
+              className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold"
+              style={{ background: theme.accent, color: theme.accentFg }}
+            >
+              ▶
+            </span>
+            <div>
+              <div className="text-[12px] font-medium leading-tight">Meeting Note #04</div>
+              <div className="text-[10px] opacity-70" style={{ color: theme.muted }}>
+                01:42 / 04:15 · Captured 10m ago
+              </div>
+            </div>
+          </div>
+          <span
+            className="rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider font-semibold"
+            style={{ background: theme.line, color: theme.fg }}
+          >
+            AI Summary
+          </span>
+        </div>
+
+        {/* Waveform graphic */}
+        <div className="flex h-16 items-center gap-1 px-1">
+          {bars.map((height, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-full transition-all"
+              style={{
+                height: `${height}%`,
+                background: i < 8 ? theme.accent : theme.line,
+                opacity: i < 8 ? 1 : 0.6,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="mt-4 pt-3 flex items-center justify-between border-t border-line text-[11px]">
+          <span style={{ color: theme.muted }}>“Synthesized 3 action items and blockers.”</span>
+          <span className="font-medium text-[10px]" style={{ color: theme.accent }}>
+            View Transcript →
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Device / App Card Mockup
+  if (kind === "device-mockup" || kind === "product") {
+    return (
+      <div
+        className="p-4"
         style={{
           background: theme.surface,
           border: `1px solid ${theme.line}`,
           borderRadius: theme.radius,
         }}
       >
-        <div className="flex gap-1.5 mb-4">
-          <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
-          <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
-          <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
+        <div className="flex items-center justify-between border-b pb-2 mb-3" style={{ borderColor: theme.line }}>
+          <div className="flex gap-1.5">
+            <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
+            <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
+            <i className="block w-2 h-2 rounded-full" style={{ background: theme.line }} />
+          </div>
+          <span className="text-[9px] tracking-wider uppercase opacity-60">Preview</span>
         </div>
-        <div className="h-3 w-1/3 mb-3 rounded" style={{ background: theme.fg, opacity: 0.85 }} />
-        <div className="h-2 w-2/3 mb-6 rounded" style={{ background: theme.line }} />
-        <div className="grid grid-cols-3 gap-2">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-16 rounded"
-              style={{ background: i === 1 ? theme.accent : theme.line, opacity: i === 1 ? 1 : 0.7 }}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-  if (kind === "grid") {
-    return (
-      <div className="grid grid-cols-3 grid-rows-3 gap-2 min-h-[220px]">
-        {Array.from({ length: 9 }).map((_, i) => (
+        <div className="h-3 w-1/3 mb-2 rounded" style={{ background: theme.fg, opacity: 0.85 }} />
+        <div className="h-2 w-2/3 mb-4 rounded" style={{ background: theme.line }} />
+        <div className="grid grid-cols-2 gap-2.5">
           <div
-            key={i}
-            style={{
-              background: i === 4 ? theme.accent : i % 2 === 0 ? theme.fg : theme.line,
-              opacity: i === 4 ? 1 : i % 2 === 0 ? 0.9 : 0.55,
-            }}
-          />
-        ))}
+            className="p-3 rounded"
+            style={{ background: theme.bg, border: `1px solid ${theme.line}` }}
+          >
+            <div className="text-[10px] opacity-70 mb-1">Status</div>
+            <div className="text-[12px] font-semibold" style={{ color: theme.accent }}>Active Sync</div>
+          </div>
+          <div
+            className="p-3 rounded"
+            style={{ background: theme.bg, border: `1px solid ${theme.line}` }}
+          >
+            <div className="text-[10px] opacity-70 mb-1">Throughput</div>
+            <div className="text-[12px] font-semibold">99.8%</div>
+          </div>
+        </div>
       </div>
     );
   }
+
+  // 3. Bento Grid Visual
+  if (kind === "bento" || kind === "grid") {
+    return (
+      <div className="grid grid-cols-2 gap-3 min-h-[200px]">
+        <div
+          className="p-4 flex flex-col justify-end"
+          style={{
+            background: theme.surface,
+            border: `1px solid ${theme.line}`,
+            borderRadius: theme.radius,
+          }}
+        >
+          <div className="text-[20px] font-medium leading-none mb-1">4.9/5</div>
+          <div className="text-[10px]" style={{ color: theme.muted }}>User Rating</div>
+        </div>
+        <div
+          className="p-4 flex flex-col justify-between"
+          style={{
+            background: theme.accent,
+            color: theme.accentFg,
+            borderRadius: theme.radius,
+          }}
+        >
+          <span className="text-[10px] uppercase tracking-wider font-semibold">Live Mode</span>
+          <span className="text-[13px] font-medium">Real-time inference</span>
+        </div>
+      </div>
+    );
+  }
+
   if (kind === "gradient") {
     return (
       <div
-        className="min-h-[220px]"
+        className="min-h-[200px]"
         style={{
           borderRadius: theme.radius,
-          background: `radial-gradient(120% 90% at 20% 10%, ${theme.accent} 0%, transparent 42%), radial-gradient(90% 80% at 90% 80%, ${theme.fg} 0%, ${theme.bg} 55%)`,
+          background: `radial-gradient(120% 90% at 20% 10%, ${theme.accent} 0%, transparent 45%), radial-gradient(90% 80% at 90% 80%, ${theme.fg} 0%, ${theme.bg} 55%)`,
         }}
       />
     );
   }
+
   return (
-    <div className="relative min-h-[220px]">
+    <div className="relative min-h-[200px]">
       <div
         className="absolute inset-4"
         style={{ background: theme.fg, opacity: 0.92, borderRadius: theme.radius }}
@@ -251,13 +422,16 @@ function Visual({ kind, theme }: { kind: string; theme: Theme }) {
   );
 }
 
-function Stats({ section, theme }: { section: Section; theme: Theme }) {
+function Stats({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const items = (section.items as { value: string; label: string }[]) || [];
   return (
-    <div className="grid grid-cols-4 px-8 py-8" style={{ borderTop: `1px solid ${theme.line}` }}>
+    <div
+      className={`grid ${isMobile ? "grid-cols-2 gap-4 px-6 py-6" : "grid-cols-4 px-8 py-8"}`}
+      style={{ borderTop: `1px solid ${theme.line}` }}
+    >
       {items.map((item) => (
         <div key={item.label}>
-          <div className="text-[22px] tracking-tight">{item.value}</div>
+          <div className="text-[20px] sm:text-[22px] tracking-tight">{item.value}</div>
           <div className="text-[10px] uppercase tracking-[0.16em] mt-1" style={{ color: theme.muted }}>
             {item.label}
           </div>
@@ -267,24 +441,27 @@ function Stats({ section, theme }: { section: Section; theme: Theme }) {
   );
 }
 
-function Features({ section, theme }: { section: Section; theme: Theme }) {
-  const items = (section.items as { title: string; body: string }[]) || [];
+function Features({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
+  const items = (section.items as { title: string; body: string; tag?: string }[]) || [];
+  const layout = String(section.layout || (isMobile ? "cards" : "minimal-cols"));
+
   return (
-    <div className="px-8 py-10" style={{ borderTop: `1px solid ${theme.line}` }}>
+    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-10"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
       <h2
-        className="text-[28px] leading-tight mb-8 max-w-[18ch]"
+        className={`${isMobile ? "text-[24px]" : "text-[28px]"} leading-tight mb-6 max-w-[20ch]`}
         style={{ fontFamily: "var(--font-fraunces), serif" }}
       >
         {String(section.title || "")}
       </h2>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "md:grid-cols-3 gap-6"}`}>
         {items.map((item) => (
-          <div key={item.title} className="pr-4">
-            <div
-              className="w-8 h-[2px] mb-4"
-              style={{ background: theme.accent }}
-            />
-            <div className="text-[15px] mb-2">{item.title}</div>
+          <div
+            key={item.title}
+            className={layout === "cards" ? "p-4 rounded-xl border border-line" : "pr-4"}
+            style={layout === "cards" ? { background: theme.surface, borderRadius: theme.radius } : undefined}
+          >
+            <div className="w-8 h-[2px] mb-3" style={{ background: theme.accent }} />
+            <div className="text-[14px] sm:text-[15px] font-medium mb-1.5">{item.title}</div>
             <div className="text-[12px] leading-relaxed" style={{ color: theme.muted }}>
               {item.body}
             </div>
@@ -295,14 +472,14 @@ function Features({ section, theme }: { section: Section; theme: Theme }) {
   );
 }
 
-function Gallery({ section, theme }: { section: Section; theme: Theme }) {
+function Gallery({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const items = (section.items as string[]) || ["A", "B", "C", "D"];
   return (
-    <div className="px-8 py-10" style={{ borderTop: `1px solid ${theme.line}` }}>
+    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-10"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
       <h2 className="text-[22px] mb-6" style={{ fontFamily: "var(--font-fraunces), serif" }}>
         {String(section.title || "Selected")}
       </h2>
-      <div className="grid grid-cols-4 gap-3">
+      <div className={`grid ${isMobile ? "grid-cols-2 gap-2.5" : "grid-cols-4 gap-3"}`}>
         {items.map((item, i) => (
           <div key={item} className="aspect-[3/4] p-3 flex items-end" style={{ background: i % 2 ? theme.fg : theme.accent, color: theme.bg }}>
             <span className="text-[11px]">{item}</span>
@@ -313,14 +490,14 @@ function Gallery({ section, theme }: { section: Section; theme: Theme }) {
   );
 }
 
-function Testimonials({ section, theme }: { section: Section; theme: Theme }) {
+function Testimonials({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const items = (section.items as { quote: string; name: string; role: string }[]) || [];
   return (
-    <div className="px-8 py-10" style={{ borderTop: `1px solid ${theme.line}` }}>
+    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-10"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
       <h2 className="text-[22px] mb-6" style={{ fontFamily: "var(--font-fraunces), serif" }}>
         {String(section.title || "")}
       </h2>
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className={`grid ${isMobile ? "grid-cols-1 gap-3.5" : "md:grid-cols-3 gap-4"}`}>
         {items.map((item) => (
           <div
             key={item.name}
@@ -339,14 +516,14 @@ function Testimonials({ section, theme }: { section: Section; theme: Theme }) {
   );
 }
 
-function Pricing({ section, theme }: { section: Section; theme: Theme }) {
+function Pricing({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const plans = (section.plans as { name: string; price: string; period?: string; features: string[] }[]) || [];
   return (
-    <div className="px-8 py-10" style={{ borderTop: `1px solid ${theme.line}` }}>
+    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-10"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
       <h2 className="text-[22px] mb-6" style={{ fontFamily: "var(--font-fraunces), serif" }}>
         {String(section.title || "")}
       </h2>
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className={`grid ${isMobile ? "grid-cols-1 gap-3.5" : "md:grid-cols-3 gap-4"}`}>
         {plans.map((plan, i) => (
           <div
             key={plan.name}

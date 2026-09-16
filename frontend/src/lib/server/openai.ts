@@ -28,19 +28,19 @@ Return ONLY a valid JSON object matching this schema:
     "surface": "#hex (card/container surface)",
     "fontDisplay": "serif|sans",
     "radius": "0px|8px|16px|24px",
-    "mood": "warm|minimal|editorial|noir|citrus|coastal|swiss",
-    "heroVisual": "editorial|product|gradient|grid"
+    "mood": "warm|minimal|editorial|noir|citrus|coastal|swiss|cyber",
+    "heroVisual": "waveform|audio-card|device-mockup|editorial|product|gradient|grid|bento"
   },
   "nav": {
     "logo": "Brand Name",
-    "links": ["About", "Work", "Pricing", "Contact"],
+    "links": ["About", "Features", "Pricing", "Contact"],
     "cta": "Primary Action"
   },
   "sections": [
-    // Include 4 to 6 relevant sections matching the requested format:
+    // Include 4 to 6 relevant, varied sections matching the requested format:
     // For WEBSITE / LANDING / PORTFOLIO:
-    // - {"kind": "hero", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "editorial|product|gradient|grid"}
-    // - {"kind": "features", "title": "...", "items": [{"title": "...", "body": "..."}]}
+    // - {"kind": "hero", "layout": "split|centered|bento", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "waveform|audio-card|device-mockup|editorial|product|gradient|grid|bento"}
+    // - {"kind": "features", "layout": "cards|minimal-cols|bento", "title": "...", "items": [{"title": "...", "body": "...", "tag": "..."}]}
     // - {"kind": "gallery", "title": "Selected Works", "items": [{"caption": "...", "tag": "..."}]}
     // - {"kind": "testimonials", "title": "...", "items": [{"quote": "...", "name": "...", "role": "..."}]}
     // - {"kind": "pricing", "title": "...", "plans": [{"name": "Starter", "price": "$19", "period": "/mo", "features": ["..."]}]}
@@ -68,7 +68,10 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "type", "display": "Fraunces Serif", "body": "Figtree Sans"}
   ]
 }
-Always ensure high color contrast, tasteful typography, and specific human copy without filler or emojis.
+Design Diversity Rules:
+- Choose visuals that match the user's domain: If audio/music/voice, use 'waveform' or 'audio-card'. If SaaS/software, use 'device-mockup' or 'product'. If agency/creative, use 'editorial' or 'bento'.
+- Varied layouts: Use centered hero when appropriate, card-based or bento features rather than only plain columns.
+- Ensure high contrast, specific human copy, and tailored aesthetics without repetitive filler.
 `;
 
 export async function generateWithOpenAI(prompt: string, format: string): Promise<DesignDoc> {

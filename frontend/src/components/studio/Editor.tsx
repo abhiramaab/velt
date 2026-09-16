@@ -117,11 +117,13 @@ export function Editor({ id }: { id: string }) {
           <div className="flex flex-1 items-start justify-center overflow-auto bg-[linear-gradient(#d8d0c4_1px,transparent_1px),linear-gradient(90deg,#d8d0c4_1px,transparent_1px)] bg-[size:28px_28px] p-8">
             {project ? (
               <div
-                className="frame-shadow overflow-hidden rounded-[20px] border border-line bg-paper"
-                style={{ width: width * scale, height: device === "mobile" ? 720 * 0.82 : undefined }}
+                className={`frame-shadow rounded-[24px] border border-line bg-paper ${
+                  device === "mobile" ? "max-h-[82vh] overflow-y-auto" : "overflow-hidden"
+                }`}
+                style={{ width: width * scale }}
               >
                 <div className="origin-top-left" style={{ width, transform: `scale(${scale})` }}>
-                  <PrototypeRenderer doc={project.design.document} />
+                  <PrototypeRenderer doc={project.design.document} device={device} />
                 </div>
               </div>
             ) : (
