@@ -410,3 +410,73 @@ html {
   transform: translateY(0) scale(1);
   filter: blur(0px);
 }
+
+/* Bento Mascot & Micro-UI Animations */
+@keyframes mascotBob {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes mascotBlink {
+  0%, 90%, 100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes mascotWave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+.animate-mascot-bob {
+  animation: mascotBob 3.6s ease-in-out infinite;
+}
+
+.animate-mascot-blink {
+  transform-origin: center;
+  animation: mascotBlink 4s infinite;
+}
+
+.animate-mascot-wave {
+  transform-origin: bottom center;
+  animation: mascotWave 2s ease-in-out infinite;
+}
+
+.animate-float-card {
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

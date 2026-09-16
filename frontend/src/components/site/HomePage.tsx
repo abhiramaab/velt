@@ -401,140 +401,394 @@ function NeedCol({ label, svg, animClass = "" }: { label: string; svg: ReactNode
 }
 
 function ModernByDefault() {
- const [tab, setTab] = useState(0);
- const [chat, setChat] = useState(0);
- const tabs = ["Website", "Ads", "Post", "Graphic", "Marketing"];
- const tabImgs = ["/showcases/s1.jpg", "/showcases/s7.jpg", "/showcases/s6.jpg", "/showcases/s3.jpg", "/showcases/s8.jpg"];
+  const [activeFormat, setActiveFormat] = useState("Website");
+  const [chatStep, setChatStep] = useState(0);
 
- useEffect(() => {
- const t = setInterval(() => setChat((c) => (c + 1) % 3), 2800);
- return () => clearInterval(t);
- }, []);
+  const formats = [
+    { name: "Website", icon: "🌐", tag: "Landing page", desc: "Clean responsive web pages" },
+    { name: "Ads", icon: "📣", tag: "Display & Social ads", desc: "High CTR ad creatives" },
+    { name: "Post", icon: "📱", tag: "Social media", desc: "Instagram & X square layouts" },
+    { name: "Graphic", icon: "🎨", tag: "Editorial & Vector", desc: "Posters, flyers & illustrations" },
+    { name: "Marketing", icon: "📊", tag: "Conversion decks", desc: "Pitch slides & one-pagers" },
+  ];
 
- return (
- <section id="how" className="mx-auto max-w-[980px] px-5 py-8 sm:px-10">
- <h2 className="font-lastik text-center text-[30px] leading-[1.15] text-[#2d2d2d] sm:text-[44px]">
- Modern designs by default.
- </h2>
- <p className="mx-auto mt-4 max-w-[560px] text-center text-[16px] text-slate-600 sm:text-[19px]">
- Make modern, conversion-ready visuals instantly, then refine every color, layout, and message through chat.
- </p>
+  useEffect(() => {
+    const t = setInterval(() => setChatStep((s) => (s + 1) % 3), 3200);
+    return () => clearInterval(t);
+  }, []);
 
- <div className="mt-14 grid gap-5 md:grid-cols-2">
- <article className="overflow-hidden rounded-[22px] border border-slate-200 bg-[#F7F8FA] p-6 sm:p-8">
- <h3 className="font-lastik text-[28px] leading-tight text-[#1a1a1a] sm:text-[34px]">
- From prompt
- <br />
- to polished design
- </h3>
- <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-slate-600 ">
- Describe what you need in your own words and watch your idea come to life instantly with the right audience,
- offer, and mood.
- </p>
- <img src="/showcases/s1.jpg" alt="" className="mt-6 rounded-xl border border-slate-200 " />
- </article>
+  return (
+    <section id="how" className="mx-auto max-w-[1040px] px-5 py-12 sm:px-10">
+      <div className="text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/70 px-3 py-1 text-xs font-semibold tracking-wide text-amber-800">
+          ✨ Playful & High-Fidelity
+        </span>
+        <h2 className="font-lastik mt-3 text-center text-[32px] leading-[1.12] text-[#202020] sm:text-[46px]">
+          Modern designs by default.
+        </h2>
+        <p className="mx-auto mt-3 max-w-[580px] text-center text-[16px] text-slate-600 sm:text-[18px]">
+          Generate bespoke layouts with AI, then shape every detail, color, and character in real-time.
+        </p>
+      </div>
 
- <article className="overflow-hidden rounded-[22px] border border-slate-200 bg-[#F7F8FA] p-6 sm:p-8">
- <h3 className="font-lastik text-[28px] leading-tight text-[#1a1a1a] sm:text-[34px]">
- Edit your design
- <br />
- through chat.
- </h3>
- <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-slate-600 ">
- Ask to write a headline, change a layout, update a button, or turn the same idea into marketing assets.
- </p>
- <div className="mt-6 space-y-3">
- {chat >= 0 ? (
- <div className="flex justify-end">
- <div className="max-w-[85%] rounded-2xl bg-slate-900 px-4 py-3 text-[13px] text-white ">
- Add some trust badges under the headline
- </div>
- </div>
- ) : null}
- {chat >= 1 ? (
- <div className="flex justify-start">
- <div className="max-w-[85%] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-700 ">
- Done! Added trust badges to build more credibility.
- </div>
- </div>
- ) : null}
- {chat >= 2 ? (
- <div className="flex justify-end">
- <div className="max-w-[85%] rounded-2xl bg-slate-900 px-4 py-3 text-[13px] text-white ">
- Make the hero a little warmer.
- </div>
- </div>
- ) : null}
- </div>
- </article>
+      <div className="mt-12 grid gap-6 md:grid-cols-2">
+        {/* Card 1: From prompt to polished design (Lavender Card with Mascot) */}
+        <article className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-purple-200/70 bg-gradient-to-br from-[#F5F0FF] via-[#F8F5FF] to-[#EDE5FF] p-7 transition-all duration-300 hover:shadow-xl hover:shadow-purple-100 sm:p-9">
+          <div className="relative z-10">
+            <div className="flex items-start justify-between">
+              <span className="inline-block rounded-full bg-purple-200/70 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-purple-800">
+                Instant Creation
+              </span>
+              {/* Cute purple blob mascot */}
+              <div className="animate-mascot-bob">
+                <svg width="68" height="68" viewBox="0 0 100 100" fill="none" className="drop-shadow-md">
+                  <path
+                    d="M20,50 C20,25 35,15 50,15 C65,15 80,25 80,50 C80,75 68,85 50,85 C32,85 20,75 20,50 Z"
+                    fill="#9333EA"
+                  />
+                  {/* Cheeks */}
+                  <ellipse cx="32" cy="55" rx="5" ry="3" fill="#C084FC" opacity="0.6" />
+                  <ellipse cx="68" cy="55" rx="5" ry="3" fill="#C084FC" opacity="0.6" />
+                  {/* Blinking eyes */}
+                  <g className="animate-mascot-blink">
+                    <circle cx="38" cy="46" r="4.5" fill="#FFFFFF" />
+                    <circle cx="40" cy="45" r="1.8" fill="#1E1B4B" />
+                    <circle cx="62" cy="46" r="4.5" fill="#FFFFFF" />
+                    <circle cx="64" cy="45" r="1.8" fill="#1E1B4B" />
+                  </g>
+                  {/* Happy Smile */}
+                  <path d="M44,56 Q50,63 56,56" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+            </div>
 
- <article className="overflow-hidden rounded-[22px] border border-slate-200 bg-[#F7F8FA] p-6 sm:p-8 md:col-span-2">
- <h3 className="font-lastik text-[28px] leading-tight text-[#1a1a1a] sm:text-[34px]">
- Designs that adapt
- <br />
- to every format.
- </h3>
- <p className="mt-3 max-w-md text-[14px] text-slate-600 ">
- Go from a simple prompt to ready-to-share assets built for web, mobile, and more.
- </p>
- <div className="mt-5 flex flex-wrap gap-2">
- {tabs.map((t, i) => (
- <button
- key={t}
- onClick={() => setTab(i)}
- className={`rounded-full px-3 py-1.5 text-[13px] font-medium transition ${
- tab === i
- ? "bg-slate-900 text-white "
- : "bg-white text-slate-600 ring-1 ring-slate-200 hover:"
- }`}
- >
- {t}
- </button>
- ))}
- </div>
- <img src={tabImgs[tab]} alt="" className="mt-5 max-h-[420px] w-full rounded-xl border border-slate-200 object-cover object-top" />
- </article>
+            <h3 className="font-lastik mt-3 text-[28px] leading-[1.15] text-[#221738] sm:text-[34px]">
+              From prompt<br />to polished design.
+            </h3>
+            <p className="mt-2.5 max-w-sm text-[14px] leading-relaxed text-purple-950/70">
+              Describe what you need in plain words. Velt instantly creates balanced typography, visual hierarchy, and production assets.
+            </p>
+          </div>
 
- <article className="overflow-hidden rounded-[22px] bg-[#111] p-6 text-white sm:p-8">
- <h3 className="font-lastik text-[28px] leading-tight sm:text-[34px]">
- Made to convert,
- <br />
- not just look nice.
- </h3>
- <p className="mt-3 max-w-sm text-[14px] text-white/70 ">
- Smart visual hierarchy, sharper messaging, and layouts that guide people to the next click.
- </p>
- <img src="/showcases/s8.jpg" alt="" className="mt-6 rounded-xl opacity-95" />
- </article>
+          {/* Interactive Micro-UI: Prompt Box transforming to Design Card */}
+          <div className="relative mt-8 rounded-2xl border border-purple-200/80 bg-white/90 p-4 shadow-sm backdrop-blur transition-all duration-300 group-hover:border-purple-300">
+            <div className="flex items-center gap-2 text-xs font-semibold text-purple-900">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-[10px] text-white">✨</span>
+              <span>Prompt:</span>
+              <span className="font-mono text-[11px] text-purple-600">"Editorial brand identity for organic tea"</span>
+            </div>
+            
+            <div className="mt-3 flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-purple-400">
+                <path d="M12 4v16m0 0l-5-5m5 5l5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
 
- <article className="overflow-hidden rounded-[22px] border border-slate-200 bg-[#F7F8FA] p-6 sm:p-8">
- <h3 className="font-lastik text-[28px] leading-tight text-[#1a1a1a] sm:text-[34px]">
- Keep everything
- <br />
- on-brand.
- </h3>
- <p className="mt-3 max-w-sm text-[14px] text-slate-600 ">
- Bring in your colors and assets so every generated design feels like it belongs to you.
- </p>
- <div className="mt-8 flex h-24 overflow-hidden rounded-2xl">
- {["#F3EEE4", "#171411", "#00A5EF", "#2F5D4A", "#C4A574"].map((c) => (
- <div key={c} className="flex-1" style={{ background: c }} />
- ))}
- </div>
- </article>
- </div>
+            <div className="mt-3 overflow-hidden rounded-xl border border-purple-100 bg-[#FAF7F2] p-4 text-slate-800">
+              <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-purple-900/60 font-semibold">
+                <span>OCHA TEA · KYOTO</span>
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] text-emerald-800">Ready</span>
+              </div>
+              <p className="font-lastik mt-2 text-lg font-medium leading-tight text-[#2D241E]">
+                Stillness in every harvest.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="rounded-full bg-[#2D241E] px-3 py-1 text-[10px] font-semibold text-white">Explore blends</span>
+                <span className="text-[10px] font-medium text-slate-500">Edition 04</span>
+              </div>
+            </div>
+          </div>
+        </article>
 
- <p className="mt-10 text-center text-[13px] font-medium uppercase tracking-[0.18em] text-slate-400 ">
- buttery workflow
- </p>
- <h3 className="font-lastik mt-2 text-center text-[28px] text-[#2d2d2d] sm:text-[36px]">
- Fast enough to feel playful.
- </h3>
- <p className="mx-auto mt-3 max-w-md text-center text-slate-600 ">
- Generate, react, refine, and ship while your idea still feels exciting.
- </p>
- </section>
- );
+        {/* Card 2: Edit your design through chat (Soft Cyan Card with Blue Mascot) */}
+        <article className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-sky-200/70 bg-gradient-to-br from-[#F0F8FF] via-[#F4FAFF] to-[#E6F3FF] p-7 transition-all duration-300 hover:shadow-xl hover:shadow-sky-100 sm:p-9">
+          <div className="relative z-10">
+            <div className="flex items-start justify-between">
+              <span className="inline-block rounded-full bg-sky-200/70 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-sky-800">
+                Chat Refinement
+              </span>
+              {/* Cute blue blob mascot */}
+              <div className="animate-mascot-bob" style={{ animationDelay: "0.8s" }}>
+                <svg width="68" height="68" viewBox="0 0 100 100" fill="none" className="drop-shadow-md">
+                  <path
+                    d="M25,45 C20,25 35,15 50,15 C65,15 80,25 75,45 C70,70 65,85 50,85 C35,85 30,70 25,45 Z"
+                    fill="#0284C7"
+                  />
+                  {/* Cheeks */}
+                  <ellipse cx="32" cy="52" rx="4" ry="2.5" fill="#38BDF8" opacity="0.7" />
+                  <ellipse cx="68" cy="52" rx="4" ry="2.5" fill="#38BDF8" opacity="0.7" />
+                  {/* Eyes */}
+                  <g className="animate-mascot-blink">
+                    <circle cx="38" cy="44" r="4.5" fill="#FFFFFF" />
+                    <circle cx="40" cy="44" r="2" fill="#0C4A6E" />
+                    <circle cx="62" cy="44" r="4.5" fill="#FFFFFF" />
+                    <circle cx="64" cy="44" r="2" fill="#0C4A6E" />
+                  </g>
+                  {/* Waving hand */}
+                  <path d="M75,55 C85,50 88,40 85,35" stroke="#0284C7" strokeWidth="5" strokeLinecap="round" className="animate-mascot-wave" />
+                  {/* Cute curved mouth */}
+                  <path d="M46,55 Q50,60 54,55" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 className="font-lastik mt-3 text-[28px] leading-[1.15] text-[#0C3247] sm:text-[34px]">
+              Edit your design<br />through chat.
+            </h3>
+            <p className="mt-2.5 max-w-sm text-[14px] leading-relaxed text-sky-950/70">
+              Direct the AI like a senior art director. Tweak typography, shift color accents, or restructure layouts with simple feedback.
+            </p>
+          </div>
+
+          {/* Interactive Chat Bubble Sequence */}
+          <div className="relative mt-8 space-y-2.5 rounded-2xl border border-sky-200/80 bg-white/80 p-4 shadow-sm backdrop-blur">
+            <div className={`transition-all duration-300 ${chatStep >= 0 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+              <div className="flex justify-end">
+                <div className="rounded-2xl rounded-tr-sm bg-sky-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-sm">
+                  "Make the headline bolder and add warm ceramic accents"
+                </div>
+              </div>
+            </div>
+
+            <div className={`transition-all duration-300 ${chatStep >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+              <div className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-[11px] text-white font-bold">V</div>
+                <div className="rounded-2xl rounded-tl-sm border border-sky-200 bg-white px-4 py-2.5 text-[13px] text-slate-800 shadow-sm">
+                  Done! Switched to Fraunces Serif and terracotta color palette.
+                </div>
+              </div>
+            </div>
+
+            <div className={`transition-all duration-300 ${chatStep >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
+              <div className="flex justify-end">
+                <div className="rounded-2xl rounded-tr-sm bg-sky-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-sm">
+                  "Now adapt this as an Instagram story card"
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/* Card 3: Designs that adapt to every format (Warm Sand Full Width Bento Card) */}
+        <article className="group relative overflow-hidden rounded-[28px] border border-amber-200/70 bg-gradient-to-br from-[#FCF9F3] via-[#FAF6ED] to-[#F3ECE0] p-7 transition-all duration-300 hover:shadow-xl hover:shadow-amber-100 md:col-span-2 sm:p-9">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between">
+            <div>
+              <span className="inline-block rounded-full bg-amber-200/70 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
+                Multi-Format Engine
+              </span>
+              <h3 className="font-lastik mt-3 text-[28px] leading-[1.15] text-[#2F2418] sm:text-[36px]">
+                Designs that adapt to every format.
+              </h3>
+              <p className="mt-2 max-w-md text-[14px] text-amber-950/70">
+                One prompt powers websites, mobile apps, social posts, posters, and pitch decks with coherent brand logic.
+              </p>
+            </div>
+
+            {/* Interactive Format Pills */}
+            <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
+              {formats.map((f) => (
+                <button
+                  key={f.name}
+                  onClick={() => setActiveFormat(f.name)}
+                  className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all ${
+                    activeFormat === f.name
+                      ? "bg-amber-900 text-white shadow-sm"
+                      : "bg-white/80 text-amber-900/80 ring-1 ring-amber-200 hover:bg-white"
+                  }`}
+                >
+                  <span>{f.icon}</span>
+                  <span>{f.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Central Node / Hub visualization */}
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-amber-200/80 bg-white/90 p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Canvas</span>
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                  {activeFormat}
+                </span>
+              </div>
+              <p className="font-lastik mt-2 text-xl font-medium text-slate-900">
+                {activeFormat === "Website" && "Responsive Landing Hero"}
+                {activeFormat === "Ads" && "High-Conversion Banner"}
+                {activeFormat === "Post" && "Instagram Carousel 1:1"}
+                {activeFormat === "Graphic" && "Swiss Modernist Poster"}
+                {activeFormat === "Marketing" && "Investor Deck Slide"}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {formats.find((f) => f.name === activeFormat)?.desc}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-amber-200/80 bg-white/90 p-5 shadow-sm">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber-700">Adaptive Layout</div>
+              <p className="font-lastik mt-2 text-xl font-medium text-slate-900">Smart Breakpoints</p>
+              <p className="mt-1 text-xs text-slate-500">
+                Reflows fluidly from 320px mobile viewports up to 4K ultra-wide monitors.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-amber-200/80 bg-white/90 p-5 shadow-sm">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber-700">Export & Share</div>
+              <p className="font-lastik mt-2 text-xl font-medium text-slate-900">Instant Code & Asset</p>
+              <p className="mt-1 text-xs text-slate-500">
+                Export to clean Tailwind React components or download high-res PNG/SVG.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        {/* Card 4: Made to convert (Mint Green Card with Mascot & Conversion Chart) */}
+        <article className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-emerald-200/70 bg-gradient-to-br from-[#F0FBF5] via-[#F4FCF8] to-[#E5F7EE] p-7 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-100 sm:p-9">
+          <div className="relative z-10">
+            <div className="flex items-start justify-between">
+              <span className="inline-block rounded-full bg-emerald-200/70 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+                Conversion Focus
+              </span>
+              {/* Cute emerald blob mascot */}
+              <div className="animate-mascot-bob" style={{ animationDelay: "1.4s" }}>
+                <svg width="68" height="68" viewBox="0 0 100 100" fill="none" className="drop-shadow-md">
+                  <path
+                    d="M30,30 C15,45 15,65 30,80 C50,90 70,85 80,70 C90,50 85,30 65,20 C50,15 38,20 30,30 Z"
+                    fill="#059669"
+                  />
+                  {/* Cheeks */}
+                  <ellipse cx="38" cy="56" rx="4" ry="2.5" fill="#6EE7B7" opacity="0.6" />
+                  <ellipse cx="68" cy="54" rx="4" ry="2.5" fill="#6EE7B7" opacity="0.6" />
+                  {/* Eyes */}
+                  <g className="animate-mascot-blink">
+                    <circle cx="44" cy="46" r="4.5" fill="#FFFFFF" />
+                    <circle cx="46" cy="45" r="2" fill="#064E3B" />
+                    <circle cx="64" cy="44" r="4.5" fill="#FFFFFF" />
+                    <circle cx="66" cy="43" r="2" fill="#064E3B" />
+                  </g>
+                  {/* Big smile */}
+                  <path d="M48,58 Q56,66 64,57" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 className="font-lastik mt-3 text-[28px] leading-[1.15] text-[#0A3D2D] sm:text-[34px]">
+              Made to convert,<br />not just look nice.
+            </h3>
+            <p className="mt-2.5 max-w-sm text-[14px] leading-relaxed text-emerald-950/70">
+              Clear visual hierarchy, strategic CTAs, and scannable sections that guide users effortlessly to the next step.
+            </p>
+          </div>
+
+          {/* Micro-UI: Interactive Conversion Graph & Stat Badge */}
+          <div className="mt-8 rounded-2xl border border-emerald-200/80 bg-white/90 p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">Visitor Engagement</span>
+                <div className="mt-1 text-2xl font-bold text-slate-900">+34.8%</div>
+              </div>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                ↗ Top 5%
+              </span>
+            </div>
+
+            {/* Sparkline Bar Visualization */}
+            <div className="mt-4 flex items-end gap-2 h-16 pt-2">
+              {[35, 48, 42, 60, 55, 78, 92, 100].map((val, idx) => (
+                <div key={idx} className="flex-1 flex flex-col items-center gap-1 group/bar">
+                  <div
+                    className="w-full rounded-t-md bg-emerald-500/80 transition-all duration-300 group-hover/bar:bg-emerald-600"
+                    style={{ height: `${val}%` }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 flex justify-between text-[10px] text-slate-400">
+              <span>Week 1</span>
+              <span>After Velt Redesign</span>
+            </div>
+          </div>
+        </article>
+
+        {/* Card 5: Keep everything on-brand (Soft Violet Card with Brand Palette) */}
+        <article className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-rose-200/70 bg-gradient-to-br from-[#FFF5F5] via-[#FFF9F9] to-[#FFEFEF] p-7 transition-all duration-300 hover:shadow-xl hover:shadow-rose-100 sm:p-9">
+          <div className="relative z-10">
+            <div className="flex items-start justify-between">
+              <span className="inline-block rounded-full bg-rose-200/70 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-rose-800">
+                Design System
+              </span>
+              {/* Cute rose blob mascot */}
+              <div className="animate-mascot-bob" style={{ animationDelay: "2s" }}>
+                <svg width="68" height="68" viewBox="0 0 100 100" fill="none" className="drop-shadow-md">
+                  <path
+                    d="M25,50 C25,25 40,20 55,20 C70,20 85,30 80,60 C75,80 60,85 45,85 C30,85 25,75 25,50 Z"
+                    fill="#E11D48"
+                  />
+                  {/* Cheeks */}
+                  <ellipse cx="38" cy="55" rx="4" ry="2.5" fill="#FDA4AF" opacity="0.7" />
+                  <ellipse cx="68" cy="55" rx="4" ry="2.5" fill="#FDA4AF" opacity="0.7" />
+                  {/* Eyes with wink */}
+                  <g className="animate-mascot-blink">
+                    <circle cx="44" cy="46" r="4.5" fill="#FFFFFF" />
+                    <circle cx="46" cy="45" r="2" fill="#4C0519" />
+                    {/* Winking right eye */}
+                    <path d="M62,47 Q67,42 72,47" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" fill="none" />
+                  </g>
+                  {/* Smile */}
+                  <path d="M48,60 Q54,66 62,60" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 className="font-lastik mt-3 text-[28px] leading-[1.15] text-[#38111A] sm:text-[34px]">
+              Keep everything<br />on-brand.
+            </h3>
+            <p className="mt-2.5 max-w-sm text-[14px] leading-relaxed text-rose-950/70">
+              Lock in your exact typography, border radiuses, and hex codes. Every generated asset will feel inherently yours.
+            </p>
+          </div>
+
+          {/* Micro-UI: Interactive Swatch & Tokens Stack */}
+          <div className="mt-8 rounded-2xl border border-rose-200/80 bg-white/90 p-5 shadow-sm">
+            <div className="flex items-center justify-between text-xs font-semibold text-rose-900">
+              <span>Primary Palette</span>
+              <span className="text-[10px] text-slate-400">Tokens synced</span>
+            </div>
+            
+            <div className="mt-3 grid grid-cols-5 gap-2">
+              {[
+                { hex: "#171411", name: "Ink" },
+                { hex: "#C24E1D", name: "Terracotta" },
+                { hex: "#0284C7", name: "Sky" },
+                { hex: "#059669", name: "Mint" },
+                { hex: "#F3EEE4", name: "Linen" },
+              ].map((swatch) => (
+                <div key={swatch.hex} className="group/swatch text-center">
+                  <div
+                    className="h-10 w-full rounded-lg shadow-inner ring-1 ring-black/10 transition-transform group-hover/swatch:scale-105"
+                    style={{ background: swatch.hex }}
+                  />
+                  <span className="mt-1 block text-[10px] font-mono text-slate-500">{swatch.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div className="mt-16 text-center">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+          Crafted for speed & delight
+        </p>
+        <h3 className="font-lastik mt-2 text-[30px] text-[#202020] sm:text-[38px]">
+          Fast enough to feel playful.
+        </h3>
+        <p className="mx-auto mt-2.5 max-w-md text-slate-600 text-[15px]">
+          Generate, react, refine, and ship while your creative momentum is still high.
+        </p>
+      </div>
+    </section>
+  );
 }
 
 function Pricing() {
