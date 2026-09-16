@@ -35,8 +35,8 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
  : "border-black/10 bg-white/90 text-slate-900"
  }`}
  >
- <Link href="/" className={`font-lastik text-[21px] tracking-[-0.02em] transition-opacity hover:opacity-90 sm:text-[23px] ${inverse ? "text-white" : "text-slate-900"}`}>
- velt
+ <Link href="/" className="transition-opacity hover:opacity-90">
+ <Logo className={`text-[21px] sm:text-[23px] ${inverse ? "text-white" : "text-slate-900"}`} inverse={inverse} />
  </Link>
  <div className={`hidden items-center justify-center gap-6 text-[14px] font-medium sm:flex lg:gap-8 lg:text-[15px] ${inverse ? "text-white/90" : "text-slate-700"}`}>
  <Link href="/#how" className="transition-opacity hover:opacity-100 hover:text-white">

@@ -24,6 +24,11 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Velt — AI Design Generator",
   description: "Describe what you want, and we handle the rest. From idea to stunning design in seconds.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
