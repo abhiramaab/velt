@@ -139,16 +139,21 @@ export async function refineWithOpenAI(currentDoc: DesignDoc, message: string): 
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.7,
+        temperature: 0.8,
         response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
-            content: `${SYSTEM_PROMPT}\nYou are revising an existing design document. Keep the schema intact. Apply the user's refinement tastefully to the palette, copy, or sections.`,
+            content: `${SYSTEM_PROMPT}
+You are an expert AI design director. You are revising or completely reimagining a design document based on user feedback.
+IMPORTANT RULES FOR REFINEMENT:
+- If the user asks for a "different design", "change design", "redesign", or specifies a new theme/vibe/layout, DO NOT just return the same sections or layout. Radically change the palette, typography, visual hierarchy, section arrangements, and components!
+- For Dashboards: Support diverse dashboard architectures (e.g. dark telemetry with live sparklines, light minimalist analytics, sidebar nav vs top nav, activity feeds, modular bento cards, status badges).
+- Always return a complete, valid DesignDoc JSON adhering strictly to the schema.`,
           },
           {
             role: "user",
-            content: `Current Design JSON:\n${JSON.stringify(currentDoc)}\n\nUser request:\n${message}`,
+            content: `Current Design:\n${JSON.stringify(currentDoc)}\n\nUser Revision Request:\n${message}\n\nDeliver the revised DesignDoc JSON.`,
           },
         ],
       }),

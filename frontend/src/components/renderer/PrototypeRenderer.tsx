@@ -891,45 +891,99 @@ function Kpis({ section, theme }: { section: Section; theme: Theme }) {
 }
 
 function Chart({ section, theme }: { section: Section; theme: Theme }) {
-  const bars = [40, 55, 48, 70, 62, 80, 76, 90, 84, 96];
+  const series = Array.isArray(section.series) && section.series.length > 0
+    ? (section.series as number[])
+    : [28, 45, 38, 65, 52, 78, 70, 92, 85, 98];
+  const max = Math.max(...series, 100);
+
   return (
-    <div className="px-6 py-4">
-      <div className="text-[15px] mb-1">{String(section.title || "")}</div>
-      <div className="text-[11px] mb-4" style={{ color: theme.muted }}>
-        {String(section.caption || "")}
+    <div className="px-6 py-5">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="text-[15px] font-medium">{String(section.title || "Metrics Overview")}</div>
+          <div className="text-[11px]" style={{ color: theme.muted }}>
+            {String(section.caption || "Dynamic metric trajectory")}
+          </div>
+        </div>
+        <span
+          className="text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold"
+          style={{ background: theme.surface, color: theme.accent, border: `1px solid ${theme.line}` }}
+        >
+          Live
+        </span>
       </div>
-      <div className="flex items-end gap-2 h-32">
-        {bars.map((h, i) => (
-          <div
-            key={i}
-            className="flex-1"
-            style={{
-              height: `${h}%`,
-              background: i === bars.length - 1 ? theme.accent : theme.fg,
-              opacity: i === bars.length - 1 ? 1 : 0.18,
-              borderRadius: "4px 4px 0 0",
-            }}
-          />
-        ))}
+      <div
+        className="p-4 rounded-xl flex items-end gap-2.5 h-36"
+        style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+      >
+        {series.map((val, i) => {
+          const heightPct = Math.max(12, Math.min(100, (val / max) * 100));
+          const isLatest = i === series.length - 1;
+          return (
+            <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
+              <div
+                className="w-full transition-all duration-300 rounded-t"
+                style={{
+                  height: `${heightPct}%`,
+                  background: isLatest ? theme.accent : theme.fg,
+                  opacity: isLatest ? 1 : 0.22,
+                }}
+              />
+              <span className="text-[9px] opacity-60 truncate">{val}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 function Table({ section, theme }: { section: Section; theme: Theme }) {
+  const headers = Array.isArray(section.headers) ? (section.headers as string[]) : ["Item", "Status", "Value"];
   const rows = (section.rows as string[][]) || [];
+
   return (
     <div className="px-6 py-5">
-      <div className="text-[15px] mb-3">{String(section.title || "")}</div>
-      <div style={{ border: `1px solid ${theme.line}`, borderRadius: theme.radius }}>
+      <div className="text-[15px] font-medium mb-3">{String(section.title || "Recent Activity")}</div>
+      <div
+        className="overflow-hidden"
+        style={{ border: `1px solid ${theme.line}`, borderRadius: theme.radius, background: theme.surface }}
+      >
+        {headers.length > 0 && (
+          <div
+            className="grid px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider opacity-70"
+            style={{
+              gridTemplateColumns: `repeat(${headers.length}, minmax(0, 1fr))`,
+              background: theme.bg,
+              borderBottom: `1px solid ${theme.line}`,
+            }}
+          >
+            {headers.map((h) => (
+              <span key={h}>{h}</span>
+            ))}
+          </div>
+        )}
         {rows.map((row, i) => (
           <div
             key={i}
-            className="grid grid-cols-3 px-4 py-3 text-[12px]"
-            style={{ borderTop: i ? `1px solid ${theme.line}` : undefined }}
+            className="grid px-4 py-3 text-[12px] items-center"
+            style={{
+              gridTemplateColumns: `repeat(${headers.length || row.length}, minmax(0, 1fr))`,
+              borderTop: i ? `1px solid ${theme.line}` : undefined,
+            }}
           >
-            {row.map((cell) => (
-              <span key={cell}>{cell}</span>
+            {row.map((cell, cIdx) => (
+              <span
+                key={cIdx}
+                className={cIdx === row.length - 1 ? "font-medium" : undefined}
+                style={
+                  cell.toLowerCase() === "completed" || cell.toLowerCase() === "active" || cell.toLowerCase() === "paid"
+                    ? { color: theme.accent, fontWeight: 600 }
+                    : undefined
+                }
+              >
+                {cell}
+              </span>
             ))}
           </div>
         ))}
