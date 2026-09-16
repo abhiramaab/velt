@@ -5,7 +5,7 @@ import { refineWithOpenAI } from "@/lib/server/openai";
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await props.params;
-    const project = getProject(id);
+    const project = await getProject(id);
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
@@ -41,7 +41,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       createdAt: now,
     });
 
-    saveProject(project);
+    await saveProject(project);
 
     return NextResponse.json({
       project,

@@ -4,7 +4,8 @@ import { generateWithOpenAI } from "@/lib/server/openai";
 import type { ProjectDetail } from "@/lib/api";
 
 export async function GET() {
-  return NextResponse.json(getProjectSummaries());
+  const summaries = await getProjectSummaries();
+  return NextResponse.json(summaries);
 }
 
 export async function POST(req: Request) {
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
       owner: DEMO_USER,
     };
 
-    saveProject(project);
+    await saveProject(project);
 
     return NextResponse.json({
       project,

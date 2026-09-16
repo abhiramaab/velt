@@ -19,11 +19,26 @@ export function Editor({ id }: { id: string }) {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace("/login");
-      return;
+    let active = true;
+    async function init() {
+      if (!getToken()) {
+        try {
+          const auth = await velt.login("creator@velt.design", "guest123");
+          saveSession(auth.token, auth.user);
+        } catch {
+          // continue
+        }
+      }
+      velt.project(id).then((p) => {
+        if (active) setProject(p);
+      }).catch(() => {
+        if (active) router.replace("/studio");
+      });
     }
-    velt.project(id).then(setProject).catch(() => router.replace("/studio"));
+    init();
+    return () => {
+      active = false;
+    };
   }, [id, router]);
 
   useEffect(() => {
