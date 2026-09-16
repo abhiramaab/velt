@@ -121,117 +121,132 @@ function Hero() {
  }
 
  return (
- <section className="hero-sky relative mx-auto flex min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pb-20 pt-28 sm:px-8 sm:py-28 text-white">
-  {/* 4K Daylight Landscape: Compact cherry blossom tree on far left, wide open clear sky */}
-  <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" />
+    <section className="hero-sky relative mx-auto flex min-h-[90svh] sm:min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pt-24 pb-12 sm:px-8 sm:py-28 text-white">
+      {/* 4K Daylight Landscape: Compact cherry blossom tree on far left, wide open clear sky */}
+      <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" />
 
- {/* Drifting animated cherry blossom petals */}
- <SakuraPetals />
+      {/* Drifting animated cherry blossom petals */}
+      <SakuraPetals />
 
- {/* Deep azure blue top wash for crystal-clear white text contrast */}
- <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#0b387e]/35 via-[#1d59b3]/10 to-transparent" />
+      {/* Deep azure blue top wash for crystal-clear white text contrast */}
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#0b387e]/45 via-[#1d59b3]/15 to-transparent sm:from-[#0b387e]/35 sm:via-[#1d59b3]/10" />
 
- <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center justify-center text-center">
- {/* Eyebrow Pill */}
- <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/25 px-4 py-1 text-[12px] font-semibold text-white backdrop-blur-md shadow-sm">
- <span>AI Design Intelligence for Builders & Creators</span>
- </div>
+      <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center justify-center text-center">
+        {/* Eyebrow Pill */}
+        <div className="mb-3 sm:mb-4 inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/25 px-3.5 py-1 text-[11px] sm:text-[12px] font-semibold text-white backdrop-blur-md shadow-sm">
+          <span>AI Design Intelligence for Builders & Creators</span>
+        </div>
 
- {/* Main Headline */}
- <h1
- className="animate-slide-down text-center text-white"
- style={{
- fontFamily: "var(--font-lastik), 'EB Garamond', Times, serif",
- fontSize: "clamp(52px, 9.2vw, 86px)",
- fontWeight: 600,
- lineHeight: 1.05,
- letterSpacing: "-0.03em",
- textShadow: "0 4px 24px rgba(5, 30, 80, 0.6), 0 1px 3px rgba(0, 15, 50, 0.8)",
- margin: 0,
- }}
- >
- Velt
- </h1>
+        {/* Main Headline */}
+        <h1
+          className="animate-slide-down text-center text-white"
+          style={{
+            fontFamily: "var(--font-lastik), 'EB Garamond', Times, serif",
+            fontSize: "clamp(46px, 9.2vw, 86px)",
+            fontWeight: 600,
+            lineHeight: 1.05,
+            letterSpacing: "-0.03em",
+            textShadow: "0 4px 24px rgba(5, 30, 80, 0.6), 0 1px 3px rgba(0, 15, 50, 0.8)",
+            margin: 0,
+          }}
+        >
+          Velt
+        </h1>
 
- {/* Subtitle */}
- <p className="mt-3.5 max-w-[580px] px-2 text-[17px] font-medium leading-[1.5] text-white sm:mt-4 sm:text-[22px] [text-shadow:0_2px_14px_rgba(5,25,70,0.65),0_1px_3px_rgba(0,15,50,0.85)]">
- Describe what you want, and we handle the rest.
- <br className="hidden sm:inline" />
- {" "}From idea to stunning design in seconds.
- </p>
+        {/* Subtitle */}
+        <p className="mt-2.5 sm:mt-4 max-w-[340px] sm:max-w-[580px] px-2 text-[15px] sm:text-[22px] font-medium leading-[1.45] text-white [text-shadow:0_2px_14px_rgba(5,25,70,0.65),0_1px_3px_rgba(0,15,50,0.85)]">
+          Describe what you want, and we handle the rest.
+          <br className="hidden sm:inline" />
+          {" "}From idea to stunning design in seconds.
+        </p>
 
- {/* Prompt Card */}
- <div className="relative mt-8 flex w-full min-w-0 max-w-[670px] cursor-text flex-col justify-between overflow-visible rounded-2xl border border-white/80 bg-white/95 p-3 text-slate-800 shadow-[0_20px_60px_rgba(0,40,110,0.25)] backdrop-blur-md transition-all sm:mt-10 sm:rounded-[20px] sm:p-4 min-h-[118px] sm:min-h-[128px]">
- <textarea
- value={prompt}
- onChange={(e) => setPrompt(e.target.value)}
- onKeyDown={(e) => {
- if (e.key === "Enter" && !e.shiftKey) {
- e.preventDefault();
- go();
- }
- }}
- placeholder="Describe what you want to build..."
- className="w-full resize-none bg-transparent px-1 pt-1 text-[15px] font-normal leading-relaxed text-slate-800 outline-none placeholder:text-slate-400 sm:text-[16.5px]"
- rows={2}
- />
- 
- <div className="flex items-center justify-between gap-2 pt-2">
- {/* Format Dropdown Button */}
- <div className="relative" ref={menuRef}>
- <button
- type="button"
- onClick={() => setOpen((v) => !v)}
- className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-normal text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:text-[14px]"
- >
- <Monitor className="size-4 text-slate-500" />
- <span className="truncate">{format.label}</span>
- <ChevronDown className="size-3.5 text-slate-400" />
- </button>
- 
- {open ? (
- <div className="absolute bottom-11 left-0 z-40 w-[270px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white py-2 shadow-[0_20px_50px_rgba(15,23,42,0.18)]">
- <div className="max-h-[320px] overflow-y-auto">
- {FORMAT_GROUPS.map((group) => (
- <div key={group} className="px-1.5 pb-1">
- <div className="px-3 pb-1 pt-2 text-[10.5px] font-bold uppercase tracking-[0.12em] text-slate-400">
- {group}
- </div>
- {FORMATS.filter((f) => f.group === group).map((f) => (
- <button
- key={f.id}
- onClick={() => {
- setFormat(f);
- setOpen(false);
- }}
- className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13.5px] transition ${
- format.id === f.id ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
- }`}
- >
- <f.icon className="size-4 text-slate-500" />
- {f.label}
- </button>
- ))}
- </div>
- ))}
- </div>
- </div>
- ) : null}
- </div>
+        {/* Prompt Card */}
+        <div className="relative mt-6 sm:mt-10 flex w-full min-w-0 max-w-[670px] cursor-text flex-col justify-between overflow-visible rounded-2xl border border-white/90 bg-white/95 p-3 sm:p-4 text-slate-800 shadow-[0_16px_50px_rgba(0,35,90,0.22)] backdrop-blur-xl transition-all sm:rounded-[20px] min-h-[114px] sm:min-h-[128px]">
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                go();
+              }
+            }}
+            placeholder="Describe what you want to build..."
+            className="w-full resize-none bg-transparent px-1 pt-1 text-[14.5px] font-normal leading-relaxed text-slate-800 outline-none placeholder:text-slate-400 sm:text-[16.5px]"
+            rows={2}
+          />
+          
+          <div className="flex items-center justify-between gap-2 pt-2">
+            {/* Format Dropdown Button */}
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[13px] font-normal text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:text-[14px]"
+              >
+                <Monitor className="size-4 text-slate-500" />
+                <span className="truncate">{format.label}</span>
+                <ChevronDown className="size-3.5 text-slate-400" />
+              </button>
+              
+              {open ? (
+                <div className="absolute bottom-11 left-0 z-40 w-[min(280px,85vw)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white py-2 shadow-[0_20px_50px_rgba(15,23,42,0.18)]">
+                  <div className="max-h-[320px] overflow-y-auto">
+                    {FORMAT_GROUPS.map((group) => (
+                      <div key={group} className="px-1.5 pb-1">
+                        <div className="px-3 pb-1 pt-2 text-[10.5px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                          {group}
+                        </div>
+                        {FORMATS.filter((f) => f.group === group).map((f) => (
+                          <button
+                            key={f.id}
+                            onClick={() => {
+                              setFormat(f);
+                              setOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-[13.5px] transition ${
+                              format.id === f.id ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            <f.icon className="size-4 text-slate-500" />
+                            {f.label}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
 
- {/* Circular Blue Arrow Submit Button */}
- <button
- type="button"
- aria-label="Submit"
- onClick={go}
- className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-400/80 bg-white text-sky-500 shadow-sm transition hover:bg-sky-50 hover:border-sky-500 active:scale-95 sm:h-10 sm:w-10"
- >
- <ArrowUp className="size-4 sm:size-4.5" strokeWidth={2.2} />
- </button>
- </div>
- </div>
- </div>
- </section>
+            {/* Circular Blue Arrow Submit Button */}
+            <button
+              type="button"
+              aria-label="Submit"
+              onClick={go}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-400/80 bg-white text-sky-500 shadow-sm transition hover:bg-sky-50 hover:border-sky-500 active:scale-95 sm:h-10 sm:w-10"
+            >
+              <ArrowUp className="size-4 sm:size-4.5" strokeWidth={2.2} />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Quick Inspiration Pills */}
+        <div className="mt-3.5 flex flex-wrap items-center justify-center gap-1.5 text-[11.5px] sm:hidden">
+          <span className="mr-0.5 font-medium text-white/85 [text-shadow:0_1px_4px_rgba(0,15,50,0.6)]">Try:</span>
+          {["Modern SaaS", "Kyoto Cafe", "Editorial Portfolio"].map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => setPrompt(suggestion)}
+              className="rounded-full border border-white/40 bg-white/20 px-3 py-0.5 font-medium text-white shadow-sm backdrop-blur-md transition hover:bg-white/30 active:scale-95"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
  );
 }
 
