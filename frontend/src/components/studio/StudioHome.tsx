@@ -19,22 +19,54 @@ export function StudioHome() {
   const [stage, setStage] = useState("");
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace("/login");
-      return;
-    }
-    velt.me().then((u) => {
-      setUser(u);
-      saveSession(getToken()!, u);
-    }).catch(() => router.replace("/login"));
-    velt.projects().then(setProjects).catch(() => setProjects([]));
-  }, [router]);
+    let active = true;
+    async function init() {
+      let token = getToken();
+      if (!token) {
+        try {
+          const auth = await velt.login("creator@velt.design", "guest123");
+          if (!active) return;
+          saveSession(auth.token, auth.user);
+          setUser(auth.user);
+          token = auth.token;
+        } catch {
+          if (active) router.replace("/login");
+          return;
+        }
+      } else {
+        velt.me().then((u) => {
+          if (active) {
+            setUser(u);
+            saveSession(token!, u);
+          }
+        }).catch(() => {
+          if (active) router.replace("/login");
+        });
+      }
 
-  async function compose() {
-    if (!prompt.trim()) return;
+      velt.projects().then((p) => {
+        if (active) setProjects(p);
+      }).catch(() => {
+        if (active) setProjects([]);
+      });
+
+      const qPrompt = params.get("prompt");
+      const qFormat = params.get("format") || "website";
+      if (qPrompt && qPrompt.trim()) {
+        composeWith(qPrompt.trim(), qFormat);
+      }
+    }
+    init();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function composeWith(text: string, fmt: string) {
+    if (!text.trim()) return;
     setBusy(true);
     setError("");
-    const stages = ["Setting type", "Mixing a palette", "Composing the grid", "Writing the close"];
+    const stages = ["Consulting ChatGPT", "Setting type", "Mixing a palette", "Composing the grid"];
     let i = 0;
     setStage(stages[0]);
     const tick = setInterval(() => {
@@ -42,7 +74,7 @@ export function StudioHome() {
       setStage(stages[i]);
     }, 700);
     try {
-      const res = await velt.create(prompt.trim(), format);
+      const res = await velt.create(text.trim(), fmt);
       saveSession(getToken()!, { ...res.project.owner, credits: res.creditsRemaining });
       router.push(`/studio/${res.project.id}`);
     } catch (err) {
@@ -52,6 +84,10 @@ export function StudioHome() {
       setBusy(false);
       setStage("");
     }
+  }
+
+  async function compose() {
+    await composeWith(prompt, format);
   }
 
   return (

@@ -23,7 +23,7 @@ import {
  type LucideIcon,
 } from "lucide-react";
 import { FORMATS as ALL_FORMATS } from "@/lib/design";
-import { getToken } from "@/lib/api";
+import { getToken, saveSession, velt } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
 import { SAMPLES } from "@/lib/samples";
 import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
@@ -114,11 +114,19 @@ function Hero() {
  return () => window.removeEventListener("mousedown", close);
  }, [open]);
 
- function go() {
- const text = prompt.trim() || "A quiet ceramic studio in Kyoto, wabi-sabi, paper and warm clay";
- const q = `?prompt=${encodeURIComponent(text)}&format=${format.id}`;
- window.location.href = getToken() ? `/studio${q}` : `/signup${q}`;
- }
+  async function go() {
+    const text = prompt.trim() || "A quiet ceramic studio in Kyoto, wabi-sabi, paper and warm clay";
+    const q = `?prompt=${encodeURIComponent(text)}&format=${format.id}`;
+    if (!getToken()) {
+      try {
+        const res = await velt.login("creator@velt.design", "guest123");
+        saveSession(res.token, res.user);
+      } catch {
+        // ignore
+      }
+    }
+    window.location.href = `/studio${q}`;
+  }
 
  return (
     <section className="hero-sky relative mx-auto flex min-h-[90svh] sm:min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pt-24 pb-12 sm:px-8 sm:py-28 text-white">
