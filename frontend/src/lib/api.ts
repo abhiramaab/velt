@@ -1,6 +1,10 @@
 import type { DesignDoc } from "./design";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+// Always use relative URLs in the browser so requests stay on the same origin (HTTPS)
+export const API_URL =
+  typeof window !== "undefined"
+    ? ""
+    : process.env.NEXT_PUBLIC_API_URL || "";
 
 export type User = {
   id: string;
