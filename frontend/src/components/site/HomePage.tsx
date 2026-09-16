@@ -124,7 +124,7 @@ function Hero() {
     <section className="hero-sky relative mx-auto flex min-h-[90svh] sm:min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pt-24 pb-12 sm:px-8 sm:py-28 text-white">
       {/* 4K Daylight Landscape: Responsive portrait on mobile, ultra-wide landscape on desktop */}
       <picture>
-        <source media="(max-width: 639px)" srcSet="/hero-day-mobile.jpg?v=1" />
+        <source media="(max-width: 639px)" srcSet="/hero-day-mobile.jpg?v=2" />
         <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" />
       </picture>
 
