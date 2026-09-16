@@ -154,6 +154,66 @@ function Block({
 function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
   const visual = String(section.visual || theme.heroVisual || "editorial");
   const layout = String(section.layout || (isMobile ? "centered" : "split"));
+  const heroImage = section.image as string | undefined;
+
+  // Editorial Cover / Full-bleed Magazine spread (AURELI / LUMEN / Bühler style)
+  if (layout === "editorial-cover" || layout === "magazine") {
+    return (
+      <div className="relative overflow-hidden">
+        <div className={`relative ${isMobile ? "min-h-[360px] p-6" : "min-h-[460px] p-10 sm:p-14"} flex flex-col justify-between`}>
+          {heroImage && (
+            <div className="absolute inset-0 z-0">
+              <img src={heroImage} alt="" className="h-full w-full object-cover brightness-[0.92]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </div>
+          )}
+          <div className="relative z-10 flex items-start justify-between">
+            {section.kicker ? (
+              <span className="inline-block rounded-full bg-white/90 backdrop-blur px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black">
+                {String(section.kicker)}
+              </span>
+            ) : <span />}
+            {Boolean(section.meta) && (
+              <span className="text-[11px] uppercase tracking-widest text-white/80 font-mono">
+                {String(section.meta)}
+              </span>
+            )}
+          </div>
+
+          <div className="relative z-10 mt-auto max-w-2xl pt-16">
+            <h1
+              className={`${
+                isMobile ? "text-[34px]" : "text-[54px] sm:text-[64px]"
+              } leading-[0.96] tracking-[-0.035em] text-white font-medium`}
+              style={{ fontFamily: theme.fontDisplay === "serif" ? "var(--font-fraunces), serif" : "var(--font-figtree), sans-serif" }}
+            >
+              {String(section.headline || "")}
+            </h1>
+            <p className="mt-4 text-[15px] leading-relaxed text-white/85 max-w-lg">
+              {String(section.sub || "")}
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              <span
+                className="px-5 py-2.5 text-[12px] font-semibold uppercase tracking-wider transition shadow-lg cursor-pointer"
+                style={{
+                  background: theme.accent,
+                  color: theme.accentFg,
+                  borderRadius: theme.radius || "4px",
+                }}
+              >
+                {String(section.cta || "Discover")}
+              </span>
+              {Boolean(section.secondary) && (
+                <span className="text-[12px] text-white/90 underline underline-offset-4 font-medium cursor-pointer">
+                  {String(section.secondary)}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (layout === "centered") {
     return (
@@ -182,7 +242,7 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
         </p>
         <div className="flex flex-wrap gap-3 items-center justify-center mb-10">
           <span
-            className="px-5 py-2.5 text-[12px] font-medium transition shadow-sm"
+            className="px-5 py-2.5 text-[12px] font-medium transition shadow-sm cursor-pointer"
             style={{
               background: theme.accent,
               color: theme.accentFg,
@@ -197,8 +257,8 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
             </span>
           ) : null}
         </div>
-        <div className="w-full max-w-[580px]">
-          <Visual kind={visual} theme={theme} isMobile={isMobile} />
+        <div className="w-full max-w-[620px]">
+          <Visual kind={visual} theme={theme} isMobile={isMobile} image={heroImage} />
         </div>
       </div>
     );
@@ -235,7 +295,7 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
         </p>
         <div className="flex flex-wrap gap-3 items-center">
           <span
-            className="px-4 py-2 text-[12px] font-medium"
+            className="px-4 py-2 text-[12px] font-medium transition shadow-sm cursor-pointer"
             style={{
               background: theme.accent,
               color: theme.accentFg,
@@ -251,12 +311,41 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
           ) : null}
         </div>
       </div>
-      <Visual kind={visual} theme={theme} isMobile={isMobile} />
+      <Visual kind={visual} theme={theme} isMobile={isMobile} image={heroImage} />
     </div>
   );
 }
 
-function Visual({ kind, theme, isMobile }: { kind: string; theme: Theme; isMobile?: boolean }) {
+function Visual({
+  kind,
+  theme,
+  isMobile,
+  image,
+}: {
+  kind: string;
+  theme: Theme;
+  isMobile?: boolean;
+  image?: string;
+}) {
+  // If an image URL is supplied, render high-editorial frame
+  if (image) {
+    return (
+      <div
+        className="overflow-hidden shadow-sm"
+        style={{
+          borderRadius: theme.radius || "8px",
+          border: `1px solid ${theme.line}`,
+        }}
+      >
+        <img
+          src={image}
+          alt=""
+          className="w-full object-cover max-h-[360px] transition-transform duration-500 hover:scale-[1.02]"
+        />
+      </div>
+    );
+  }
+
   // 1. Audio Waveform Player
   if (kind === "waveform" || kind === "audio-card") {
     const bars = [18, 35, 55, 24, 70, 95, 45, 80, 60, 30, 85, 100, 50, 75, 40, 90, 65, 35, 20];
@@ -317,7 +406,38 @@ function Visual({ kind, theme, isMobile }: { kind: string; theme: Theme; isMobil
     );
   }
 
-  // 2. Device / App Card Mockup
+  // 2. Architecture / Swiss Grid Frame
+  if (kind === "architecture" || kind === "swiss") {
+    return (
+      <div
+        className="relative overflow-hidden p-6"
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.line}`,
+          borderRadius: theme.radius || "4px",
+        }}
+      >
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] mb-4 text-slate-500 font-mono">
+          <span>Plate 01 // Section</span>
+          <span className="font-bold text-red-600">PMS 185</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2 h-36">
+          <div className="col-span-2 rounded bg-slate-200 overflow-hidden relative">
+            <img src="/showcases/s3.jpg" alt="" className="w-full h-full object-cover object-center" />
+            <div className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-0.5 text-[9px] font-mono text-white">
+              Gstaad Library
+            </div>
+          </div>
+          <div className="flex flex-col justify-between p-3 rounded" style={{ background: theme.accent, color: theme.accentFg }}>
+            <span className="text-[10px] uppercase font-bold tracking-widest">Est. 2011</span>
+            <span className="font-mono text-xs font-semibold">ZÜRICH</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Device / App Card Mockup
   if (kind === "device-mockup" || kind === "product") {
     return (
       <div
@@ -358,7 +478,7 @@ function Visual({ kind, theme, isMobile }: { kind: string; theme: Theme; isMobil
     );
   }
 
-  // 3. Bento Grid Visual
+  // 4. Bento Grid Visual
   if (kind === "bento" || kind === "grid") {
     return (
       <div className="grid grid-cols-2 gap-3 min-h-[200px]">
@@ -473,18 +593,93 @@ function Features({ section, theme, isMobile }: { section: Section; theme: Theme
 }
 
 function Gallery({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
-  const items = (section.items as string[]) || ["A", "B", "C", "D"];
+  const rawItems = (section.items as unknown[]) || [];
+  const subtitle = section.subtitle ? String(section.subtitle) : undefined;
+  const layout = String(section.layout || (isMobile ? "grid-2" : "grid-3"));
+
   return (
-    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-10"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
-      <h2 className="text-[22px] mb-6" style={{ fontFamily: "var(--font-fraunces), serif" }}>
-        {String(section.title || "Selected")}
-      </h2>
-      <div className={`grid ${isMobile ? "grid-cols-2 gap-2.5" : "grid-cols-4 gap-3"}`}>
-        {items.map((item, i) => (
-          <div key={item} className="aspect-[3/4] p-3 flex items-end" style={{ background: i % 2 ? theme.fg : theme.accent, color: theme.bg }}>
-            <span className="text-[11px]">{item}</span>
-          </div>
-        ))}
+    <div className={`${isMobile ? "px-6 py-8" : "px-8 py-12"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
+        <div>
+          {Boolean(section.kicker) && (
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] mb-2 block" style={{ color: theme.accent }}>
+              {String(section.kicker)}
+            </span>
+          )}
+          <h2 className="text-[24px] sm:text-[30px] font-medium leading-tight" style={{ fontFamily: "var(--font-fraunces), serif" }}>
+            {String(section.title || "Selected Works")}
+          </h2>
+          {Boolean(subtitle) && (
+            <p className="text-[13px] mt-1.5 opacity-70 max-w-md" style={{ color: theme.muted }}>
+              {subtitle}
+            </p>
+          )}
+        </div>
+        <span className="mt-3 sm:mt-0 text-[11px] font-mono uppercase tracking-wider opacity-80 cursor-pointer" style={{ color: theme.accent }}>
+          View Archive →
+        </span>
+      </div>
+
+      <div className={`grid ${isMobile ? "grid-cols-1 sm:grid-cols-2 gap-4" : layout === "grid-2" ? "grid-cols-2 gap-6" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"}`}>
+        {rawItems.map((item, i) => {
+          if (typeof item === "string") {
+            return (
+              <div
+                key={i}
+                className="aspect-[4/3] rounded-lg p-5 flex flex-col justify-between overflow-hidden shadow-sm transition-transform duration-300 hover:-translate-y-1"
+                style={{ background: i % 2 ? theme.fg : theme.accent, color: theme.bg }}
+              >
+                <span className="text-[10px] font-mono tracking-widest uppercase opacity-70">Project 0{i + 1}</span>
+                <span className="text-[16px] font-medium">{item}</span>
+              </div>
+            );
+          }
+
+          const obj = item as { title?: string; tag?: string; image?: string; meta?: string; caption?: string };
+          return (
+            <div
+              key={i}
+              className="group overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg"
+              style={{
+                background: theme.surface,
+                borderColor: theme.line,
+                borderRadius: theme.radius || "12px",
+              }}
+            >
+              {obj.image ? (
+                <div className="aspect-[16/10] overflow-hidden relative">
+                  <img
+                    src={obj.image}
+                    alt={obj.title || ""}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {obj.tag && (
+                    <span className="absolute top-3 left-3 rounded-full bg-black/75 backdrop-blur px-2.5 py-0.5 text-[9px] uppercase tracking-wider text-white font-mono">
+                      {obj.tag}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="aspect-[16/10] p-4 flex flex-col justify-between"
+                  style={{ background: i % 2 === 0 ? theme.accent : theme.fg, color: theme.accentFg || theme.bg }}
+                >
+                  <span className="text-[9px] font-mono uppercase tracking-widest opacity-80">{obj.tag || `Case 0${i + 1}`}</span>
+                  <div className="font-display text-lg font-medium leading-snug">{obj.title || obj.caption}</div>
+                </div>
+              )}
+              <div className="p-4">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span>{obj.tag || "Editorial"}</span>
+                  <span>{obj.meta || "2026"}</span>
+                </div>
+                <h3 className="font-display mt-1.5 text-[17px] font-medium leading-snug" style={{ color: theme.fg }}>
+                  {obj.title || obj.caption || "Monograph"}
+                </h3>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

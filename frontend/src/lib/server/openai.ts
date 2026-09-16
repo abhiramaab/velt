@@ -38,10 +38,10 @@ Return ONLY a valid JSON object matching this schema:
   },
   "sections": [
     // Include 4 to 6 relevant, varied sections matching the requested format:
-    // For WEBSITE / LANDING / PORTFOLIO:
-    // - {"kind": "hero", "layout": "split|centered|bento", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "waveform|audio-card|device-mockup|editorial|product|gradient|grid|bento"}
+    // For WEBSITE / LANDING / PORTFOLIO / ARCHITECTURE / FASHION:
+    // - {"kind": "hero", "layout": "editorial-cover|split|centered|bento", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "architecture|swiss|editorial|waveform|audio-card|device-mockup|product|gradient|grid|bento", "meta": "Vol. 04 // 2026"}
     // - {"kind": "features", "layout": "cards|minimal-cols|bento", "title": "...", "items": [{"title": "...", "body": "...", "tag": "..."}]}
-    // - {"kind": "gallery", "title": "Selected Works", "items": [{"caption": "...", "tag": "..."}]}
+    // - {"kind": "gallery", "title": "Selected Works / Monograph", "subtitle": "...", "layout": "grid-2|grid-3", "items": [{"title": "Project Name", "tag": "Architecture|Fashion|Creative", "meta": "2026", "caption": "..."}]}
     // - {"kind": "testimonials", "title": "...", "items": [{"quote": "...", "name": "...", "role": "..."}]}
     // - {"kind": "pricing", "title": "...", "plans": [{"name": "Starter", "price": "$19", "period": "/mo", "features": ["..."]}]}
     // - {"kind": "cta", "headline": "...", "body": "...", "cta": "..."}
@@ -69,8 +69,8 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }
 Design Diversity Rules:
-- Choose visuals that match the user's domain: If audio/music/voice, use 'waveform' or 'audio-card'. If SaaS/software, use 'device-mockup' or 'product'. If agency/creative, use 'editorial' or 'bento'.
-- Varied layouts: Use centered hero when appropriate, card-based or bento features rather than only plain columns.
+- Choose visuals that match the user's domain: If architectural/spatial, use 'architecture' or 'swiss'. If audio/music/voice, use 'waveform' or 'audio-card'. If SaaS/software, use 'device-mockup' or 'product'. If agency/creative/fashion, use 'editorial', 'editorial-cover', or 'bento'.
+- Varied layouts: Use 'editorial-cover' for grand architectural/fashion websites, centered hero when appropriate, card-based or bento features rather than only plain columns.
 - Ensure high contrast, specific human copy, and tailored aesthetics without repetitive filler.
 `;
 
