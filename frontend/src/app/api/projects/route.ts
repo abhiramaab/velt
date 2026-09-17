@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getProjectSummaries, saveProject } from "@/lib/server/storage";
 import { generateWithOpenAI } from "@/lib/server/openai";
 import { extractAuthUser } from "@/lib/server/jwt";
+import { checkAndConsumeLimit } from "@/lib/server/ratelimit";
 import type { ProjectDetail, User } from "@/lib/api";
 
 export async function GET(req: Request) {
@@ -29,6 +30,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
+    // Rate Limit Check per user plan (Admin bypasses)
+    const rateStatus = checkAndConsumeLimit(authUser.email, authUser.plan || "free");
+    if (!rateStatus.allowed) {
+      return NextResponse.json(
+        {
+          error: `Monthly generation limit reached for your ${rateStatus.planName} plan (${rateStatus.limit} designs/mo). Please upgrade your plan to continue generating.`,
+          code: "RATE_LIMIT_EXCEEDED",
+          limit: rateStatus.limit,
+          remaining: 0,
+        },
+        { status: 429 }
+      );
+    }
+
     const designDoc = await generateWithOpenAI(prompt.trim(), format);
     const id = `proj_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = new Date().toISOString();
@@ -37,8 +52,8 @@ export async function POST(req: Request) {
       id: authUser.sub,
       name: authUser.name || authUser.email.split("@")[0] || "Creator",
       email: authUser.email,
-      plan: "Pro Studio",
-      credits: 50,
+      plan: rateStatus.planName,
+      credits: rateStatus.remaining,
     };
 
     const project: ProjectDetail = {

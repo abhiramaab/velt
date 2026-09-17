@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { DEMO_USER } from "@/lib/server/storage";
 import { signJwt } from "@/lib/server/jwt";
+import { getUserUsage } from "@/lib/server/ratelimit";
 
 export async function POST(req: Request) {
   try {
@@ -16,17 +17,39 @@ export async function POST(req: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+
+    // Master Admin account: abhiram.b@icloud.com with Abhi60@123
+    let plan = "Free Trial";
+    let credits = 3;
+    let name = cleanEmail.split("@")[0] || "Creator";
+
+    if (cleanEmail === "abhiram.b@icloud.com") {
+      if (password !== "Abhi60@123") {
+        return NextResponse.json({ error: "Invalid password for administrator account." }, { status: 401 });
+      }
+      plan = "Max Lifetime VIP";
+      credits = 999999;
+      name = "Abhiram (Admin)";
+    } else {
+      const usage = getUserUsage(cleanEmail, "Free Trial");
+      credits = usage.remaining;
+    }
+
     const user = {
       ...DEMO_USER,
       id: `usr_${Buffer.from(cleanEmail).toString("hex").slice(0, 16)}`,
       email: cleanEmail,
-      name: cleanEmail.split("@")[0] || "Creator",
+      name,
+      plan,
+      credits,
     };
 
     const token = signJwt({
       sub: user.id,
       email: user.email,
       name: user.name,
+      plan: user.plan,
+      credits: user.credits,
     });
 
     return NextResponse.json({

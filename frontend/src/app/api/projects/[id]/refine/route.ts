@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getProject, saveProject } from "@/lib/server/storage";
 import { refineWithOpenAI } from "@/lib/server/openai";
 import { extractAuthUser } from "@/lib/server/jwt";
+import { checkAndConsumeLimit } from "@/lib/server/ratelimit";
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
@@ -22,6 +23,20 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     const { message = "" } = await req.json();
     if (!message.trim()) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    // Rate limit check
+    const rateStatus = checkAndConsumeLimit(authUser.email, authUser.plan || "free");
+    if (!rateStatus.allowed) {
+      return NextResponse.json(
+        {
+          error: `Monthly generation limit reached for your ${rateStatus.planName} plan (${rateStatus.limit} requests/mo). Please upgrade your plan to continue.`,
+          code: "RATE_LIMIT_EXCEEDED",
+          limit: rateStatus.limit,
+          remaining: 0,
+        },
+        { status: 429 }
+      );
     }
 
     const refinedDoc = await refineWithOpenAI(project.design.document, message.trim());

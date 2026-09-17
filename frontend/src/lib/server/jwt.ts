@@ -24,6 +24,8 @@ export interface JwtPayload {
   sub: string;
   email: string;
   name?: string;
+  plan: string;
+  credits: number;
   iat: number;
   exp: number;
 }

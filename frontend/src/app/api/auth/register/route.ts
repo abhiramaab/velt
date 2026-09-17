@@ -24,13 +24,16 @@ export async function POST(req: Request) {
       id: `usr_${Buffer.from(cleanEmail).toString("hex").slice(0, 16)}`,
       email: cleanEmail,
       name: cleanName,
-      credits: 50,
+      plan: "Free Trial",
+      credits: 3,
     };
 
     const token = signJwt({
       sub: user.id,
       email: user.email,
       name: user.name,
+      plan: user.plan,
+      credits: user.credits,
     });
 
     return NextResponse.json({

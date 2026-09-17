@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Monitor, Smartphone, Tablet } from "lucide-react";
+import { Code2, Download, Monitor, Smartphone, Tablet } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ComposingOverlay } from "./StudioHome";
 import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
 import { getToken, saveSession, velt, type ProjectDetail } from "@/lib/api";
+import { generateExportBundle } from "@/lib/exportBundle";
 
 export function Editor({ id }: { id: string }) {
   const router = useRouter();
@@ -71,6 +72,18 @@ export function Editor({ id }: { id: string }) {
     URL.revokeObjectURL(url);
   }
 
+  function exportCode() {
+    if (!project) return;
+    const html = generateExportBundle(project.design.document);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${project.title.replace(/\s+/g, "-").toLowerCase()}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const width = device === "mobile" ? 390 : device === "tablet" ? 768 : 1280;
   const scale = device === "mobile" ? 0.82 : device === "tablet" ? 0.62 : 0.58;
 
@@ -105,8 +118,21 @@ export function Editor({ id }: { id: string }) {
                   </button>
                 ))}
               </div>
-              <button onClick={exportJson} className="rounded-full border border-line px-3 py-1.5 text-[12px]">
-                Export
+              <button
+                onClick={exportCode}
+                title="Download standalone HTML + Tailwind CSS (Ready for Shopify, WordPress, Wix, or Web)"
+                className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-paper hover:opacity-90"
+              >
+                <Code2 size={13} />
+                <span>Export Code</span>
+              </button>
+              <button
+                onClick={exportJson}
+                title="Export Velt JSON Specification"
+                className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[12px] text-muted hover:text-ink"
+              >
+                <Download size={13} />
+                <span>JSON</span>
               </button>
             </div>
           </header>
