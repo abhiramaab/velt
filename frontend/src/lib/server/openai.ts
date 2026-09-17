@@ -49,7 +49,7 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "footer", "copy": "...", "links": ["Privacy", "Terms", "Twitter"]}
 
     // For POSTER / FLYER:
-    // - {"kind": "poster", "kicker": "...", "title": "...", "sub": "...", "meta": "...", "year": "2026", "place": "..."}
+    // - {"kind": "poster", "layout": "swiss|brutalist|techno|minimal", "kicker": "...", "title": "...", "subtitle": "...", "meta": "...", "place": "...", "lineup": ["Artist A", "Artist B", "Artist C"]}
 
     // For APP:
     // - {"kind": "appbar", "title": "...", "subtitle": "..."}
@@ -79,8 +79,11 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }
 Design Diversity Rules:
-- Never repeat identical layouts across different domains! A crypto app MUST use trading_terminal and order_book. An ecommerce admin MUST use products_grid and orders table. A SaaS admin MUST use bento_analytics and growth telemetry.
-- Choose visuals that match the user's domain: If architectural/spatial, use 'architecture' or 'swiss'. If audio/music/voice, use 'waveform' or 'audio-card'. If SaaS/software, use 'device-mockup' or 'product'. If agency/creative/fashion, use 'editorial', 'editorial-cover', or 'bento'.
+- NEVER repeat identical templates! 
+  * A crypto prompt MUST use trading_terminal and order_book.
+  * An e-commerce prompt MUST use products_grid and customer orders table.
+  * An event/rave/techno poster MUST use layout="brutalist" with artist lineups and ticketed doors.
+  * A high-end architectural site MUST use layout="editorial-cover" with gallery monographs.
 - Ensure high contrast, specific human copy, and tailored aesthetics without repetitive filler.
 `;
 
@@ -99,8 +102,9 @@ export async function generateWithOpenAI(prompt: string, format: string): Promis
 - Theme Mode: ${triage.themeMode || "automatic"}
 - Visual Aesthetic: ${triage.uiStyle || "balanced"}
 - Domain Context: ${triage.domainContext || "custom"}
-- Dashboard Architecture: ${triage.dashboardVariant || "domain_tailored"}
-Respect these triage directives strictly! If domain is crypto_trading, generate trading_terminal and order_book. If ecommerce_store, generate products_grid and orders. Never generate generic filler.\n`;
+- Layout Archetype: ${triage.layoutArchetype || "custom"}
+- Hero Composition: ${triage.heroComposition || "editorial-cover"}
+Respect these triage directives strictly in the theme colors, typography, hero layout, and section choices! Never output generic filler.\n`;
   }
   userInstruction += `Compose a stunning, structurally unique design document JSON.`;
 

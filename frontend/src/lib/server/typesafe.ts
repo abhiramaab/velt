@@ -7,7 +7,8 @@ export interface DesignTriageResult {
   themeMode?: string;
   uiStyle?: string;
   domainContext?: string;
-  dashboardVariant?: string;
+  layoutArchetype?: string;
+  heroComposition?: string;
   confidence?: Record<string, number>;
 }
 
@@ -51,6 +52,7 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
               minimal_clean: "Whitespace-heavy, clean typography, Apple / Linear style minimalism",
               corporate_formal: "Traditional enterprise, trusted slate/blue, fintech/banking",
               editorial_luxury: "Serif typography, monograph, architecture or high fashion",
+              brutalist_bold: "Heavy black borders, high-contrast, large typography, stark raw grid",
             },
           },
           domain_context: {
@@ -58,20 +60,34 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
             instructions: "What exact industry or product domain is this interface built for?",
             criteria: {
               crypto_trading: "Crypto exchange, trading terminal, orderbook, candlestick charts, live pairs",
-              ecommerce_store: "Online store, merchant portal, products sold, revenue, orders, fulfilment",
+              ecommerce_store: "Online store, shop, merchant portal, products sold, revenue, orders",
               developer_devops: "API latency, cluster nodes, telemetry, logs, git commits, CI/CD pipelines",
               saas_analytics: "B2B SaaS, MRR, churn rate, subscriptions, active user cohorts, user growth",
-              generic_web: "Standard website, landing page, portfolio, or brand showcase",
+              fashion_architecture: "High fashion, luxury studio, architectural monograph, atelier, interior",
+              cultural_music_event: "Concert, festival, exhibition, film, club event, DJ set",
+              culinary_restaurant: "Artisan bakery, coffee roaster, seasonal dining, bespoke winery",
             },
           },
-          dashboard_variant: {
+          layout_archetype: {
             type: "choice",
-            instructions: "If this is an analytical/dashboard interface, what UI architecture is required?",
+            instructions: "What high-level visual structure should govern this entire document?",
             criteria: {
-              trading_terminal: "Candlestick / depth chart, live order book bids/asks, order entry execution, token pairs",
-              ecommerce_admin: "Revenue KPI cards, recent customer orders list, top selling products grid, return rate",
-              telemetry_metrics: "System latency, server uptime, CPU/Memory telemetry sparklines, error log stream",
-              saas_bento: "MRR / ARR counters, churn sparklines, user acquisition funnel, billing table",
+              editorial_monograph: "Full-bleed cover hero, monograph gallery, architectural grid, minimal text",
+              conversion_landing: "Headline with CTA, bento feature cards, testimonial wall, transparent pricing tiers",
+              interactive_terminal: "Live chart telemetry, orderbook or live execution feed, metric badges",
+              product_catalog: "Hero showcase, interactive product grid, order status, cart/checkout triggers",
+              swiss_poster: "Large display typography, brutalist geometric grid, venue/date meta badges",
+              mobile_app_flow: "Header bar, interactive action chips, live list cards, bottom tab bar",
+            },
+          },
+          hero_composition: {
+            type: "choice",
+            instructions: "How should the hero / header section be arranged?",
+            criteria: {
+              editorial_cover: "Grand full-bleed magazine cover with large typography over visual/gradient",
+              split_balanced: "Left-aligned copy with CTA button, right-aligned interactive graphic or mockups",
+              centered_minimal: "Centered high-impact headline, refined subtext, single prominent CTA",
+              bento_grid: "Modular bento box arrangement with key metrics and preview badges",
             },
           },
         },
@@ -91,13 +107,15 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
       themeMode: answers.theme_mode?.choice,
       uiStyle: answers.ui_style?.choice,
       domainContext: answers.domain_context?.choice,
-      dashboardVariant: answers.dashboard_variant?.choice,
+      layoutArchetype: answers.layout_archetype?.choice,
+      heroComposition: answers.hero_composition?.choice,
       confidence: {
         targetDevice: answers.target_device?.confidence,
         themeMode: answers.theme_mode?.confidence,
         uiStyle: answers.ui_style?.confidence,
         domainContext: answers.domain_context?.confidence,
-        dashboardVariant: answers.dashboard_variant?.confidence,
+        layoutArchetype: answers.layout_archetype?.confidence,
+        heroComposition: answers.hero_composition?.confidence,
       },
     };
   } catch (err) {

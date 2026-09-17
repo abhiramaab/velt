@@ -788,8 +788,103 @@ function Footer({ section, theme }: { section: Section; theme: Theme }) {
 }
 
 function Poster({ section, theme }: { section: Section; theme: Theme }) {
+  const layout = String(section.layout || "swiss");
+  const title = String(section.title || "Untitled Print");
+  const subtitle = String(section.subtitle || "");
+  const kicker = String(section.kicker || "Studio Edition");
+  const meta = String(section.meta || "Edition of 100");
+  const place = String(section.place || "Zurich · Berlin");
+  const lineup = Array.isArray(section.lineup) ? (section.lineup as string[]) : [];
+
+  // Brutalist / Techno / Event Poster
+  if (layout === "brutalist" || layout === "techno" || layout === "rave") {
+    return (
+      <div
+        className="relative min-h-[580px] p-8 flex flex-col justify-between overflow-hidden font-mono"
+        style={{ background: theme.bg, color: theme.fg, border: `2px solid ${theme.fg}` }}
+      >
+        <div className="flex items-center justify-between border-b-2 pb-3 uppercase text-[11px] font-bold" style={{ borderColor: theme.fg }}>
+          <span>{kicker}</span>
+          <span className="px-2 py-0.5" style={{ background: theme.accent, color: theme.accentFg }}>{meta}</span>
+        </div>
+
+        <div className="my-8">
+          <div className="text-[12px] uppercase opacity-70 tracking-widest mb-1">{place}</div>
+          <h1 className="text-[64px] sm:text-[80px] font-black uppercase tracking-tighter leading-[0.82] break-words">
+            {title}
+          </h1>
+          {subtitle && <p className="mt-4 text-[14px] uppercase max-w-[28ch] opacity-80 leading-snug">{subtitle}</p>}
+        </div>
+
+        {lineup.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 py-4 border-t border-b text-[12px] font-bold uppercase" style={{ borderColor: theme.fg }}>
+            {lineup.map((artist, idx) => (
+              <span key={idx}>+ {artist}</span>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-end justify-between pt-4 text-[10px] tracking-widest uppercase">
+          <div className="space-y-0.5">
+            <div>DOORS: 22:00</div>
+            <div>ENTRY: TICKETED</div>
+          </div>
+          <div className="font-bold text-[14px]" style={{ color: theme.accent }}>
+            NO PHOTOGRAPHY
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Geometric Swiss Grid
+  if (layout === "grid" || layout === "swiss") {
+    return (
+      <div
+        className="relative min-h-[560px] p-8 flex flex-col justify-between overflow-hidden"
+        style={{ background: theme.bg, color: theme.fg }}
+      >
+        <div className="grid grid-cols-3 gap-4 pb-4 border-b text-[11px] uppercase tracking-widest font-mono" style={{ borderColor: theme.line }}>
+          <span>{kicker}</span>
+          <span className="text-center">{place}</span>
+          <span className="text-right" style={{ color: theme.accent }}>{meta}</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-auto py-10 items-center">
+          <div className="md:col-span-8">
+            <h1
+              className="text-[64px] sm:text-[76px] leading-[0.88] tracking-[-0.04em] font-medium"
+              style={{ fontFamily: theme.fontDisplay === "serif" ? "var(--font-fraunces), serif" : "var(--font-figtree), sans-serif" }}
+            >
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="mt-5 text-[15px] max-w-[32ch] leading-relaxed" style={{ color: theme.muted }}>
+                {subtitle}
+              </p>
+            )}
+          </div>
+          <div className="md:col-span-4 flex flex-col items-center justify-center">
+            <div
+              className="w-32 h-32 rounded-full flex items-center justify-center text-[12px] font-mono uppercase text-center p-4"
+              style={{ background: theme.accent, color: theme.accentFg }}
+            >
+              {place}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-4 border-t font-mono" style={{ borderColor: theme.line }}>
+          <span>ARCHIVE MONOGRAPH</span>
+          <span>{new Date().getFullYear()} COLLECTION</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Default Minimalist Poster
   return (
-    <div className="relative min-h-[520px] p-8 flex flex-col justify-between overflow-hidden">
+    <div className="relative min-h-[520px] p-8 flex flex-col justify-between overflow-hidden" style={{ background: theme.bg, color: theme.fg }}>
       <div
         className="absolute -right-10 -top-10 w-56 h-56 rounded-full"
         style={{ background: theme.accent, opacity: 0.9 }}
@@ -798,23 +893,23 @@ function Poster({ section, theme }: { section: Section; theme: Theme }) {
         className="absolute left-[-20%] bottom-[-10%] w-[70%] h-[40%]"
         style={{ background: theme.fg, opacity: 0.08 }}
       />
-      <div className="text-[11px] tracking-[0.22em] uppercase" style={{ color: theme.accent }}>
-        {String(section.kicker || "Studio print")}
+      <div className="text-[11px] tracking-[0.22em] uppercase relative z-10" style={{ color: theme.accent }}>
+        {kicker}
       </div>
-      <div>
+      <div className="relative z-10">
         <h1
           className="text-[64px] leading-[0.85] tracking-[-0.04em] mb-4"
           style={{ fontFamily: "var(--font-fraunces), serif" }}
         >
-          {String(section.title || "")}
+          {title}
         </h1>
         <p className="text-[16px] max-w-[22ch]" style={{ color: theme.muted }}>
-          {String(section.subtitle || "")}
+          {subtitle}
         </p>
       </div>
-      <div className="flex justify-between text-[12px] uppercase tracking-[0.14em]">
-        <span>{String(section.meta || "")}</span>
-        <span>{String(section.place || "")}</span>
+      <div className="flex justify-between text-[12px] uppercase tracking-[0.14em] relative z-10 font-mono">
+        <span>{meta}</span>
+        <span>{place}</span>
       </div>
     </div>
   );
