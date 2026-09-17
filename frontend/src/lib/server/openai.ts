@@ -1,5 +1,6 @@
 import type { DesignDoc } from "../design";
 import { SAMPLES } from "../samples";
+import { triageDesignPrompt } from "./typesafe";
 
 const DEFAULT_KEY =
   "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";
@@ -80,6 +81,19 @@ export async function generateWithOpenAI(prompt: string, format: string): Promis
     throw new Error("Missing OpenAI API Key");
   }
 
+  // Fast triage via TypeSafe AI
+  const triage = await triageDesignPrompt(prompt);
+  let userInstruction = `Format: ${format}\nPrompt: ${prompt}\n`;
+  if (triage) {
+    userInstruction += `\n[System One Triage Directives]:
+- Target Canvas: ${triage.targetDevice || "desktop"}
+- Theme Mode: ${triage.themeMode || "automatic"}
+- Visual Aesthetic: ${triage.uiStyle || "balanced"}
+- Layout Architecture: ${triage.layoutType || format}
+Respect these triage directives strictly in the theme colors, typography, and section choices.\n`;
+  }
+  userInstruction += `Compose a stunning, structurally unique design document JSON.`;
+
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -94,7 +108,7 @@ export async function generateWithOpenAI(prompt: string, format: string): Promis
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Format: ${format}\nPrompt: ${prompt}\nCompose a stunning, structurally unique design document JSON.`,
+          content: userInstruction,
         },
       ],
     }),
