@@ -6,7 +6,8 @@ export interface DesignTriageResult {
   targetDevice?: string;
   themeMode?: string;
   uiStyle?: string;
-  layoutType?: string;
+  domainContext?: string;
+  dashboardVariant?: string;
   confidence?: Record<string, number>;
 }
 
@@ -38,7 +39,7 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
             type: "choice",
             instructions: "What color mode does the user want?",
             criteria: {
-              dark: "Dark theme, black/deep charcoal background, glowing or high-contrast accents",
+              dark: "Dark theme, pitch black or deep carbon/charcoal background, glowing neon or crisp light accents",
               light: "Light theme, clean paper or crisp white background",
             },
           },
@@ -52,13 +53,25 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
               editorial_luxury: "Serif typography, monograph, architecture or high fashion",
             },
           },
-          layout_type: {
+          domain_context: {
             type: "choice",
-            instructions: "What interface structure fits this design?",
+            instructions: "What exact industry or product domain is this interface built for?",
             criteria: {
-              dashboard: "Metrics, sparklines, tables, sidebar navigation, activity logs",
-              landing_page: "Hero banner, features grid, social proof, call to action",
-              mobile_flow: "App screen, bottom tab bar, swipe cards, list items",
+              crypto_trading: "Crypto exchange, trading terminal, orderbook, candlestick charts, live pairs",
+              ecommerce_store: "Online store, merchant portal, products sold, revenue, orders, fulfilment",
+              developer_devops: "API latency, cluster nodes, telemetry, logs, git commits, CI/CD pipelines",
+              saas_analytics: "B2B SaaS, MRR, churn rate, subscriptions, active user cohorts, user growth",
+              generic_web: "Standard website, landing page, portfolio, or brand showcase",
+            },
+          },
+          dashboard_variant: {
+            type: "choice",
+            instructions: "If this is an analytical/dashboard interface, what UI architecture is required?",
+            criteria: {
+              trading_terminal: "Candlestick / depth chart, live order book bids/asks, order entry execution, token pairs",
+              ecommerce_admin: "Revenue KPI cards, recent customer orders list, top selling products grid, return rate",
+              telemetry_metrics: "System latency, server uptime, CPU/Memory telemetry sparklines, error log stream",
+              saas_bento: "MRR / ARR counters, churn sparklines, user acquisition funnel, billing table",
             },
           },
         },
@@ -77,12 +90,14 @@ export async function triageDesignPrompt(prompt: string): Promise<DesignTriageRe
       targetDevice: answers.target_device?.choice,
       themeMode: answers.theme_mode?.choice,
       uiStyle: answers.ui_style?.choice,
-      layoutType: answers.layout_type?.choice,
+      domainContext: answers.domain_context?.choice,
+      dashboardVariant: answers.dashboard_variant?.choice,
       confidence: {
         targetDevice: answers.target_device?.confidence,
         themeMode: answers.theme_mode?.confidence,
         uiStyle: answers.ui_style?.confidence,
-        layoutType: answers.layout_type?.confidence,
+        domainContext: answers.domain_context?.confidence,
+        dashboardVariant: answers.dashboard_variant?.confidence,
       },
     };
   } catch (err) {

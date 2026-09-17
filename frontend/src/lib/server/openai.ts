@@ -57,11 +57,20 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "list", "title": "...", "items": [{"title": "...", "sub": "...", "meta": "..."}]}
     // - {"kind": "tabbar", "active": 0, "tabs": ["Home", "Activity", "Profile"]}
 
-    // For DASHBOARD:
-    // - {"kind": "dashnav", "brand": "...", "user": "..."}
-    // - {"kind": "kpis", "items": [{"label": "MRR", "value": "$42.8k", "delta": "+14%"}, {"label": "Active Users", "value": "3,420", "delta": "+8%"}]}
-    // - {"kind": "chart", "title": "Growth", "series": [12, 19, 15, 27, 34, 45, 52]}
-    // - {"kind": "table", "title": "Recent Orders", "headers": ["Customer", "Status", "Amount"], "rows": [["Acme Corp", "Paid", "$1,200"]]}
+    // For DASHBOARD (Tailor strictly to domain! Never use the same template for crypto vs ecommerce vs b2b):
+    // - Common Nav: {"kind": "dashnav", "brand": "...", "links": ["Trade", "Markets", "Portfolio"] or ["Orders", "Inventory", "Analytics"]}
+    // - For TRADING / CRYPTO / FINTECH:
+    //   * {"kind": "trading_terminal", "pair": "BTC/USDT", "price": "$67,420.50", "change": "+4.85%", "high": "$68,120.00", "low": "$64,890.00", "volume": "1.42B", "candles": [{"open": 64, "close": 68, "high": 70, "low": 63}, ...]}
+    //   * {"kind": "order_book", "asks": [{"price": "67,480.00", "amount": "1.42", "total": "95.8k"}], "bids": [{"price": "67,410.00", "amount": "1.12", "total": "75.4k"}]}
+    //   * {"kind": "kpis", "items": [{"label": "24H VOLUME", "value": "$1.42B", "delta": "+12.4%"}, {"label": "OPEN INTEREST", "value": "$420.8M", "delta": "+5.2%"}, {"label": "FUNDING RATE", "value": "0.0100%", "delta": "Next 4h"}, {"label": "INDEX PRICE", "value": "$67,415.00", "delta": "Fair"}]}
+    // - For E-COMMERCE / STORE ADMIN:
+    //   * {"kind": "bento_analytics", "cards": [{"title": "Net Revenue", "metric": "$84,200", "detail": "+24% vs last week", "tag": "Sales"}, {"title": "Conversion Rate", "metric": "3.8%", "detail": "Top tier traffic", "tag": "Funnel"}, {"title": "Avg Order Value", "metric": "$112.50", "detail": "+$8.20 growth", "tag": "AOV"}, {"title": "Pending Fulfilment", "metric": "42 orders", "detail": "All ready to ship", "tag": "Ops"}]}
+    //   * {"kind": "products_grid", "title": "Top Selling Products", "items": [{"name": "Product Name", "category": "Category", "sales": "1,420", "revenue": "$85,200", "stock": "In Stock (84)", "trend": "+24%"}]}
+    //   * {"kind": "table", "title": "Recent Customer Orders", "headers": ["Order ID", "Customer", "Items", "Total", "Status"], "rows": [["#1094", "Elena Vance", "2x Wool Coat", "$340", "Paid"], ["#1093", "Marcus Wei", "1x Desk Pad", "$85", "Shipped"]]}
+    // - For B2B SAAS / TELEMETRY:
+    //   * {"kind": "bento_analytics", "cards": [{"title": "MRR", "metric": "$48.2k", "detail": "+14% MoM", "tag": "Revenue"}, {"title": "Active Seats", "metric": "3,420", "detail": "+8% growth", "tag": "Usage"}, {"title": "Churn Rate", "metric": "0.8%", "detail": "Negative net churn", "tag": "Retention"}, {"title": "API P99 Latency", "metric": "42ms", "detail": "Edge optimal", "tag": "Infra"}]}
+    //   * {"kind": "chart", "title": "Traffic & Ingestion Velocity", "caption": "Live event stream across 4 global regions", "series": [32, 45, 58, 62, 75, 89, 94, 110, 105, 128]}
+    //   * {"kind": "table", "title": "Audit Log & Access Events", "headers": ["Actor", "Resource", "IP Address", "Status"], "rows": [["api-gateway", "/v1/auth", "10.0.4.12", "Success"], ["admin@corp", "/settings/keys", "172.16.0.4", "Success"]]}
 
     // For BRAND KIT:
     // - {"kind": "brandmark", "mark": "Single letter or geometric glyph", "name": "..."}
@@ -70,8 +79,8 @@ Return ONLY a valid JSON object matching this schema:
   ]
 }
 Design Diversity Rules:
+- Never repeat identical layouts across different domains! A crypto app MUST use trading_terminal and order_book. An ecommerce admin MUST use products_grid and orders table. A SaaS admin MUST use bento_analytics and growth telemetry.
 - Choose visuals that match the user's domain: If architectural/spatial, use 'architecture' or 'swiss'. If audio/music/voice, use 'waveform' or 'audio-card'. If SaaS/software, use 'device-mockup' or 'product'. If agency/creative/fashion, use 'editorial', 'editorial-cover', or 'bento'.
-- Varied layouts: Use 'editorial-cover' for grand architectural/fashion websites, centered hero when appropriate, card-based or bento features rather than only plain columns.
 - Ensure high contrast, specific human copy, and tailored aesthetics without repetitive filler.
 `;
 
@@ -89,8 +98,9 @@ export async function generateWithOpenAI(prompt: string, format: string): Promis
 - Target Canvas: ${triage.targetDevice || "desktop"}
 - Theme Mode: ${triage.themeMode || "automatic"}
 - Visual Aesthetic: ${triage.uiStyle || "balanced"}
-- Layout Architecture: ${triage.layoutType || format}
-Respect these triage directives strictly in the theme colors, typography, and section choices.\n`;
+- Domain Context: ${triage.domainContext || "custom"}
+- Dashboard Architecture: ${triage.dashboardVariant || "domain_tailored"}
+Respect these triage directives strictly! If domain is crypto_trading, generate trading_terminal and order_book. If ecommerce_store, generate products_grid and orders. Never generate generic filler.\n`;
   }
   userInstruction += `Compose a stunning, structurally unique design document JSON.`;
 

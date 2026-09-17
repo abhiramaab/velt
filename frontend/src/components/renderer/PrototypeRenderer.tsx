@@ -140,6 +140,14 @@ function Block({
       return <Chart section={section} theme={theme} />;
     case "table":
       return <Table section={section} theme={theme} />;
+    case "trading_terminal":
+      return <TradingTerminal section={section} theme={theme} />;
+    case "order_book":
+      return <OrderBook section={section} theme={theme} />;
+    case "products_grid":
+      return <ProductsGrid section={section} theme={theme} />;
+    case "bento_analytics":
+      return <BentoAnalytics section={section} theme={theme} />;
     case "brandmark":
       return <BrandMark section={section} theme={theme} />;
     case "palette":
@@ -1180,6 +1188,336 @@ function Table({ section, theme }: { section: Section; theme: Theme }) {
                 {cell}
               </span>
             ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TradingTerminal({ section, theme }: { section: Section; theme: Theme }) {
+  const pair = String(section.pair || "BTC/USDT");
+  const price = String(section.price || "$67,420.50");
+  const change = String(section.change || "+4.85%");
+  const high = String(section.high || "$68,120.00");
+  const low = String(section.low || "$64,890.00");
+  const volume = String(section.volume || "1.42B USDT");
+  const candles = Array.isArray(section.candles) && section.candles.length > 0
+    ? (section.candles as Array<{ open: number; close: number; high: number; low: number }>)
+    : [
+        { open: 64, close: 66, high: 67, low: 63 },
+        { open: 66, close: 65, high: 68, low: 64 },
+        { open: 65, close: 68, high: 69, low: 64 },
+        { open: 68, close: 67, high: 70, low: 66 },
+        { open: 67, close: 71, high: 72, low: 66 },
+        { open: 71, close: 69, high: 73, low: 68 },
+        { open: 69, close: 74, high: 75, low: 68 },
+        { open: 74, close: 72, high: 76, low: 71 },
+        { open: 72, close: 77, high: 78, low: 71 },
+        { open: 77, close: 79, high: 80, low: 75 },
+        { open: 79, close: 78, high: 81, low: 76 },
+        { open: 78, close: 83, high: 84, low: 77 },
+        { open: 83, close: 82, high: 85, low: 80 },
+        { open: 82, close: 86, high: 87, low: 81 },
+      ];
+
+  const minVal = Math.min(...candles.map((c) => c.low));
+  const maxVal = Math.max(...candles.map((c) => c.high));
+  const range = maxVal - minVal || 1;
+
+  return (
+    <div className="px-6 py-4">
+      {/* Ticker Bar */}
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 p-4 mb-3"
+        style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[17px] font-bold tracking-tight">{pair}</span>
+          </div>
+          <span className="text-[20px] font-mono font-semibold" style={{ color: theme.fg }}>
+            {price}
+          </span>
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400">
+            {change}
+          </span>
+        </div>
+        <div className="flex items-center gap-6 text-[11px] font-mono" style={{ color: theme.muted }}>
+          <div>
+            <span className="opacity-60 uppercase block text-[9px]">24h High</span>
+            <span className="font-semibold text-emerald-400">{high}</span>
+          </div>
+          <div>
+            <span className="opacity-60 uppercase block text-[9px]">24h Low</span>
+            <span className="font-semibold text-rose-400">{low}</span>
+          </div>
+          <div>
+            <span className="opacity-60 uppercase block text-[9px]">24h Volume</span>
+            <span className="font-semibold">{volume}</span>
+          </div>
+          <div className="flex items-center gap-1.5 pl-2 border-l border-white/10">
+            <button className="px-2 py-1 rounded text-[10px] uppercase font-bold bg-emerald-500 text-black hover:opacity-90">
+              Buy
+            </button>
+            <button className="px-2 py-1 rounded text-[10px] uppercase font-bold bg-rose-500 text-white hover:opacity-90">
+              Sell
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Candlestick Interactive Chart Area */}
+      <div
+        className="p-5 relative"
+        style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            {["1m", "5m", "15m", "1H", "4H", "1D"].map((interval, i) => (
+              <span
+                key={interval}
+                className={`px-2 py-0.5 text-[10px] font-mono rounded cursor-pointer ${
+                  i === 3 ? "bg-white/15 font-bold" : "opacity-60 hover:opacity-100"
+                }`}
+              >
+                {interval}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 text-[10px] font-mono opacity-60">
+            <span>MA(7): 67,112</span>
+            <span>MA(25): 66,450</span>
+            <span className="text-emerald-400">RSI(14): 62.4</span>
+          </div>
+        </div>
+
+        {/* Real Candlestick Bars */}
+        <div className="h-56 flex items-end justify-between gap-1 sm:gap-2 pt-4 pb-2 border-b border-t border-white/5 relative">
+          {/* Subtle horizontal grid lines */}
+          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
+            <div className="w-full border-b border-white" />
+            <div className="w-full border-b border-white" />
+            <div className="w-full border-b border-white" />
+          </div>
+
+          {candles.map((c, i) => {
+            const isGreen = c.close >= c.open;
+            const candleTop = Math.max(c.open, c.close);
+            const candleBottom = Math.min(c.open, c.close);
+
+            const bodyHeightPct = Math.max(8, ((candleTop - candleBottom) / range) * 100);
+            const bottomOffsetPct = ((candleBottom - minVal) / range) * 80;
+            const wickHeightPct = Math.max(15, ((c.high - c.low) / range) * 100);
+            const wickBottomOffsetPct = ((c.low - minVal) / range) * 80;
+
+            const color = isGreen ? "#10b981" : "#f43f5e";
+
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center h-full relative justify-end group cursor-crosshair">
+                {/* Upper/Lower Wick */}
+                <div
+                  className="w-[1.5px] absolute"
+                  style={{
+                    height: `${wickHeightPct}%`,
+                    bottom: `${wickBottomOffsetPct}%`,
+                    background: color,
+                    opacity: 0.7,
+                  }}
+                />
+                {/* Real Candle Body */}
+                <div
+                  className="w-full max-w-[18px] rounded-[1px] absolute shadow-sm"
+                  style={{
+                    height: `${bodyHeightPct}%`,
+                    bottom: `${bottomOffsetPct}%`,
+                    background: color,
+                    boxShadow: isGreen ? "0 0 8px rgba(16,185,129,0.3)" : "0 0 8px rgba(244,63,94,0.3)",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrderBook({ section, theme }: { section: Section; theme: Theme }) {
+  const asks = (section.asks as Array<{ price: string; amount: string; total: string }>) || [
+    { price: "67,480.00", amount: "1.420", total: "95.8k" },
+    { price: "67,460.50", amount: "0.850", total: "57.3k" },
+    { price: "67,440.00", amount: "2.105", total: "141.9k" },
+    { price: "67,425.00", amount: "0.340", total: "22.9k" },
+  ];
+  const bids = (section.bids as Array<{ price: string; amount: string; total: string }>) || [
+    { price: "67,410.00", amount: "1.120", total: "75.4k" },
+    { price: "67,395.00", amount: "3.450", total: "232.5k" },
+    { price: "67,380.00", amount: "0.980", total: "66.0k" },
+    { price: "67,365.00", amount: "1.890", total: "127.3k" },
+  ];
+
+  return (
+    <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Live Orderbook Panel */}
+      <div
+        className="p-4"
+        style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-[13px] font-bold uppercase tracking-wider">Live Order Book</div>
+          <span className="text-[10px] font-mono opacity-60">Spread 0.50 USDT</span>
+        </div>
+        <div className="grid grid-cols-3 text-[10px] uppercase font-mono tracking-wider opacity-50 pb-1.5 border-b border-white/10">
+          <span>Price (USDT)</span>
+          <span className="text-right">Size</span>
+          <span className="text-right">Sum</span>
+        </div>
+        {/* Asks (Sells) */}
+        <div className="py-1 space-y-1 font-mono text-[11px]">
+          {asks.map((a, i) => (
+            <div key={i} className="grid grid-cols-3 relative items-center py-0.5">
+              <div className="absolute inset-y-0 right-0 bg-rose-500/10 pointer-events-none" style={{ width: `${(i + 1) * 22}%` }} />
+              <span className="text-rose-400 font-semibold relative z-10">{a.price}</span>
+              <span className="text-right relative z-10">{a.amount}</span>
+              <span className="text-right opacity-60 relative z-10">{a.total}</span>
+            </div>
+          ))}
+        </div>
+        {/* Current Mid-Price Bar */}
+        <div className="my-2 py-1.5 px-3 rounded bg-white/5 flex items-center justify-between font-mono">
+          <span className="text-[14px] font-bold text-emerald-400">67,420.50 ↑</span>
+          <span className="text-[10px] opacity-60">Market Index</span>
+        </div>
+        {/* Bids (Buys) */}
+        <div className="py-1 space-y-1 font-mono text-[11px]">
+          {bids.map((b, i) => (
+            <div key={i} className="grid grid-cols-3 relative items-center py-0.5">
+              <div className="absolute inset-y-0 right-0 bg-emerald-500/10 pointer-events-none" style={{ width: `${(4 - i) * 22}%` }} />
+              <span className="text-emerald-400 font-semibold relative z-10">{b.price}</span>
+              <span className="text-right relative z-10">{b.amount}</span>
+              <span className="text-right opacity-60 relative z-10">{b.total}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Market Telemetry & Trade History */}
+      <div
+        className="p-4 flex flex-col justify-between"
+        style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[13px] font-bold uppercase tracking-wider">Recent Executions</div>
+            <span className="text-[10px] font-mono text-emerald-400">● LIVE FEED</span>
+          </div>
+          <div className="space-y-2 font-mono text-[11px]">
+            {[
+              { time: "10:14:02", side: "BUY", price: "67,420.50", size: "0.245 BTC" },
+              { time: "10:13:58", side: "SELL", price: "67,419.00", size: "1.120 BTC" },
+              { time: "10:13:45", side: "BUY", price: "67,422.00", size: "0.089 BTC" },
+              { time: "10:13:30", side: "BUY", price: "67,420.00", size: "2.500 BTC" },
+              { time: "10:13:12", side: "SELL", price: "67,415.50", size: "0.450 BTC" },
+            ].map((t, i) => (
+              <div key={i} className="flex items-center justify-between py-1 border-b border-white/5">
+                <span className="opacity-50">{t.time}</span>
+                <span className={`font-semibold ${t.side === "BUY" ? "text-emerald-400" : "text-rose-400"}`}>{t.side}</span>
+                <span>{t.price}</span>
+                <span className="opacity-70">{t.size}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+          <span className="opacity-60">Engine Latency: 1.2ms</span>
+          <span className="opacity-60">Liquidity Depth: Tier-1</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductsGrid({ section, theme }: { section: Section; theme: Theme }) {
+  const title = String(section.title || "Top Performing Products");
+  const products = (section.items as Array<{ name: string; category: string; sales: string; revenue: string; stock: string; trend: string }>) || [
+    { name: "Minimal Leather Desk Pad", category: "Accessories", sales: "1,420", revenue: "$85,200", stock: "In Stock (84)", trend: "+24%" },
+    { name: "Nordic Ceramic Pour-Over", category: "Kitchenware", sales: "980", revenue: "$44,100", stock: "Low (12)", trend: "+18%" },
+    { name: "Wool Felt Laptop Sleeve", category: "Carry", sales: "760", revenue: "$38,000", stock: "In Stock (140)", trend: "+9%" },
+    { name: "Matte Brass Desktop Lamp", category: "Lighting", sales: "520", revenue: "$72,800", stock: "Pre-order", trend: "+31%" },
+  ];
+
+  return (
+    <div className="px-6 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[15px] font-medium">{title}</div>
+        <span className="text-[11px] font-semibold px-2.5 py-1 rounded" style={{ background: theme.surface, color: theme.accent, border: `1px solid ${theme.line}` }}>
+          Store Performance
+        </span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {products.map((p, i) => (
+          <div
+            key={i}
+            className="p-4 flex flex-col justify-between"
+            style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+          >
+            <div>
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-wider mb-1" style={{ color: theme.muted }}>
+                <span>{p.category}</span>
+                <span className="text-emerald-500 font-bold">{p.trend}</span>
+              </div>
+              <div className="font-medium text-[14px] leading-snug line-clamp-2">{p.name}</div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between">
+              <div>
+                <span className="text-[9px] uppercase tracking-wider opacity-60 block">Revenue</span>
+                <span className="font-semibold text-[15px]">{p.revenue}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-[9px] uppercase tracking-wider opacity-60 block">Units Sold</span>
+                <span className="text-[12px] opacity-80">{p.sales}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BentoAnalytics({ section, theme }: { section: Section; theme: Theme }) {
+  const cards = (section.cards as Array<{ title: string; metric: string; detail: string; tag?: string }>) || [
+    { title: "Monthly Recurring Revenue", metric: "$124,500", detail: "+18.4% vs last month", tag: "MRR" },
+    { title: "Active Customer Churn", metric: "1.4%", detail: "Industry benchmark 2.8%", tag: "Retention" },
+    { title: "Average Revenue Per Unit", metric: "$89.50", detail: "Expanded through add-ons", tag: "ARPU" },
+    { title: "Net Expansion Rate", metric: "114%", detail: "Enterprise cohort retention", tag: "Expansion" },
+  ];
+
+  return (
+    <div className="px-6 py-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {cards.map((c, i) => (
+          <div
+            key={i}
+            className="p-5 flex flex-col justify-between group hover:border-accent transition-colors"
+            style={{ background: theme.surface, border: `1px solid ${theme.line}`, borderRadius: theme.radius }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium opacity-70">{c.title}</span>
+              {c.tag && (
+                <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded font-semibold" style={{ background: theme.bg, color: theme.accent }}>
+                  {c.tag}
+                </span>
+              )}
+            </div>
+            <div className="mt-3">
+              <div className="text-[26px] font-bold tracking-tight">{c.metric}</div>
+              <div className="text-[11px] mt-1 opacity-70">{c.detail}</div>
+            </div>
           </div>
         ))}
       </div>
