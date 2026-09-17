@@ -118,12 +118,8 @@ function Hero() {
     const text = prompt.trim() || "A quiet ceramic studio in Kyoto, wabi-sabi, paper and warm clay";
     const q = `?prompt=${encodeURIComponent(text)}&format=${format.id}`;
     if (!getToken()) {
-      try {
-        const res = await velt.login("creator@velt.design", "guest123");
-        saveSession(res.token, res.user);
-      } catch {
-        // ignore
-      }
+      window.location.href = `/login${q}`;
+      return;
     }
     window.location.href = `/studio${q}`;
   }

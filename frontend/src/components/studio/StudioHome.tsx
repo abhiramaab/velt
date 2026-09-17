@@ -21,28 +21,23 @@ export function StudioHome() {
   useEffect(() => {
     let active = true;
     async function init() {
-      let token = getToken();
+      const token = getToken();
       if (!token) {
-        try {
-          const auth = await velt.login("creator@velt.design", "guest123");
-          if (!active) return;
-          saveSession(auth.token, auth.user);
-          setUser(auth.user);
-          token = auth.token;
-        } catch {
-          if (active) router.replace("/login");
-          return;
-        }
-      } else {
-        velt.me().then((u) => {
-          if (active) {
-            setUser(u);
-            saveSession(token!, u);
-          }
-        }).catch(() => {
-          if (active) router.replace("/login");
-        });
+        const q = window.location.search || "";
+        if (active) router.replace(`/login${q}`);
+        return;
       }
+      velt.me().then((u) => {
+        if (active) {
+          setUser(u);
+          saveSession(token, u);
+        }
+      }).catch(() => {
+        if (active) {
+          const q = window.location.search || "";
+          router.replace(`/login${q}`);
+        }
+      });
 
       velt.projects().then((p) => {
         if (active) setProjects(p);

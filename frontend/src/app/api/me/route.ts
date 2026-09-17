@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
 import { DEMO_USER } from "@/lib/server/storage";
+import { extractAuthUser } from "@/lib/server/jwt";
 
 export async function GET(req: Request) {
-  const auth = req.headers.get("Authorization") || "";
-  let email = DEMO_USER.email;
-  if (auth.startsWith("Bearer velt_jwt_")) {
-    try {
-      email = Buffer.from(auth.replace("Bearer velt_jwt_", ""), "base64").toString("utf-8");
-    } catch {
-      /* ignore */
-    }
+  const authUser = extractAuthUser(req);
+  if (!authUser) {
+    return NextResponse.json({ error: "Unauthorized: Valid JWT required." }, { status: 401 });
   }
+
   return NextResponse.json({
     ...DEMO_USER,
-    email,
-    name: email.split("@")[0] || DEMO_USER.name,
+    id: authUser.sub,
+    email: authUser.email,
+    name: authUser.name || authUser.email.split("@")[0] || DEMO_USER.name,
   });
 }

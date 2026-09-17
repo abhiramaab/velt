@@ -22,12 +22,8 @@ export function Editor({ id }: { id: string }) {
     let active = true;
     async function init() {
       if (!getToken()) {
-        try {
-          const auth = await velt.login("creator@velt.design", "guest123");
-          saveSession(auth.token, auth.user);
-        } catch {
-          // continue
-        }
+        if (active) router.replace("/login");
+        return;
       }
       velt.project(id).then((p) => {
         if (active) setProject(p);
