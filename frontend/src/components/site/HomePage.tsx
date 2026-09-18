@@ -182,17 +182,38 @@ function Hero() {
 
   return (
     <section className="hero-sky relative mx-auto flex min-h-[90svh] sm:min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pt-24 pb-12 sm:px-8 sm:py-28 text-white">
-      {/* 4K Daylight Landscape: Responsive portrait on mobile, ultra-wide landscape on desktop */}
+      {/* 4K UHD Daylight Landscape. Responsive, high-density sources keep the
+          hero crisp on phones, tablets, and large retina displays alike. */}
       <picture>
-        <source media="(max-width: 639px)" srcSet="/hero-day-mobile.jpg?v=2" />
-        <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" />
+        <source
+          media="(max-width: 639px)"
+          srcSet="/hero-day-mobile-1170.jpg?v=1 1170w"
+          sizes="100vw"
+        />
+        <source
+          media="(max-width: 1279px)"
+          srcSet="/hero-day-1600.jpg?v=1 1600w"
+          sizes="100vw"
+        />
+        <source
+          media="(min-width: 1280px)"
+          srcSet="/hero-day.jpg?v=12 3840w"
+          sizes="100vw"
+        />
+        <img
+          src="/hero-day.jpg?v=12"
+          alt=""
+          className="hero-photo select-none"
+          fetchPriority="high"
+          decoding="async"
+        />
       </picture>
 
       {/* Drifting animated cherry blossom petals */}
       <SakuraPetals />
 
-      {/* Deep azure blue top wash for crystal-clear white text contrast */}
-      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#0b387e]/45 via-[#1d59b3]/15 to-transparent sm:from-[#0b387e]/35 sm:via-[#1d59b3]/10" />
+      {/* Soft azure wash only at the very top for legibility — no dark cast over the photo */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-1/2 bg-gradient-to-b from-[#0b387e]/35 to-transparent" />
 
       <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center justify-center text-center">
         {/* Eyebrow Pill */}
@@ -209,7 +230,6 @@ function Hero() {
             fontWeight: 600,
             lineHeight: 1.05,
             letterSpacing: "-0.03em",
-            textShadow: "0 4px 24px rgba(5, 30, 80, 0.6), 0 1px 3px rgba(0, 15, 50, 0.8)",
             margin: 0,
           }}
         >
@@ -217,7 +237,7 @@ function Hero() {
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-2.5 sm:mt-4 max-w-[340px] sm:max-w-[580px] px-2 text-[15px] sm:text-[22px] font-medium leading-[1.45] text-white [text-shadow:0_2px_14px_rgba(5,25,70,0.65),0_1px_3px_rgba(0,15,50,0.85)]">
+        <p className="mt-2.5 sm:mt-4 max-w-[340px] sm:max-w-[580px] px-2 text-[15px] sm:text-[22px] font-medium leading-[1.45] text-white">
           Describe what you want, and we handle the rest.
           <br className="hidden sm:inline" />
           {" "}From idea to stunning design in seconds.
@@ -296,7 +316,7 @@ function Hero() {
 
         {/* Mobile Quick Inspiration Pills */}
         <div className="mt-3.5 flex flex-wrap items-center justify-center gap-1.5 text-[11.5px] sm:hidden">
-          <span className="mr-0.5 font-medium text-white/85 [text-shadow:0_1px_4px_rgba(0,15,50,0.6)]">Try:</span>
+          <span className="mr-0.5 font-medium text-white/85">Try:</span>
           {["Modern SaaS", "Kyoto Cafe", "Editorial Portfolio"].map((suggestion) => (
             <button
               key={suggestion}
