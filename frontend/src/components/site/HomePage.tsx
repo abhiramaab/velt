@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUp,
   Camera,
@@ -23,13 +23,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { FORMATS as ALL_FORMATS } from "@/lib/design";
-import { SAMPLES } from "@/lib/samples";
 import { getToken } from "@/lib/api";
 import { Nav } from "./Nav";
 import { Footer } from "./Footer";
 import { SakuraPetals } from "./SakuraPetals";
-import { Foliage } from "./Foliage";
-import { DemoCanvas } from "./ProductDemo";
 
 const FORMAT_ICONS: Record<string, LucideIcon> = {
   website: Monitor,
@@ -67,25 +64,40 @@ const STEPS = [
     no: "01",
     title: "Describe the intent",
     body: "Write it the way you would brief a designer. A sentence, a mood, a constraint. No forms, no templates, no dropdown gymnastics.",
-    accent: "var(--demo-violet)",
   },
   {
     no: "02",
     title: "Velt composes",
     body: "The engine resolves format, type scale, grid, palette, and hierarchy. You get a complete, coherent design — not a moodboard.",
-    accent: "var(--demo-coral)",
   },
   {
     no: "03",
     title: "Direct the details",
     body: "React in plain language. Move an accent, tighten the headline, change the tone. Each pass refines the same document, in place.",
-    accent: "var(--demo-teal)",
   },
   {
     no: "04",
     title: "Take it anywhere",
     body: "One direction expands across web, product, social, print, and brand. Export clean components or ship the source directly.",
-    accent: "var(--demo-amber)",
+  },
+];
+
+const PRINCIPLES = [
+  {
+    k: "Hierarchy first",
+    v: "Typography, rhythm, and proportion are decided before a single pixel of ornament. That is why the output reads as design, not decoration.",
+  },
+  {
+    k: "One system, many formats",
+    v: "A website, a poster, and an app screen drawn from the same tokens stay recognisably one brand.",
+  },
+  {
+    k: "Editable by default",
+    v: "Every result is a structured document. Nothing is flattened. Refine any layer without regenerating the whole.",
+  },
+  {
+    k: "Export without lock-in",
+    v: "Structured React components and high-resolution assets, ready for the tools you already use.",
   },
 ];
 
@@ -107,12 +119,6 @@ const FAQS = [
   { q: "Can I use the designs commercially?", a: "Yes. Everything you create can be used for client work, products, marketing, and commercial projects." },
 ];
 
-const findDoc = (name: string) => {
-  const doc = SAMPLES.find((s) => s.name.toLowerCase() === name.toLowerCase());
-  if (!doc) throw new Error(`sample "${name}" not found`);
-  return doc;
-};
-
 export function HomePage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -127,18 +133,19 @@ export function HomePage() {
       { threshold: 0.14, rootMargin: "0px 0px -8% 0px" }
     );
 
-    const elements = document.querySelectorAll(".ed-reveal, .ed-clip, .ed-rule, .ed-line-draw, .demo-scene");
+    const elements = document.querySelectorAll(".ed-reveal, .ed-clip, .ed-rule, .ed-line-draw");
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f4f2ee] text-[#16151a]">
+    <main className="relative min-h-screen overflow-hidden bg-[#faf9f7] text-[#0e0e0e]">
       <Nav overHero />
       <Hero />
       <Showcase />
       <HowItWorks />
+      <Principles />
       <UseCases />
       <Pricing />
       <FAQ />
@@ -175,27 +182,14 @@ function Hero() {
 
   return (
     <section className="hero-sky relative mx-auto flex min-h-[90svh] sm:min-h-[min(88vh,820px)] w-full items-center justify-center overflow-hidden px-4 pt-24 pb-12 sm:px-8 sm:py-28 text-white">
-      {/* 4K Daylight Landscape: responsive portrait on mobile, ultra-wide on desktop.
-          srcset lets high-DPI phones pull the sharper 4K master. */}
+      {/* 4K Daylight Landscape: Responsive portrait on mobile, ultra-wide landscape on desktop */}
       <picture>
-        <source
-          media="(max-width: 639px)"
-          srcSet="/hero-day-mobile.jpg?v=2 780w, /hero-day.jpg?v=11 3840w"
-          sizes="100vw"
-        />
-        <source
-          media="(min-width: 640px)"
-          srcSet="/hero-day.jpg?v=11 3840w"
-          sizes="100vw"
-        />
-        <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" fetchPriority="high" />
+        <source media="(max-width: 639px)" srcSet="/hero-day-mobile.jpg?v=2" />
+        <img src="/hero-day.jpg?v=11" alt="" className="hero-photo select-none" />
       </picture>
 
       {/* Drifting animated cherry blossom petals */}
       <SakuraPetals />
-
-      {/* Falling foliage — layered with the petals */}
-      <Foliage />
 
       {/* Deep azure blue top wash for crystal-clear white text contrast */}
       <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#0b387e]/45 via-[#1d59b3]/15 to-transparent sm:from-[#0b387e]/35 sm:via-[#1d59b3]/10" />
@@ -319,189 +313,80 @@ function Hero() {
   );
 }
 
-function SectionLabel({ index, children, tone = "violet" }: { index: string; children: string; tone?: "violet" | "coral" | "teal" | "amber" }) {
-  const dot = {
-    violet: "var(--demo-violet)",
-    coral: "var(--demo-coral)",
-    teal: "var(--demo-teal)",
-    amber: "var(--demo-amber)",
-  }[tone];
+function SectionLabel({ index, children }: { index: string; children: string }) {
   return (
-    <div className="ed-reveal demo-eyebrow text-[#8b8780]">
-      <span className="h-2 w-2 rounded-full" style={{ background: dot }} />
-      <span>{index}</span>
-      <span className="opacity-40">—</span>
-      <span>{children}</span>
+    <div className="ed-reveal flex items-center gap-4">
+      <span className="font-mono text-[11px] tracking-[0.28em] text-[#c0392b]">{index}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#6f6b64]">{children}</span>
+      <span className="ed-rule h-px flex-1 bg-[#dedbd5]" />
     </div>
-  );
-}
-
-function Marquee({ reverse = false, children }: { reverse?: boolean; children: ReactNode }) {
-  return (
-    <div className="ed-marquee-mask relative mt-10 w-full overflow-hidden">
-      <div
-        className="ed-marquee flex w-max items-stretch gap-4 px-4 sm:gap-6"
-        style={reverse ? { animationDirection: "reverse" } : undefined}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ShowcaseCard({ src, caption }: { src: string; caption: string }) {
-  return (
-    <figure className="group relative w-[72vw] max-w-[380px] shrink-0 overflow-hidden rounded-2xl border border-[#e3e0d9] bg-white shadow-[0_18px_40px_-24px_rgba(22,21,26,0.35)] sm:w-[440px]">
-      <div className="aspect-[4/3] overflow-hidden">
-        <img
-          src={src}
-          alt=""
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        />
-      </div>
-      <figcaption className="flex items-center gap-2 px-4 py-3 text-[12.5px] text-[#6f6b64]">
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--demo-coral)]" />
-        {caption}
-      </figcaption>
-    </figure>
   );
 }
 
 function Showcase() {
   return (
-    <section className="border-b border-[#e3e0d9] py-16 sm:py-24">
-      <div className="mx-auto max-w-[1180px] px-5 sm:px-10">
-        <SectionLabel index="Output" tone="coral">Made with Velt</SectionLabel>
+    <section className="border-b border-[#dedbd5] px-5 py-14 sm:px-10 sm:py-20">
+      <div className="mx-auto max-w-[1180px]">
+        <SectionLabel index="01">Selected output</SectionLabel>
 
-        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="ed-clip demo-display max-w-[15ch] text-[38px] sm:text-[64px]">
-            <span>A studio in a sentence.</span>
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <h2 className="ed-clip font-lastik max-w-[16ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
+            <span>What people are building.</span>
           </h2>
-          <p className="ed-reveal max-w-[36ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[16px]" data-delay="1">
-            Every direction below began as a single line of plain language. No template was chosen. Nothing was assembled by hand.
+          <p className="ed-reveal max-w-[34ch] text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15px]" data-delay="1">
+            Every direction below began as a single sentence. No template was chosen. No component was assembled by hand.
           </p>
         </div>
       </div>
 
-      <Marquee>
-        {[...SHOWCASES, ...SHOWCASES].map((item, i) => (
-          <ShowcaseCard key={item.src + i} {...item} />
-        ))}
-      </Marquee>
-      <Marquee reverse>
-        {[...SHOWCASES.slice(4), ...SHOWCASES.slice(0, 4), ...SHOWCASES.slice(4), ...SHOWCASES.slice(0, 4)].map((item, i) => (
-          <ShowcaseCard key={`b-${item.src}-${i}`} {...item} />
-        ))}
-      </Marquee>
+      <div className="ed-marquee-mask relative left-1/2 right-1/2 mt-10 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
+        <div className="ed-marquee flex w-max items-stretch gap-px bg-[#dedbd5]">
+          {[...SHOWCASES, ...SHOWCASES].map((item, i) => (
+            <figure
+              key={item.src + i}
+              className="group relative w-[74vw] max-w-[420px] shrink-0 overflow-hidden bg-[#faf9f7] sm:w-[460px]"
+            >
+              <div className="aspect-[4/3] overflow-hidden">
+                <img
+                  src={item.src}
+                  alt=""
+                  className="h-full w-full object-cover grayscale-[0.35] transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+                />
+              </div>
+              <figcaption className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-[12px] font-medium text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                {item.caption}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+
+      <div className="ed-marquee-mask relative left-1/2 right-1/2 mt-px -ml-[50vw] -mr-[50vw] w-screen overflow-hidden border-t border-[#dedbd5] pt-px">
+        <div className="ed-marquee flex w-max items-stretch gap-px bg-[#dedbd5]" style={{ animationDirection: "reverse" }}>
+          {[...SHOWCASES.slice(4), ...SHOWCASES.slice(0, 4), ...SHOWCASES.slice(4), ...SHOWCASES.slice(0, 4)].map((item, i) => (
+            <figure key={`b-${item.src}-${i}`} className="w-[60vw] max-w-[320px] shrink-0 overflow-hidden bg-[#faf9f7] sm:w-[340px]">
+              <div className="aspect-[16/10] overflow-hidden">
+                <img src={item.src} alt="" className="h-full w-full object-cover grayscale-[0.35] transition-all duration-700 hover:grayscale-0" />
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
     </section>
-  );
-}
-
-function StepPromptDemo() {
-  const [typed, setTyped] = useState("");
-  const [phase, setPhase] = useState<"typing" | "generating" | "done">("typing");
-  const full = "Dark creative studio site for an art direction team.";
-
-  useEffect(() => {
-    let i = 0;
-    let timer: ReturnType<typeof setTimeout>;
-    const tick = () => {
-      i += 1;
-      setTyped(full.slice(0, i));
-      if (i < full.length) {
-        timer = setTimeout(tick, 42);
-      } else {
-        timer = setTimeout(() => setPhase("generating"), 550);
-        timer = setTimeout(() => setPhase("done"), 1900);
-      }
-    };
-    timer = setTimeout(tick, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div className="relative">
-      <div className="rounded-2xl border border-[#e3e0d9] bg-white p-4 shadow-[0_18px_40px_-26px_rgba(22,21,26,0.3)]">
-        <div className="flex items-start gap-2.5 text-[14px] text-[#16151a]">
-          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--demo-violet)] text-[10px] font-bold text-white">
-            V
-          </span>
-          <p className="leading-snug">
-            {typed}
-            {phase === "typing" ? <span className="demo-caret" /> : null}
-          </p>
-        </div>
-        {phase !== "typing" ? (
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#eeece7]">
-            <div
-              className={`h-full rounded-full bg-[var(--demo-violet)] transition-all duration-700 ${
-                phase === "done" ? "w-full" : "demo-sweep w-2/3"
-              }`}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      <div className="pointer-events-none absolute -bottom-8 -right-3 hidden sm:block">
-        <div className="demo-float rounded-xl border border-[#e3e0d9] bg-white px-3 py-2 text-[11px] font-medium shadow-lg">
-          <span className="text-[var(--demo-violet)]">●</span> composing layout…
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StepChatDemo() {
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setStep((s) => (s + 1) % 4), 2200);
-    return () => clearInterval(t);
-  }, []);
-  const bubbles = [
-    { me: true, text: "Make the headline bolder and add warm accents." },
-    { me: false, text: "Done — tightened the hierarchy and switched the accent to terracotta." },
-    { me: false, text: "Reflowed the hero for mobile at the same time." },
-  ];
-  return (
-    <div className="space-y-2.5">
-      {bubbles.map((b, i) => (
-        <div
-          key={i}
-          className={`flex transition-all duration-500 ${b.me ? "justify-end" : "justify-start"} ${
-            step >= i + 1 ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-          }`}
-        >
-          {!b.me ? (
-            <span className="mr-2 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--demo-teal)] text-[10px] font-bold text-white">
-              V
-            </span>
-          ) : null}
-          <div
-            className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-[13.5px] leading-snug ${
-              b.me
-                ? "rounded-tr-sm bg-[#16151a] text-white"
-                : "rounded-tl-sm border border-[#e3e0d9] bg-white text-[#16151a] shadow-sm"
-            }`}
-          >
-            {b.text}
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }
 
 function HowItWorks() {
   const [active, setActive] = useState(0);
-  const refs = useRef<Array<HTMLDivElement | null>>([]);
+  const refs = useRef<Array<HTMLLIElement | null>>([]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActive(Number((entry.target as HTMLElement).dataset.step));
+            const idx = Number((entry.target as HTMLElement).dataset.step);
+            setActive(idx);
           }
         });
       },
@@ -511,73 +396,130 @@ function HowItWorks() {
     return () => observer.disconnect();
   }, []);
 
-  const showcaseDoc = findDoc("Lumen");
-  const editDoc = findDoc("Kama");
-
   return (
-    <section id="how" className="demo-stage border-b border-[#e3e0d9] px-5 py-16 sm:px-10 sm:py-28">
+    <section id="how" className="border-b border-[#dedbd5] px-5 py-16 sm:px-10 sm:py-24">
       <div className="mx-auto max-w-[1180px]">
-        <SectionLabel index="Process" tone="violet">How it works</SectionLabel>
+        <SectionLabel index="02">How it works</SectionLabel>
 
-        <h2 className="ed-clip demo-display mt-6 max-w-[18ch] text-[38px] sm:text-[64px]">
-          <span>From a sentence to a system.</span>
+        <h2 className="ed-clip font-lastik mt-8 max-w-[18ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[56px]">
+          <span>Four moves from</span>
         </h2>
-        <p className="ed-reveal mt-5 max-w-[50ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[17px]" data-delay="1">
-          Four moves. No forms to fill, no components to drag. You direct the work the way you would direct a designer.
-        </p>
+        <div className="ed-clip font-lastik max-w-[18ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[56px]">
+          <span>a sentence to a system.</span>
+        </div>
 
-        <div className="mt-14 space-y-20 sm:mt-20 sm:space-y-28">
-          {STEPS.map((step, i) => {
-            const live = active === i;
-            const flip = i % 2 === 1;
-            return (
-              <div
-                key={step.no}
-                data-step={i}
-                ref={(el) => {
-                  refs.current[i] = el;
-                }}
-                className="demo-scene grid list-none items-center gap-8 md:grid-cols-2 md:gap-16"
-              >
-                <div className={`${flip ? "md:order-2" : ""}`}>
-                  <div className="flex items-center gap-3">
+        <div className="mt-12 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-16">
+          {/* Sticky index */}
+          <div className="md:sticky md:top-32 md:self-start">
+            <ol className="relative space-y-1">
+              <span
+                aria-hidden
+                className="absolute left-[15px] top-2 bottom-2 w-px bg-[#dedbd5]"
+              />
+              {STEPS.map((step, i) => {
+                const live = active === i;
+                return (
+                  <li key={step.no} className="relative flex items-center gap-4 py-2.5">
                     <span
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-bold text-white"
-                      style={{ background: step.accent, boxShadow: `0 8px 24px -8px ${step.accent}` }}
+                      className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] transition-colors duration-300 ${
+                        live
+                          ? "ed-dot-live border-[#c0392b] bg-[#c0392b] text-white"
+                          : "border-[#dedbd5] bg-[#faf9f7] text-[#6f6b64]"
+                      }`}
                     >
                       {step.no}
                     </span>
-                    <span
-                      className="text-[12px] font-semibold uppercase tracking-[0.18em] transition-colors duration-300"
-                      style={{ color: live ? step.accent : "#a8a49d" }}
+                    <button
+                      type="button"
+                      onClick={() => refs.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                      className={`text-left text-[14px] font-medium transition-colors duration-300 sm:text-[15px] ${
+                        live ? "text-[#0e0e0e]" : "text-[#a8a49d] hover:text-[#6f6b64]"
+                      }`}
                     >
-                      Step {i + 1} of 4
-                    </span>
-                  </div>
-                  <h3 className="demo-display mt-5 text-[30px] sm:text-[42px]">{step.title}</h3>
-                  <p className="mt-4 max-w-[46ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[16.5px]">{step.body}</p>
-                </div>
+                      {step.title}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
 
-                <div className={`${flip ? "md:order-1" : ""}`}>
-                  {i === 0 ? <StepPromptDemo /> : null}
-                  {i === 1 ? (
-                    <DemoCanvas doc={showcaseDoc} baseWidth={1280} device="browser" maxHeight={280} />
-                  ) : null}
-                  {i === 2 ? (
-                    <div className="rounded-2xl border border-[#e3e0d9] bg-white p-4 shadow-[0_18px_40px_-26px_rgba(22,21,26,0.3)] sm:p-5">
-                      <StepChatDemo />
+          {/* Steps */}
+          <ul className="space-y-px">
+            {STEPS.map((step, i) => {
+              const live = active === i;
+              return (
+                <li
+                  key={step.no}
+                  data-step={i}
+                  ref={(el) => {
+                    refs.current[i] = el;
+                  }}
+                  className="ed-reveal border-t border-[#dedbd5] py-8 first:border-t-0 md:py-12"
+                  data-delay={String((i % 3) + 1) as "1" | "2" | "3"}
+                >
+                  <div className="flex items-baseline gap-5">
+                    <span
+                      className={`font-mono text-[12px] tabular-nums transition-colors duration-300 ${
+                        live ? "text-[#c0392b]" : "text-[#c8c4bd]"
+                      }`}
+                    >
+                      {step.no}
+                    </span>
+                    <div>
+                      <h3
+                        className={`font-lastik text-[26px] leading-tight tracking-[-0.01em] transition-colors duration-300 sm:text-[34px] ${
+                          live ? "text-[#0e0e0e]" : "text-[#8d8981]"
+                        }`}
+                      >
+                        {step.title}
+                      </h3>
+                      <p className="mt-3 max-w-[52ch] text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15.5px]">
+                        {step.body}
+                      </p>
                     </div>
-                  ) : null}
-                  {i === 3 ? (
-                    <div className="grid grid-cols-2 gap-4">
-                      <DemoCanvas doc={editDoc} baseWidth={1280} device="browser" maxHeight={220} />
-                      <DemoCanvas doc={findDoc("Loaf")} baseWidth={390} device="phone" maxHeight={220} />
-                    </div>
-                  ) : null}
-                </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Principles() {
+  return (
+    <section className="border-b border-[#dedbd5] px-5 py-16 sm:px-10 sm:py-24">
+      <div className="mx-auto max-w-[1180px]">
+        <SectionLabel index="03">The method</SectionLabel>
+
+        <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:gap-16">
+          <div>
+            <h2 className="ed-clip font-lastik max-w-[14ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
+              <span>Design decisions,</span>
+            </h2>
+            <div className="ed-clip font-lastik max-w-[14ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
+              <span>made explicit.</span>
+            </div>
+            <p className="ed-reveal mt-6 max-w-[40ch] text-[14px] leading-relaxed text-[#6f6b64]" data-delay="1">
+              Velt is opinionated about the things that make design legible — hierarchy, rhythm, restraint — while staying neutral about your taste.
+            </p>
+          </div>
+
+          <dl>
+            {PRINCIPLES.map((p, i) => (
+              <div
+                key={p.k}
+                className="ed-reveal grid gap-2 border-t border-[#dedbd5] py-6 first:border-t-0 first:pt-0 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] sm:gap-8"
+                data-delay={String((i % 5) + 1) as "1" | "2" | "3" | "4" | "5"}
+              >
+                <dt className="font-lastik text-[20px] leading-snug tracking-[-0.01em] sm:text-[22px]">{p.k}</dt>
+                <dd className="text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15px]">{p.v}</dd>
               </div>
-            );
-          })}
+            ))}
+          </dl>
         </div>
       </div>
     </section>
@@ -585,43 +527,41 @@ function HowItWorks() {
 }
 
 function UseCases() {
-  const featured = [
-    { doc: findDoc("House"), label: "Dashboards", tone: "var(--demo-amber)" },
-    { doc: findDoc("Quill"), label: "Landing pages", tone: "var(--demo-violet)" },
-    { doc: findDoc("Loaf"), label: "Mobile apps", tone: "var(--demo-coral)" },
-    { doc: findDoc("AURELI"), label: "Websites", tone: "var(--demo-teal)" },
-  ];
-
   return (
-    <section className="border-b border-[#e3e0d9] px-5 py-16 sm:px-10 sm:py-28">
+    <section className="border-b border-[#dedbd5] px-5 py-16 sm:px-10 sm:py-24">
       <div className="mx-auto max-w-[1180px]">
-        <SectionLabel index="Formats" tone="teal">One engine, every surface</SectionLabel>
+        <SectionLabel index="04">One engine, many surfaces</SectionLabel>
 
-        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="ed-clip demo-display max-w-[16ch] text-[38px] sm:text-[64px]">
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <h2 className="ed-clip font-lastik max-w-[14ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
             <span>Built for the whole brief.</span>
           </h2>
-          <p className="ed-reveal max-w-[36ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[16px]" data-delay="1">
-            Fourteen formats spanning web, product, marketing, and brand — all drawn from one coherent design document.
+          <p className="ed-reveal max-w-[36ch] text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15px]" data-delay="1">
+            Fourteen supported formats spanning web, product, marketing, and brand — drawn from one coherent design document.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2">
-          {featured.map((f, i) => (
-            <div key={f.label} className="demo-scene" data-delay={String((i % 3) + 1) as "1" | "2" | "3"}>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: f.tone }} />
-                <span className="text-[12.5px] font-semibold uppercase tracking-[0.16em] text-[#6f6b64]">{f.label}</span>
-              </div>
-              <DemoCanvas doc={f.doc} baseWidth={f.doc.format === "app" ? 390 : 1280} device={f.doc.format === "app" ? "phone" : "browser"} maxHeight={260} />
+        <div className="mt-10 grid grid-cols-1 gap-px border border-[#dedbd5] bg-[#dedbd5] sm:grid-cols-2 lg:grid-cols-3">
+          {USE_CASES.map((c, i) => (
+            <div
+              key={c.n}
+              className="ed-reveal group relative bg-[#faf9f7] p-6 transition-colors duration-300 hover:bg-white sm:p-8"
+              data-delay={String((i % 3) + 1) as "1" | "2" | "3"}
+            >
+              <span className="font-mono text-[11px] tabular-nums text-[#c8c4bd]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 className="font-lastik mt-4 text-[22px] leading-snug tracking-[-0.01em] sm:text-[24px]">{c.n}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-[#6f6b64]">{c.d}</p>
+              <span className="absolute bottom-0 left-0 h-px w-0 bg-[#c0392b] transition-all duration-500 group-hover:w-full" />
             </div>
           ))}
         </div>
 
-        <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2">
           {FORMATS.map((f) => (
-            <span key={f.id} className="inline-flex items-center gap-2 text-[13px] font-medium text-[#6f6b64]">
-              <f.icon className="size-4 text-[#a8a49d]" strokeWidth={1.75} />
+            <span key={f.id} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#6f6b64]">
+              <f.icon className="size-3.5 text-[#a8a49d]" strokeWidth={1.75} />
               {f.label}
             </span>
           ))}
@@ -655,65 +595,59 @@ function Pricing() {
   ];
 
   return (
-    <section className="border-b border-[#e3e0d9] px-5 py-16 sm:px-10 sm:py-28">
+    <section className="border-b border-[#dedbd5] px-5 py-16 sm:px-10 sm:py-24">
       <div className="mx-auto max-w-[1180px]">
-        <SectionLabel index="Pricing" tone="amber">Simple and honest</SectionLabel>
+        <SectionLabel index="05">Plans and pricing</SectionLabel>
 
-        <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="ed-clip demo-display max-w-[16ch] text-[38px] sm:text-[64px]">
+            <h2 className="ed-clip font-lastik max-w-[16ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
               <span>Priced for momentum.</span>
             </h2>
-            <p className="ed-reveal mt-4 max-w-[44ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[16px]" data-delay="1">
+            <p className="ed-reveal mt-4 max-w-[44ch] text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15px]" data-delay="1">
               Start on a three-day trial. Cancel whenever. Every plan includes the full format engine.
             </p>
           </div>
 
-          <div className="ed-reveal inline-flex self-start rounded-full border border-[#e3e0d9] bg-white p-1 text-[13px] font-medium sm:self-auto" data-delay="2">
+          <div className="ed-reveal inline-flex self-start border border-[#dedbd5] p-0.5 text-[13px] font-medium sm:self-auto" data-delay="2">
             <button
               onClick={() => setYearly(false)}
-              className={`rounded-full px-4 py-1.5 transition-colors ${!yearly ? "bg-[#16151a] text-white" : "text-[#6f6b64] hover:text-[#16151a]"}`}
+              className={`px-4 py-1.5 transition-colors ${!yearly ? "bg-[#0e0e0e] text-white" : "text-[#6f6b64] hover:text-[#0e0e0e]"}`}
             >
               Monthly
             </button>
             <button
               onClick={() => setYearly(true)}
-              className={`rounded-full px-4 py-1.5 transition-colors ${yearly ? "bg-[#16151a] text-white" : "text-[#6f6b64] hover:text-[#16151a]"}`}
+              className={`px-4 py-1.5 transition-colors ${yearly ? "bg-[#0e0e0e] text-white" : "text-[#6f6b64] hover:text-[#0e0e0e]"}`}
             >
               Annually · Save 30%
             </button>
           </div>
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 grid gap-px border border-[#dedbd5] bg-[#dedbd5] md:grid-cols-3">
           {plans.map((plan, i) => {
             const price = yearly ? Math.round(plan.monthly * 0.7) : plan.monthly;
             const featured = i === 1;
             return (
               <div
                 key={plan.name}
-                className={`demo-scene relative flex flex-col rounded-3xl border p-7 sm:p-8 ${
-                  featured
-                    ? "border-transparent bg-[#16151a] text-white shadow-[0_30px_70px_-30px_rgba(22,21,26,0.6)]"
-                    : "border-[#e3e0d9] bg-white text-[#16151a]"
-                }`}
+                className={`ed-reveal relative flex flex-col p-7 sm:p-9 ${featured ? "bg-[#0e0e0e] text-white" : "bg-[#faf9f7] text-[#0e0e0e]"}`}
                 data-delay={String(i + 1) as "1" | "2" | "3"}
               >
-                {featured ? (
-                  <span className="absolute -top-3 left-7 rounded-full bg-[var(--demo-violet)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                    Most popular
-                  </span>
-                ) : null}
-                <span className="text-[13px] font-semibold uppercase tracking-[0.16em]">{plan.name}</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.24em]">{plan.name}</span>
+                  {featured ? <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Recommended</span> : null}
+                </div>
                 <p className={`mt-1 text-[13px] ${featured ? "text-white/60" : "text-[#6f6b64]"}`}>{plan.note}</p>
-                <div className="demo-display mt-6 text-[52px] leading-none">
+                <div className="font-lastik mt-7 text-[52px] leading-none tracking-[-0.03em]">
                   ${price}
                   <span className="font-sans text-[14px] tracking-normal opacity-50"> / mo</span>
                 </div>
                 <Link
                   href="/signup"
-                  className={`mt-7 block rounded-full py-3 text-center text-[13.5px] font-semibold transition-all ${
-                    featured ? "bg-white text-[#16151a] hover:scale-[1.02]" : "bg-[#16151a] text-white hover:scale-[1.02]"
+                  className={`mt-7 block py-3 text-center text-[13.5px] font-semibold transition-colors ${
+                    featured ? "bg-white text-[#0e0e0e] hover:bg-white/90" : "bg-[#0e0e0e] text-white hover:bg-[#2a2a2a]"
                   }`}
                 >
                   Start free trial
@@ -721,10 +655,10 @@ function Pricing() {
                 <p className={`mt-3 text-[12px] ${featured ? "text-white/50" : "text-[#a8a49d]"}`}>
                   3-day free trial. Cancel anytime.
                 </p>
-                <ul className={`mt-7 space-y-2.5 border-t pt-7 text-[13.5px] ${featured ? "border-white/15" : "border-[#e3e0d9]"}`}>
+                <ul className={`mt-7 space-y-2.5 border-t pt-7 text-[13.5px] ${featured ? "border-white/15" : "border-[#dedbd5]"}`}>
                   {plan.items.map((item) => (
                     <li key={item} className="flex items-start gap-2.5">
-                      <Check size={15} className={`mt-0.5 shrink-0 ${featured ? "text-[var(--demo-violet)]" : "text-[var(--demo-teal)]"}`} />
+                      <Check size={14} className={`mt-0.5 shrink-0 ${featured ? "text-white/70" : "text-[#c0392b]"}`} />
                       <span className={featured ? "text-white/85" : "text-[#3a3733]"}>{item}</span>
                     </li>
                   ))}
@@ -741,29 +675,34 @@ function Pricing() {
 function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="border-b border-[#e3e0d9] px-5 py-16 sm:px-10 sm:py-28">
+    <section className="border-b border-[#dedbd5] px-5 py-16 sm:px-10 sm:py-24">
       <div className="mx-auto max-w-[900px]">
-        <SectionLabel index="Questions" tone="violet">Before you begin</SectionLabel>
+        <SectionLabel index="06">Questions</SectionLabel>
 
-        <h2 className="ed-clip demo-display mt-6 max-w-[18ch] text-[38px] sm:text-[60px]">
-          <span>Answers, up front.</span>
+        <h2 className="ed-clip font-lastik mt-8 max-w-[18ch] text-[34px] leading-[1.02] tracking-[-0.02em] sm:text-[52px]">
+          <span>Before you begin.</span>
         </h2>
 
         <div className="mt-10">
           {FAQS.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div key={item.q} className="ed-reveal border-t border-[#e3e0d9]" data-delay={String((i % 5) + 1) as "1" | "2" | "3" | "4" | "5"}>
+              <div key={item.q} className="ed-reveal border-t border-[#dedbd5]" data-delay={String((i % 5) + 1) as "1" | "2" | "3" | "4" | "5"}>
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
                   className="group flex w-full items-center justify-between gap-6 py-5 text-left"
                 >
-                  <span className="text-[16px] font-medium text-[#16151a] sm:text-[18px]">{item.q}</span>
-                  <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e3e0d9] transition-colors group-hover:border-[#16151a]">
-                    <span className="absolute h-px w-3 bg-[#16151a]" />
+                  <span className="flex items-baseline gap-4">
+                    <span className="font-mono text-[11px] tabular-nums text-[#c8c4bd]">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-[16px] font-medium text-[#0e0e0e] sm:text-[18px]">{item.q}</span>
+                  </span>
+                  <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+                    <span className="absolute h-px w-3.5 bg-[#8d8981] transition-colors group-hover:bg-[#0e0e0e]" />
                     <span
-                      className={`absolute h-3 w-px bg-[#16151a] transition-all duration-300 ${
+                      className={`absolute h-3.5 w-px bg-[#8d8981] transition-all duration-300 group-hover:bg-[#0e0e0e] ${
                         isOpen ? "rotate-90 opacity-0" : "opacity-100"
                       }`}
                     />
@@ -774,16 +713,16 @@ function FAQ() {
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-[62ch] pb-6 text-[14.5px] leading-relaxed text-[#6f6b64] sm:text-[15.5px]">{item.a}</p>
+                    <p className="max-w-[62ch] pb-6 pl-8 text-[14px] leading-relaxed text-[#6f6b64] sm:text-[15px]">{item.a}</p>
                   </div>
                 </div>
               </div>
             );
           })}
-          <div className="border-t border-[#e3e0d9] pt-6">
+          <div className="border-t border-[#dedbd5] pt-6">
             <p className="text-[14px] text-[#6f6b64]">
               Still curious?{" "}
-              <a href="mailto:hello@velt.app" className="font-medium text-[var(--demo-violet)] underline-offset-4 hover:underline">
+              <a href="mailto:hello@velt.app" className="font-medium text-[#c0392b] underline-offset-4 hover:underline">
                 say hello
               </a>
             </p>
@@ -795,30 +734,36 @@ function FAQ() {
 }
 
 function Closing() {
-  const hero = findDoc("Lumen");
   return (
-    <section className="relative overflow-hidden px-5 py-20 sm:px-10 sm:py-32">
+    <section className="px-5 py-20 sm:px-10 sm:py-28">
       <div className="mx-auto max-w-[1180px]">
-        <div className="demo-scene rounded-[32px] border border-[#e3e0d9] bg-white p-8 sm:p-14">
-          <div className="flex flex-col items-center text-center">
-            <SectionLabel index="Start" tone="coral">Free for three days</SectionLabel>
-            <h2 className="ed-clip demo-display mt-6 max-w-[16ch] text-[42px] leading-[0.98] sm:text-[84px]">
-              <span>Make anything you imagine.</span>
-            </h2>
-            <p className="mt-5 max-w-[48ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[17px]">
-              Describe it once. Refine it in plain language. Ship it everywhere.
-            </p>
-            <Link
-              href="/signup"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#16151a] px-7 py-3.5 text-[14px] font-semibold text-white transition-transform hover:scale-[1.03]"
-            >
-              Start creating
-              <ArrowUp className="size-4 rotate-45" strokeWidth={2.2} />
-            </Link>
-          </div>
+        <div className="ed-reveal border-t border-[#dedbd5] pt-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#6f6b64]">Web design</p>
+          <h2 className="ed-clip font-lastik mt-5 text-[40px] leading-[0.98] tracking-[-0.03em] sm:text-[80px]">
+            <span>Make anything you imagine.</span>
+          </h2>
+          <p className="mt-6 max-w-[52ch] text-[15px] leading-relaxed text-[#6f6b64] sm:text-[16px]">
+            Each piece below was made from the line beneath it with Velt, generated on the first try in seconds.
+          </p>
+          <Link
+            href="/signup"
+            className="mt-8 inline-flex items-center gap-2 bg-[#0e0e0e] px-6 py-3 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#2a2a2a]"
+          >
+            Start creating
+            <ArrowUp className="size-4 rotate-45" strokeWidth={2} />
+          </Link>
+        </div>
 
-          <div className="mt-12">
-            <DemoCanvas doc={hero} baseWidth={1280} device="browser" maxHeight={380} />
+        <div className="ed-marquee-mask relative left-1/2 right-1/2 mt-14 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
+          <div className="ed-marquee flex w-max items-stretch gap-px bg-[#dedbd5]">
+            {SHOWCASES.map((item, i) => (
+              <figure key={item.src + i} className="w-[70vw] max-w-[380px] shrink-0 overflow-hidden bg-[#faf9f7] sm:w-[420px]">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={item.src} alt="" className="h-full w-full object-cover grayscale-[0.3] transition-all duration-700 hover:grayscale-0" />
+                </div>
+                <figcaption className="px-4 py-3 text-[12px] text-[#6f6b64]">{item.caption}</figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </div>
