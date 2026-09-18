@@ -42,6 +42,9 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
  <Link href="/#how" className="transition-opacity hover:opacity-100 hover:text-white">
  How it works
  </Link>
+ <Link href="/#features" className="transition-opacity hover:opacity-100 hover:text-white">
+ Features
+ </Link>
  <Link href="/showcase" className="transition-opacity hover:opacity-100 hover:text-white">
  Showcases
  </Link>

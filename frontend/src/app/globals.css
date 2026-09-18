@@ -584,3 +584,312 @@ html {
     animation: none;
   }
 }
+
+/* ============================================================
+   Sky landing system — Tracwell-style choreography, Velt sky tint
+   (applies to everything below the hero)
+   ============================================================ */
+
+.vl {
+  --vl-surface: #f4f9ff;
+  --vl-panel: #ffffff;
+  --vl-mist: #e9f3ff;
+  --vl-hairline: #d6e6f7;
+  --vl-tint-blue: #e4f1ff;
+  --vl-tint-sky: #eaf6ff;
+  --vl-tint-mint: #e6f5f0;
+  --vl-tint-lilac: #eceafd;
+  --vl-primary: #008be3;
+  --vl-primary-soft: #00a5ef;
+  --vl-foreground: #0b1b2b;
+  --vl-muted: #5b7290;
+  --vl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Word-split heading reveal */
+.vl-words {
+  display: block;
+}
+.vl-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.vl-word > span {
+  display: inline-block;
+  transform: translateY(115%);
+  opacity: 0;
+  filter: blur(10px);
+  transition: transform 0.9s var(--vl-ease), opacity 0.7s var(--vl-ease),
+    filter 0.9s var(--vl-ease);
+  will-change: transform, opacity, filter;
+}
+.vl-words.is-in .vl-word > span {
+  transform: translateY(0);
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Generic reveal */
+.vl-reveal {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(18px);
+  transition: opacity 0.62s var(--vl-ease), transform 0.62s var(--vl-ease),
+    filter 0.62s var(--vl-ease);
+  will-change: opacity, transform, filter;
+}
+.vl-reveal.is-in {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+.vl-reveal[data-delay="1"] { transition-delay: 0.06s; }
+.vl-reveal[data-delay="2"] { transition-delay: 0.12s; }
+.vl-reveal[data-delay="3"] { transition-delay: 0.18s; }
+.vl-reveal[data-delay="4"] { transition-delay: 0.24s; }
+.vl-reveal[data-delay="5"] { transition-delay: 0.3s; }
+.vl-reveal[data-delay="6"] { transition-delay: 0.36s; }
+
+/* Mockup scale-in */
+.vl-pop {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(12px) scale(0.96);
+  transition: opacity 0.52s var(--vl-ease), transform 0.52s var(--vl-ease),
+    filter 0.52s var(--vl-ease);
+}
+.vl-pop.is-in {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+}
+
+/* Shadow used by dashboard mockups */
+.vl-shadow {
+  box-shadow: 0 0 0 1px rgba(11, 27, 43, 0.05),
+    0 24px 60px -28px rgba(11, 27, 43, 0.26),
+    0 40px 90px -48px rgba(0, 139, 227, 0.24);
+}
+
+/* Live event row slide-in */
+@keyframes vl-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--vl-row-x, 0));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Receiving ping dot */
+@keyframes vl-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+.vl-ping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: currentColor;
+  animation: vl-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Rolling 3D event stack */
+@keyframes vl-roll {
+  0% {
+    transform: translateY(0) translateZ(0) scale(1);
+    opacity: 1;
+    z-index: 5;
+  }
+  22% {
+    transform: translateY(-118%) translateZ(0) scale(0.96);
+    opacity: 0;
+    z-index: 3;
+  }
+  23% {
+    transform: translateY(126%) translateZ(-40px) scale(0.74);
+    opacity: 0;
+    z-index: 1;
+  }
+  45%,
+  100% {
+    transform: translateY(0) translateZ(0) scale(1);
+    opacity: 1;
+    z-index: 5;
+  }
+}
+.vl-roll-card {
+  animation: vl-roll 9.6s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+  transform-origin: center;
+}
+
+/* Visitor journey — lines draw down, pages appear in order */
+@keyframes vl-line-draw {
+  0%,
+  12% {
+    transform: scaleY(0);
+  }
+  55%,
+  100% {
+    transform: scaleY(1);
+  }
+}
+@keyframes vl-page-in {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Funnel sweep + goal chart */
+@keyframes vl-sweep {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  60%,
+  100% {
+    clip-path: inset(0);
+  }
+}
+@keyframes vl-bar-grow {
+  0% {
+    transform: scaleY(0.08);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+@keyframes vl-line-draw-x {
+  from {
+    stroke-dashoffset: var(--vl-dash, 420);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Revenue provider carousel */
+@keyframes vl-provider {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-116%);
+    opacity: 0;
+  }
+  26% {
+    transform: translateY(116%);
+    opacity: 0;
+  }
+  45%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.vl-provider {
+  animation: vl-provider 8.4s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+/* Soft tinted bands + radial feature visuals */
+.vl-tint-lilac {
+  background: radial-gradient(
+      120% 100% at 85% 0%,
+      rgba(124, 122, 240, 0.24) 0%,
+      transparent 60%
+    ),
+    radial-gradient(90% 90% at 0% 100%, rgba(0, 165, 239, 0.16) 0%, transparent 55%),
+    var(--vl-tint-lilac);
+}
+.vl-tint-mint {
+  background: radial-gradient(
+      120% 100% at 85% 0%,
+      rgba(16, 185, 129, 0.2) 0%,
+      transparent 60%
+    ),
+    radial-gradient(90% 90% at 0% 100%, rgba(0, 165, 239, 0.16) 0%, transparent 55%),
+    var(--vl-tint-mint);
+}
+.vl-feature-visual {
+  background: radial-gradient(
+      90% 120% at 70% 0%,
+      rgba(0, 165, 239, 0.16) 0%,
+      transparent 62%
+    ),
+    radial-gradient(80% 80% at 10% 90%, rgba(124, 122, 240, 0.12) 0%, transparent 55%);
+}
+
+/* Gentle marquee (showcase strips) */
+@keyframes vl-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.vl-marquee {
+  animation: vl-marquee 72s linear infinite;
+  will-change: transform;
+}
+.vl-marquee-reverse {
+  animation-direction: reverse;
+}
+.vl-marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+.vl-marquee-mask:hover .vl-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vl-reveal,
+  .vl-pop,
+  .vl-word > span {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+  .vl-marquee,
+  .vl-roll-card,
+  .vl-provider,
+  .vl-ping::after,
+  .vl-sweep,
+  .vl-bar,
+  .vl-line {
+    animation: none;
+  }
+}
