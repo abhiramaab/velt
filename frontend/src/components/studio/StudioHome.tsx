@@ -86,14 +86,14 @@ export function StudioHome() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-paper">
+    <div className="flex h-[100dvh] overflow-hidden bg-paper">
       <Sidebar />
-      <div className="relative flex min-w-0 flex-1 flex-col overflow-y-auto">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-y-auto pt-14 lg:pt-0">
         {busy ? <ComposingOverlay stage={stage} /> : null}
-        <div className="mx-auto w-full max-w-4xl px-8 py-10">
+        <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-8 sm:py-10">
           <p className="text-[12px] uppercase tracking-[0.2em] text-muted">New composition</p>
-          <h1 className="font-display mt-2 text-4xl tracking-tight">What are we making?</h1>
-          <div className="prompt-ring mt-6 rounded-[28px] border border-line bg-paper-2 p-4">
+          <h1 className="font-display mt-2 text-3xl tracking-tight sm:text-4xl">What are we making?</h1>
+          <div className="prompt-ring mt-6 rounded-2xl border border-line bg-paper-2 p-3.5 sm:rounded-[28px] sm:p-4">
             <div className="mb-3 flex flex-wrap gap-1.5">
               {FORMATS.map((f) => (
                 <button
@@ -114,7 +114,7 @@ export function StudioHome() {
               placeholder="A quiet ceramic studio in Kyoto. Wabi-sabi, paper, warm clay."
               className="w-full resize-none bg-transparent text-[15px] outline-none"
             />
-            <div className="mt-3 flex items-center justify-between">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[12px] text-muted">{user ? `${user.credits} credits · 2 to compose` : ""}</span>
               <button
                 onClick={compose}
@@ -142,22 +142,25 @@ export function StudioHome() {
           {projects.length === 0 ? (
             <p className="mt-3 text-sm text-muted">Nothing yet. Write a sentence above.</p>
           ) : (
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-5">
               {projects.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => router.push(`/studio/${p.id}`)}
-                  className="overflow-hidden rounded-[22px] border border-line bg-paper-2 text-left"
+                  className="overflow-hidden rounded-[22px] border border-line bg-paper-2 text-left transition hover:border-accent/40"
                 >
-                  <div className="h-[150px] overflow-hidden">
-                    <div className="origin-top-left scale-[0.28]" style={{ width: 1280 }}>
+                  <div className="preview-frame relative aspect-[16/10] overflow-hidden">
+                    <div
+                      className="pointer-events-none absolute left-0 top-0 origin-top-left"
+                      style={{ width: 1280, transform: "scale(calc(100cqw / 1280))" }}
+                    >
                       <PrototypeRenderer doc={p.preview} />
                     </div>
                   </div>
                   <div className="px-4 py-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-display text-lg">{p.title}</span>
-                      <span className="text-[10px] uppercase tracking-[0.14em] text-muted">{p.format}</span>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate font-display text-lg">{p.title}</span>
+                      <span className="shrink-0 text-[10px] uppercase tracking-[0.14em] text-muted">{p.format}</span>
                     </div>
                     <p className="mt-1 line-clamp-1 text-[12px] text-muted">{p.prompt}</p>
                   </div>

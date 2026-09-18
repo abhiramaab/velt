@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Code2, Download, Monitor, Smartphone, Tablet } from "lucide-react";
+import { Code2, Download, MessageSquare, Monitor, Smartphone, Tablet } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ComposingOverlay } from "./StudioHome";
 import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
@@ -17,7 +17,13 @@ export function Editor({ id }: { id: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [stage, setStage] = useState("");
+  const [pane, setPane] = useState<"preview" | "chat">("preview");
+  const [frameScale, setFrameScale] = useState(0.58);
+  const [frameHeight, setFrameHeight] = useState(0);
+  const width = device === "mobile" ? 390 : device === "tablet" ? 768 : 1280;
   const endRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const docRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -41,6 +47,30 @@ export function Editor({ id }: { id: string }) {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [project?.messages.length]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    const doc = docRef.current;
+    if (!stage) return;
+    const measure = () => {
+      const natural = width;
+      const isNarrow = window.innerWidth < 1024;
+      const maxScale = device === "mobile" ? 1 : device === "tablet" ? 0.75 : 0.58;
+      const available = Math.max(200, stage.clientWidth - (isNarrow ? 24 : 64));
+      const next = Math.min(maxScale, available / natural);
+      setFrameScale(next);
+      setFrameHeight(doc ? doc.scrollHeight * next : 0);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+    if (doc) ro.observe(doc);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [width, project?.design.document, device]);
 
   async function refine(e: React.FormEvent) {
     e.preventDefault();
@@ -84,23 +114,26 @@ export function Editor({ id }: { id: string }) {
     URL.revokeObjectURL(url);
   }
 
-  const width = device === "mobile" ? 390 : device === "tablet" ? 768 : 1280;
-  const scale = device === "mobile" ? 0.82 : device === "tablet" ? 0.62 : 0.58;
-
   return (
-    <div className="flex h-screen overflow-hidden bg-paper">
+    <div className="flex h-[100dvh] overflow-hidden bg-paper">
       <Sidebar />
-      <div className="flex min-w-0 flex-1">
-        <section className="relative flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col pt-14 lg:flex-row lg:pt-0">
+        <section
+          className={`relative min-w-0 flex-1 flex-col lg:flex ${
+            pane === "preview" ? "flex" : "hidden"
+          }`}
+        >
           {busy ? <ComposingOverlay stage={stage} /> : null}
-          <header className="flex items-center justify-between border-b border-line px-5 py-3">
-            <div>
-              <div className="font-display text-lg leading-none">{project?.title || "Draft"}</div>
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2.5 sm:px-5 sm:py-3">
+            <div className="min-w-0">
+              <div className="truncate font-display text-base leading-none sm:text-lg">
+                {project?.title || "Draft"}
+              </div>
               <div className="mt-1 text-[11px] uppercase tracking-[0.14em] text-muted">
                 {project?.format} · v{project?.design.version ?? 1}
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex rounded-full border border-line p-1">
                 {(
                   [
@@ -112,6 +145,7 @@ export function Editor({ id }: { id: string }) {
                   <button
                     key={key}
                     onClick={() => setDevice(key)}
+                    aria-label={`${key} preview`}
                     className={`rounded-full p-1.5 ${device === key ? "bg-ink text-paper" : "text-muted"}`}
                   >
                     <Icon size={14} />
@@ -124,7 +158,8 @@ export function Editor({ id }: { id: string }) {
                 className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-paper hover:opacity-90"
               >
                 <Code2 size={13} />
-                <span>Export Code</span>
+                <span className="hidden sm:inline">Export Code</span>
+                <span className="sm:hidden">Code</span>
               </button>
               <button
                 onClick={exportJson}
@@ -132,19 +167,29 @@ export function Editor({ id }: { id: string }) {
                 className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[12px] text-muted hover:text-ink"
               >
                 <Download size={13} />
-                <span>JSON</span>
+                <span className="hidden sm:inline">JSON</span>
               </button>
             </div>
           </header>
-          <div className="flex flex-1 items-start justify-center overflow-auto bg-[linear-gradient(#d8d0c4_1px,transparent_1px),linear-gradient(90deg,#d8d0c4_1px,transparent_1px)] bg-[size:28px_28px] p-8">
+          <div
+            ref={stageRef}
+            className="flex flex-1 items-start justify-center overflow-auto bg-[linear-gradient(#d8d0c4_1px,transparent_1px),linear-gradient(90deg,#d8d0c4_1px,transparent_1px)] bg-[size:28px_28px] p-3 pb-16 sm:p-6 lg:p-8 lg:pb-8"
+          >
             {project ? (
               <div
-                className={`frame-shadow rounded-[24px] border border-line bg-paper ${
-                  device === "mobile" ? "max-h-[82vh] overflow-y-auto" : "overflow-hidden"
+                className={`frame-shadow overflow-hidden rounded-[24px] border border-line bg-paper ${
+                  device === "mobile" ? "max-h-[78dvh] overflow-y-auto" : ""
                 }`}
-                style={{ width: width * scale }}
+                style={{
+                  width: width * frameScale,
+                  height: frameHeight ? frameHeight : undefined,
+                }}
               >
-                <div className="origin-top-left" style={{ width, transform: `scale(${scale})` }}>
+                <div
+                  ref={docRef}
+                  className="origin-top-left"
+                  style={{ width, transform: `scale(${frameScale})` }}
+                >
                   <PrototypeRenderer doc={project.design.document} device={device} />
                 </div>
               </div>
@@ -154,8 +199,12 @@ export function Editor({ id }: { id: string }) {
           </div>
         </section>
 
-        <aside className="flex w-[340px] shrink-0 flex-col border-l border-line">
-          <div className="border-b border-line px-4 py-3 text-[12px] uppercase tracking-[0.16em] text-muted">
+        <aside
+          className={`w-full shrink-0 flex-col border-line lg:flex lg:w-[340px] lg:border-l ${
+            pane === "chat" ? "flex" : "hidden"
+          }`}
+        >
+          <div className="hidden border-b border-line px-4 py-3 text-[12px] uppercase tracking-[0.16em] text-muted lg:block">
             Refine in conversation
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
@@ -172,8 +221,8 @@ export function Editor({ id }: { id: string }) {
             ))}
             <div ref={endRef} />
           </div>
-          {error ? <p className="px-4 text-[12px] text-accent">{error}</p> : null}
-          <form onSubmit={refine} className="border-t border-line p-3">
+          {error ? <p className="px-4 pb-1 text-[12px] text-accent">{error}</p> : null}
+          <form onSubmit={refine} className="border-t border-line p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -189,6 +238,26 @@ export function Editor({ id }: { id: string }) {
             </div>
           </form>
         </aside>
+      </div>
+
+      {/* Mobile pane switcher */}
+      <div className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden">
+        <button
+          onClick={() => setPane("preview")}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium ${
+            pane === "preview" ? "text-ink" : "text-muted"
+          }`}
+        >
+          <Monitor size={15} /> Preview
+        </button>
+        <button
+          onClick={() => setPane("chat")}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-[13px] font-medium ${
+            pane === "chat" ? "text-ink" : "text-muted"
+          }`}
+        >
+          <MessageSquare size={15} /> Refine
+        </button>
       </div>
     </div>
   );
