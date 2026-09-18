@@ -7,9 +7,9 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 
 const PLANS = [
-  { name: "Starter", monthly: 9, note: "Perfect for getting started.", items: ["75 images / month", "Website Design generations", "Graphic Design generations", "Chat-based refinements"] },
-  { name: "Pro", monthly: 25, note: "For creators who want more.", items: ["200 images / month", "Everything in Starter", "Advanced Reasoning", "Priority rendering queue"] },
-  { name: "Max", monthly: 50, note: "Built for power users.", items: ["400 images / month", "Everything in Pro", "Long-context memory", "Priority support"] },
+  { name: "Starter", monthly: 6, note: "Perfect for getting started.", items: ["75 images / month", "Website Design generations", "Graphic Design generations", "Chat-based refinements"] },
+  { name: "Pro", monthly: 14, note: "For creators who want more.", items: ["200 images / month", "Everything in Starter", "Advanced Reasoning", "Priority rendering queue"] },
+  { name: "Max", monthly: 49, note: "Built for power users.", items: ["400 images / month", "Everything in Pro", "Long-context memory", "Priority support"] },
 ];
 
 export default function PricingPage() {

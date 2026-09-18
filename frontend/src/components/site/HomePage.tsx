@@ -576,19 +576,19 @@ function Pricing() {
   const plans = [
     {
       name: "Starter",
-      monthly: 9,
+      monthly: 6,
       note: "Perfect for getting started.",
       items: ["75 images / month", "Website Design generations", "Graphic Design generations", "Marketing generations & more", "Chat-based refinements"],
     },
     {
       name: "Pro",
-      monthly: 25,
+      monthly: 14,
       note: "For creators who want more.",
       items: ["200 images / month", "Everything in Starter", "Advanced Reasoning", "Priority rendering queue", "Early access features"],
     },
     {
       name: "Max",
-      monthly: 50,
+      monthly: 49,
       note: "Built for power users.",
       items: ["400 images / month", "Everything in Pro", "Long-context memory", "Experimental features", "Priority support"],
     },
