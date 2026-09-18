@@ -480,3 +480,107 @@ html {
 .animate-pulse-glow {
   animation: pulseGlow 3s ease-in-out infinite;
 }
+
+/* ============================================================
+   Editorial Swiss system — reveals, rules, counters, draws
+   ============================================================ */
+
+:root {
+  --ed-ink: #0e0e0e;
+  --ed-paper: #faf9f7;
+  --ed-line: #dedbd5;
+  --ed-muted: #6f6b64;
+  --ed-accent: #c0392b;
+}
+
+/* Staggered, crisp reveal (no blur, no bounce) */
+.ed-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.ed-reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ed-reveal[data-delay="1"] { transition-delay: 0.08s; }
+.ed-reveal[data-delay="2"] { transition-delay: 0.16s; }
+.ed-reveal[data-delay="3"] { transition-delay: 0.24s; }
+.ed-reveal[data-delay="4"] { transition-delay: 0.32s; }
+.ed-reveal[data-delay="5"] { transition-delay: 0.4s; }
+
+/* Clip reveal for display headlines */
+.ed-clip {
+  overflow: hidden;
+}
+.ed-clip > span {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ed-clip.is-in > span {
+  transform: translateY(0);
+}
+
+/* Hairline that draws across on reveal */
+.ed-rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ed-rule.is-in {
+  transform: scaleX(1);
+}
+
+/* Vertical connector draw for the process column */
+.ed-line-draw {
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ed-line-draw.is-in {
+  transform: scaleY(1);
+}
+
+/* Numbered step dot pulse (subtle, once active) */
+@keyframes ed-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.0); }
+  50% { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0.08); }
+}
+.ed-dot-live {
+  animation: ed-dot 2.8s ease-in-out infinite;
+}
+
+/* Marquee track used by showcases, slower + calmer */
+@keyframes ed-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ed-marquee {
+  animation: ed-marquee 64s linear infinite;
+  will-change: transform;
+}
+.ed-marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%);
+}
+.ed-marquee-mask:hover .ed-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-reveal,
+  .ed-clip > span,
+  .ed-rule,
+  .ed-line-draw {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ed-marquee,
+  .ed-dot-live {
+    animation: none;
+  }
+}
