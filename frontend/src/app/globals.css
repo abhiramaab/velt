@@ -584,3 +584,194 @@ html {
     animation: none;
   }
 }
+
+/* ============================================================
+   Canva-style product demo system — scenes, frames, reveals
+   ============================================================ */
+
+:root {
+  --demo-paper: #f4f2ee;
+  --demo-ink: #16151a;
+  --demo-line: #e3e0d9;
+  --demo-violet: #6c5ce7;
+  --demo-coral: #ff6b5e;
+  --demo-teal: #12b3a8;
+  --demo-amber: #f5a524;
+}
+
+/* Wide, soft "stage" behind a device — colored per scene */
+.demo-stage {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 100% at 15% 0%, var(--stage-a, rgba(108, 92, 231, 0.16)) 0%, transparent 55%),
+    radial-gradient(120% 120% at 90% 100%, var(--stage-b, rgba(18, 179, 168, 0.16)) 0%, transparent 55%),
+    var(--demo-paper);
+}
+
+/* Device frame */
+.demo-frame {
+  position: relative;
+  background: #fff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 24px 60px -20px rgba(22, 21, 26, 0.28),
+    0 6px 18px -8px rgba(22, 21, 26, 0.16);
+}
+.demo-frame-browser {
+  border-radius: 12px;
+  border: 1px solid var(--demo-line);
+  overflow: hidden;
+}
+.demo-frame-phone {
+  border-radius: 40px;
+  border: 8px solid #16151a;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.08) inset,
+    0 30px 70px -24px rgba(22, 21, 26, 0.4);
+}
+
+/* Scale-to-fit wrapper for live renderer output */
+.demo-canvas {
+  transform-origin: top left;
+}
+
+/* Scroll scene reveal that also settles into place */
+.demo-scene {
+  opacity: 0;
+  transform: translateY(46px) scale(0.975);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.demo-scene.is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Parallax float for floating chips around the stage */
+@keyframes demo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.demo-float {
+  animation: demo-float 6s ease-in-out infinite;
+}
+.demo-float-slow {
+  animation: demo-float 8.5s ease-in-out infinite;
+}
+
+/* Typing caret for prompt demos */
+@keyframes demo-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.demo-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: demo-caret 1s steps(1) infinite;
+}
+
+/* Sweeping shimmer for "generating" progress */
+@keyframes demo-sweep {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
+}
+.demo-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.demo-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: demo-sweep 1.9s ease-in-out infinite;
+}
+
+/* Eyebrow label with a colored dot */
+.demo-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Big friendly display heading */
+.demo-display {
+  font-family: var(--font-lastik), "EB Garamond", Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+/* ============================================================
+   Hero foliage / leaves
+   ============================================================ */
+
+@keyframes leafFall {
+  0% {
+    transform: translate3d(0, -30px, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(var(--leaf-drift, 90px), var(--leaf-fall, 70vh), 0) rotate(var(--leaf-spin, 320deg));
+    opacity: 0;
+  }
+}
+.leaf-fall {
+  position: absolute;
+  will-change: transform, opacity;
+}
+
+@keyframes leafFlutter {
+  0% { transform: rotate(0deg) scale(0.95) skewX(-8deg); }
+  50% { transform: rotate(24deg) scale(1.06) skewX(10deg); }
+  100% { transform: rotate(-18deg) scale(0.95) skewX(-8deg); }
+}
+.leaf-flutter {
+  transform-origin: 50% 40%;
+  animation: leafFlutter 3.4s ease-in-out infinite;
+}
+
+@keyframes canopySway {
+  0%, 100% { transform: rotate(-1deg) translateX(0); }
+  50% { transform: rotate(1.4deg) translateX(6px); }
+}
+.canopy-sway {
+  transform-origin: 20% 100%;
+  animation: canopySway 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-scene,
+  .leaf-fall,
+  .canopy-sway {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .demo-float,
+  .demo-float-slow,
+  .demo-caret,
+  .demo-sweep::after {
+    animation: none;
+  }
+}
