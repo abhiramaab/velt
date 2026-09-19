@@ -874,6 +874,232 @@ html {
   animation-play-state: paused;
 }
 
+/* Feature visual — chat loop */
+@keyframes vl-bubble-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+@keyframes vl-typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+@keyframes vl-chat-cycle {
+  0%,
+  26% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+    filter: blur(5px);
+  }
+  34%,
+  88% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+    filter: blur(5px);
+  }
+}
+@keyframes vl-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.vl-chat-bubble {
+  animation: vl-chat-cycle 7.2s var(--vl-ease) infinite both;
+}
+.vl-typing span {
+  animation: vl-typing 1.2s ease-in-out infinite;
+}
+.vl-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.vl-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Feature visual — colour tokens drop in */
+@keyframes vl-swatch-in {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.6);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+@keyframes vl-swatch-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.vl-swatch {
+  animation: vl-swatch-in 0.6s var(--vl-ease) both,
+    vl-swatch-bob 3.4s ease-in-out infinite;
+}
+
+/* Feature visual — code lines type on */
+@keyframes vl-code-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+.vl-code-line {
+  animation: vl-code-in 0.7s var(--vl-ease) both;
+}
+@keyframes vl-code-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.vl-code-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: vl-code-caret 1s steps(1) infinite;
+}
+
+/* Feature visual — version cards deal out */
+@keyframes vl-deal-in {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) rotate(-3deg) scale(0.9);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Feature visual — ticking counters */
+@keyframes vl-count-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    text-shadow: 0 0 0 rgba(0, 139, 227, 0);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.015);
+    text-shadow: 0 0 18px rgba(0, 139, 227, 0.22);
+  }
+}
+.vl-count {
+  animation: vl-count-pulse 2.6s ease-in-out infinite both;
+}
+@keyframes vl-spark-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-30deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12) rotate(8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.vl-spark {
+  animation: vl-spark-in 0.7s var(--vl-ease) infinite alternate both;
+}
+
+/* Feature visual — format chips drift up gently */
+@keyframes vl-chip-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.vl-chip {
+  animation: vl-chip-float 3.8s ease-in-out infinite both;
+}
+
+/* Numbered elements — index stamp pop */
+@keyframes vl-stamp-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+    letter-spacing: 0.3em;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.12em;
+  }
+}
+.vl-stamp {
+  animation: vl-stamp-in 0.7s var(--vl-ease) both;
+}
+
+/* Numbered rows — digit badge shimmer */
+@keyframes vl-badge-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 139, 227, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 139, 227, 0.1);
+  }
+}
+.vl-badge {
+  animation: vl-badge-glow 2.8s ease-in-out infinite both;
+}
+
+/* Milestone bar chart — grow from baseline */
+.vl-bar-grow {
+  transform-origin: bottom;
+  animation: vl-bar-grow 0.7s var(--vl-ease) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .vl-reveal,
   .vl-pop,
@@ -889,7 +1115,18 @@ html {
   .vl-ping::after,
   .vl-sweep,
   .vl-bar,
-  .vl-line {
+  .vl-line,
+  .vl-chat-bubble,
+  .vl-typing span,
+  .vl-swatch,
+  .vl-code-line,
+  .vl-code-caret,
+  .vl-count,
+  .vl-spark,
+  .vl-chip,
+  .vl-stamp,
+  .vl-badge,
+  .vl-bar-grow {
     animation: none;
   }
 }

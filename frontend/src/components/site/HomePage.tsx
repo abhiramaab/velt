@@ -221,6 +221,37 @@ function useReveal() {
   }, []);
 }
 
+function useCountUp(target: number, duration = 1400, decimals = 0) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting || started.current) return;
+        started.current = true;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          setValue(target * eased);
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        observer.disconnect();
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return { value, ref, display: value.toFixed(decimals) };
+}
+
 function Reveal({
   children,
   className = "",
@@ -736,8 +767,8 @@ function FormatsVisual() {
       {items.map((t, i) => (
         <span
           key={t}
-          className="vl-pop rounded-full border border-[#d6e6f7] bg-white px-3.5 py-1.5 text-[12.5px] font-medium text-[#3a5a7a] shadow-sm"
-          style={{ transitionDelay: `${i * 0.04}s` }}
+          className="vl-pop vl-chip rounded-full border border-[#d6e6f7] bg-white px-3.5 py-1.5 text-[12.5px] font-medium text-[#3a5a7a] shadow-sm"
+          style={{ transitionDelay: `${i * 0.04}s`, animationDelay: `${i * 0.3}s` }}
         >
           {t}
         </span>
@@ -747,19 +778,33 @@ function FormatsVisual() {
 }
 
 function ChatVisual() {
+  const bubbles = [
+    { side: "end", text: "Warmer palette, tighter headline" },
+    { side: "start", text: "Updated the accent and re-set the type scale." },
+    { side: "end", text: "Make it more Swiss" },
+  ] as const;
+
   return (
     <div className="flex h-full flex-col justify-center gap-2.5 px-7">
-      <div className="max-w-[78%] self-end rounded-2xl rounded-br-sm bg-[#008be3] px-3.5 py-2 text-[12.5px] font-medium text-white">
-        Warmer palette, tighter headline
-      </div>
-      <div className="max-w-[82%] self-start rounded-2xl rounded-bl-sm border border-[#d6e6f7] bg-white px-3.5 py-2 text-[12.5px] text-[#3a5a7a]">
-        Updated the accent and re-set the type scale.
-      </div>
-      <div className="max-w-[70%] self-end rounded-2xl rounded-br-sm bg-[#008be3] px-3.5 py-2 text-[12.5px] font-medium text-white">
-        Make it more Swiss
-      </div>
+      {bubbles.map((b, i) => (
+        <div
+          key={b.text}
+          className={`vl-chat-bubble max-w-[78%] ${
+            b.side === "end"
+              ? "self-end rounded-2xl rounded-br-sm bg-[#008be3] px-3.5 py-2 text-[12.5px] font-medium text-white"
+              : "self-start rounded-2xl rounded-bl-sm border border-[#d6e6f7] bg-white px-3.5 py-2 text-[12.5px] text-[#3a5a7a]"
+          }`}
+          style={{ animationDelay: `${i * 0.85}s` }}
+        >
+          {b.text}
+        </div>
+      ))}
       <div className="mt-1 flex items-center gap-2 self-start rounded-full border border-[#d6e6f7] bg-white px-3 py-1.5 text-[11.5px] text-[#5b7290]">
-        <span className="size-1.5 animate-pulse rounded-full bg-[#008be3]" />
+        <span className="vl-typing flex items-center gap-0.5">
+          {[0, 1, 2].map((d) => (
+            <span key={d} className="size-1 rounded-full bg-[#008be3]" />
+          ))}
+        </span>
         Refining document
       </div>
     </div>
@@ -771,15 +816,19 @@ function TokensVisual() {
   return (
     <div className="flex h-full flex-col justify-center gap-4 px-8">
       <div className="flex items-end gap-2">
-        <span className="font-display text-[40px] font-semibold leading-none text-[#0b1b2b]">Aa</span>
+        <span className="vl-pop font-display text-[40px] font-semibold leading-none text-[#0b1b2b]">Aa</span>
         <div className="pb-1 text-[11px] leading-tight text-[#5b7290]">
           <div className="font-medium text-[#3a5a7a]">Display</div>
           <div>48 / 1.05 / -3%</div>
         </div>
       </div>
       <div className="flex gap-2">
-        {swatches.map((c) => (
-          <span key={c} className="size-8 rounded-lg border border-black/5" style={{ background: c }} />
+        {swatches.map((c, i) => (
+          <span
+            key={c}
+            className="vl-swatch size-8 rounded-lg border border-black/5"
+            style={{ background: c, animationDelay: `${0.08 + i * 0.09}s, ${i * 0.35}s` }}
+          />
         ))}
       </div>
     </div>
@@ -793,7 +842,11 @@ function VersionsVisual() {
         <div
           key={v}
           className="vl-pop relative aspect-[3/4] w-24 overflow-hidden rounded-xl border border-[#d6e6f7] bg-white shadow-sm"
-          style={{ transitionDelay: `${i * 0.07}s`, transform: `translateY(${(i - 1) * 10}px)` }}
+          style={{
+            transitionDelay: `${i * 0.07}s`,
+            transform: `translateY(${(i - 1) * 10}px)`,
+            animation: `vl-deal-in 0.7s var(--vl-ease) ${0.1 + i * 0.12}s both`,
+          }}
         >
           <div className="h-8 border-b border-[#e9f3ff] bg-[#e9f3ff]" />
           <div className="space-y-1.5 p-2.5">
@@ -822,8 +875,13 @@ function ExportVisual() {
     <div className="flex h-full items-center justify-center px-7">
       <div className="w-full rounded-xl border border-[#d6e6f7] bg-white p-4 font-mono text-[12px] leading-relaxed shadow-sm">
         {lines.map((l, i) => (
-          <div key={i} className={l.c}>
+          <div
+            key={i}
+            className={`vl-code-line ${l.c}`}
+            style={{ animationDelay: `${0.15 + i * 0.28}s` }}
+          >
             {l.d}
+            {i === lines.length - 1 ? <span className="vl-code-caret" /> : null}
           </div>
         ))}
       </div>
@@ -832,13 +890,14 @@ function ExportVisual() {
 }
 
 function SpeedVisual() {
+  const { display, ref } = useCountUp(2.4, 1500, 1);
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3">
-      <div className="font-mono text-[56px] font-semibold leading-none tracking-[-0.04em] text-[#0b1b2b]">
-        2.4s
+      <div className="vl-count font-mono text-[56px] font-semibold leading-none tracking-[-0.04em] text-[#0b1b2b]">
+        <span ref={ref}>{display}</span>s
       </div>
       <div className="flex items-center gap-2 text-[12px] font-medium text-[#5b7290]">
-        <Sparkles className="size-3.5 text-[#008be3]" />
+        <Sparkles className="vl-spark size-3.5 text-[#008be3]" />
         average render time
       </div>
     </div>
@@ -897,7 +956,7 @@ function Beat({
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-5 pb-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end lg:gap-16 lg:pb-10">
           <Reveal>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#008be3]">
+            <span className="vl-stamp inline-block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#008be3]">
               {index}
             </span>
             <h3 className="mt-3 font-display text-[26px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#0b1b2b] sm:text-[32px]">
@@ -1007,7 +1066,10 @@ function EditorMock() {
               className="vl-page flex items-center gap-3 rounded-xl border border-[#d6e6f7] bg-white px-3.5 py-3"
               style={{ animation: `vl-page-in 7.2s var(--vl-ease) ${i * 1.1}s infinite both` }}
             >
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[#e9f3ff] font-mono text-[10.5px] font-medium text-[#008be3]">
+              <span
+                className="vl-badge flex size-6 shrink-0 items-center justify-center rounded-md bg-[#e9f3ff] font-mono text-[10.5px] font-medium text-[#008be3]"
+                style={{ animationDelay: `${i * 0.5}s` }}
+              >
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="truncate text-[12.5px] text-[#3a5a7a]">{p.label}</span>
