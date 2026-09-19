@@ -341,21 +341,26 @@ function Hero() {
       <picture>
         <source
           media="(max-width: 639px)"
-          srcSet="/hero-day-mobile-1170.jpg?v=1 1170w"
+          srcSet="/hero-day-mobile-1170.jpg?v=2 1170w"
+          sizes="100vw"
+        />
+        <source
+          media="(max-width: 899px)"
+          srcSet="/hero-day-1600.jpg?v=2 1600w"
           sizes="100vw"
         />
         <source
           media="(max-width: 1279px)"
-          srcSet="/hero-day-1600.jpg?v=1 1600w"
+          srcSet="/hero-day-2560.jpg?v=2 2560w"
           sizes="100vw"
         />
         <source
           media="(min-width: 1280px)"
-          srcSet="/hero-day.jpg?v=12 3840w"
+          srcSet="/hero-day.jpg?v=13 3840w"
           sizes="100vw"
         />
         <img
-          src="/hero-day.jpg?v=12"
+          src="/hero-day.jpg?v=13"
           alt=""
           className="hero-photo select-none"
           fetchPriority="high"

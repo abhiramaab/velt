@@ -47,14 +47,15 @@ export function SakuraPetals() {
 
   return (
     <div
-      className="pointer-events-none absolute z-[4] overflow-visible select-none"
+      className="pointer-events-none absolute z-[4] hidden overflow-visible select-none sm:block"
       aria-hidden="true"
       style={{
-        /* Exact bounding box of the tree foliage on the left */
-        left: "3%",
-        top: "22%",
-        width: "240px",
-        height: "360px",
+        /* Exact bounding box of the tree canopy in the desktop hero
+           (blossoms measured at ~10-18% width, ~40-58% height) */
+        left: "6%",
+        top: "34%",
+        width: "260px",
+        height: "340px",
       }}
     >
       <svg className="absolute w-0 h-0 pointer-events-none">
