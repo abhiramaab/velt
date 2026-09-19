@@ -12,17 +12,17 @@ export const PLANS_CONFIG: Record<string, PlanLimits> = {
   },
   starter: {
     name: "Starter",
-    monthlyLimit: 75,
+    monthlyLimit: 85,
     unlimited: false,
   },
   pro: {
     name: "Pro",
-    monthlyLimit: 200,
+    monthlyLimit: 250,
     unlimited: false,
   },
   max: {
     name: "Max",
-    monthlyLimit: 400,
+    monthlyLimit: 450,
     unlimited: false,
   },
   admin: {
