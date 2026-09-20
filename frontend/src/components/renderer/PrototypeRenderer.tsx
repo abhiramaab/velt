@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import type { DesignDoc, Section, Theme } from "@/lib/design";
 
 type Props = {
@@ -34,7 +36,14 @@ export function PrototypeRenderer({ doc, className = "", device = "desktop" }: P
         <NavBar nav={doc.nav} theme={theme} isMobile={device === "mobile"} />
       )}
       {doc.sections?.map((section, i) => (
-        <Block key={`${section.kind}-${i}`} section={section} theme={theme} doc={doc} isMobile={device === "mobile"} />
+        <motion.div
+          key={`${section.kind}-${i}`}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: Math.min(i * 0.08, 0.4), ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Block section={section} theme={theme} doc={doc} isMobile={device === "mobile"} />
+        </motion.div>
       ))}
     </div>
   );
@@ -1778,19 +1787,44 @@ function TypeSpec({ section, theme, doc }: { section: Section; theme: Theme; doc
 }
 
 function TerminalHero({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
-  const command = String(section.command || "npx shipper deploy --prod");
-  const logs = (section.logs as string[]) || [
+  const fullCommand = String(section.command || "npx shipper deploy --prod");
+  const allLogs = (section.logs as string[]) || [
     "✓ Verified agentic sandbox environment",
     "✓ Synthesizing container image: sha256:4f81c9...",
     "✓ Routing edge mesh across 38 global regions",
     "→ Deployed to https://edge.production.live (24ms)",
   ];
 
+  const [typedCommand, setTypedCommand] = useState("");
+  const [visibleLogCount, setVisibleLogCount] = useState(0);
+
+  useEffect(() => {
+    let charIndex = 0;
+    const typeInterval = setInterval(() => {
+      charIndex++;
+      setTypedCommand(fullCommand.slice(0, charIndex));
+      if (charIndex >= fullCommand.length) {
+        clearInterval(typeInterval);
+        // Start streaming logs
+        let logIndex = 0;
+        const logInterval = setInterval(() => {
+          logIndex++;
+          setVisibleLogCount(logIndex);
+          if (logIndex >= allLogs.length) {
+            clearInterval(logInterval);
+          }
+        }, 350);
+      }
+    }, 45);
+
+    return () => clearInterval(typeInterval);
+  }, [fullCommand, allLogs.length]);
+
   return (
     <div className={`px-6 sm:px-12 ${isMobile ? "py-10" : "py-16"} flex flex-col items-center text-center`}>
       {Boolean(section.kicker) && (
         <span
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase mb-5"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase mb-5 shadow-sm"
           style={{ background: theme.surface, border: `1px solid ${theme.line}`, color: theme.accent }}
         >
           <span className="size-1.5 rounded-full animate-pulse" style={{ background: theme.accent }} />
@@ -1808,23 +1842,27 @@ function TerminalHero({ section, theme, isMobile }: { section: Section; theme: T
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <span
-          className="px-6 py-3 rounded-full text-xs font-semibold tracking-wide shadow-lg cursor-pointer"
+        <motion.span
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          className="px-6 py-3 rounded-full text-xs font-semibold tracking-wide shadow-lg cursor-pointer transition-colors"
           style={{ background: theme.accent, color: theme.accentFg }}
         >
           {String(section.cta || "Deploy Cluster Now")}
-        </span>
+        </motion.span>
         {Boolean(section.secondary) && (
-          <span
-            className="px-6 py-3 rounded-full text-xs font-medium cursor-pointer"
+          <motion.span
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            className="px-6 py-3 rounded-full text-xs font-medium cursor-pointer transition-colors"
             style={{ background: theme.surface, border: `1px solid ${theme.line}`, color: theme.fg }}
           >
             {String(section.secondary)}
-          </span>
+          </motion.span>
         )}
       </div>
 
-      {/* Modern Developer Terminal / Console Window */}
+      {/* Modern Developer Terminal / Console Window with live streaming */}
       <div
         className="mt-12 w-full max-w-3xl rounded-2xl border text-left overflow-hidden shadow-2xl backdrop-blur-md"
         style={{ background: theme.surface, borderColor: theme.line }}
@@ -1839,22 +1877,29 @@ function TerminalHero({ section, theme, isMobile }: { section: Section; theme: T
             </span>
           </div>
           <span
-            className="font-mono text-[10px] px-2 py-0.5 rounded"
+            className="font-mono text-[10px] px-2 py-0.5 rounded flex items-center gap-1.5"
             style={{ background: theme.bg, color: theme.accent, border: `1px solid ${theme.line}` }}
           >
-            LIVE CONTAINER
+            <span className="size-1.5 rounded-full animate-ping" style={{ background: theme.accent }} />
+            LIVE RUNTIME
           </span>
         </div>
-        <div className="p-5 font-mono text-xs space-y-2">
+        <div className="p-5 font-mono text-xs space-y-2 min-h-[160px]">
           <div className="flex items-center gap-2 text-[13px]">
             <span style={{ color: theme.accent }}>$</span>
-            <span className="font-semibold" style={{ color: theme.fg }}>{command}</span>
+            <span className="font-semibold" style={{ color: theme.fg }}>{typedCommand}</span>
+            <span className="inline-block w-2 h-4 bg-accent animate-pulse" style={{ background: theme.accent }} />
           </div>
           <div className="pt-2 space-y-1.5" style={{ color: theme.muted }}>
-            {logs.map((log, i) => (
-              <p key={i} className="flex items-center gap-2">
+            {allLogs.slice(0, visibleLogCount).map((log, i) => (
+              <motion.p
+                key={i}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2"
+              >
                 <span className="text-emerald-400">›</span> {log}
-              </p>
+              </motion.p>
             ))}
           </div>
         </div>
@@ -1885,9 +1930,11 @@ function ArchitectureFlow({ section, theme, isMobile }: { section: Section; them
 
       <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "grid-cols-3 gap-6"} relative`}>
         {steps.map((s, idx) => (
-          <div
+          <motion.div
             key={idx}
-            className="p-6 rounded-2xl border transition-all duration-300 hover:border-accent/40"
+            whileHover={{ y: -4, scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 rounded-2xl border transition-all duration-300 hover:border-accent/40 hover:shadow-lg cursor-default"
             style={{ background: theme.surface, borderColor: theme.line }}
           >
             <div className="flex items-center justify-between mb-4">
@@ -1908,7 +1955,7 @@ function ArchitectureFlow({ section, theme, isMobile }: { section: Section; them
             </div>
             <h3 className="text-base font-semibold mb-2" style={{ color: theme.fg }}>{s.title}</h3>
             <p className="text-xs leading-relaxed" style={{ color: theme.muted }}>{s.desc}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -1932,9 +1979,11 @@ function TechBento({ section, theme, isMobile }: { section: Section; theme: Them
 
       <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "grid-cols-3 gap-6"}`}>
         {cards.map((c, i) => (
-          <div
+          <motion.div
             key={i}
-            className={`p-6 rounded-2xl border flex flex-col justify-between ${i === 0 && !isMobile ? "col-span-2" : ""}`}
+            whileHover={{ y: -4, scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+            className={`p-6 rounded-2xl border flex flex-col justify-between transition-all duration-300 hover:border-accent/40 hover:shadow-xl cursor-default ${i === 0 && !isMobile ? "col-span-2" : ""}`}
             style={{ background: theme.surface, borderColor: theme.line }}
           >
             <div>
@@ -1955,7 +2004,7 @@ function TechBento({ section, theme, isMobile }: { section: Section; theme: Them
               <span>ACTIVE SYSTEM</span>
               <span style={{ color: theme.accent }}>LEARN MORE →</span>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
