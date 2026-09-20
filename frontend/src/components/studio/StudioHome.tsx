@@ -82,11 +82,16 @@ export function StudioHome() {
     }
   }
 
-  async function composeWith(text: string, fmt: string, img?: string | null) {
-    if (!text.trim() && !img) return;
+  const [referenceUrl, setReferenceUrl] = useState("");
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
+  async function composeWith(text: string, fmt: string, img?: string | null, refUrl?: string | null) {
+    if (!text.trim() && !img && !refUrl) return;
     setBusy(true);
     setError("");
-    const stages = img
+    const stages = refUrl
+      ? ["Inspecting reference site...", "Extracting typography & visual DNA...", "Analyzing hero & layout hierarchy...", "Composing the grid"]
+      : img
       ? ["Analyzing reference image...", "Discovering layout & medium...", "Mixing palette from visual DNA...", "Composing the grid"]
       : ["Consulting ChatGPT", "Setting type", "Mixing a palette", "Composing the grid"];
     let i = 0;
@@ -96,7 +101,12 @@ export function StudioHome() {
       setStage(stages[i]);
     }, 700);
     try {
-      const res = await velt.create(text.trim() || "Design this reference for me.", fmt, img || undefined);
+      const res = await velt.create(
+        text.trim() || (refUrl ? `Design a site inspired by ${refUrl}` : "Design this reference for me."),
+        fmt,
+        img || undefined,
+        refUrl || undefined
+      );
       saveSession(getToken()!, { ...res.project.owner, credits: res.creditsRemaining });
       router.push(`/studio/${res.project.id}`);
     } catch (err) {
@@ -109,7 +119,7 @@ export function StudioHome() {
   }
 
   async function compose() {
-    await composeWith(prompt, format, imagePreview);
+    await composeWith(prompt, format, imagePreview, referenceUrl);
   }
 
   return (
@@ -145,23 +155,70 @@ export function StudioHome() {
                   </button>
                 ))}
               </div>
-              <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-medium text-muted transition hover:border-ink hover:text-ink">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-                <span>Attach reference</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFile(e.target.files[0]);
-                    }
-                  }}
-                />
-              </label>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput((prev) => !prev)}
+                  className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                    referenceUrl || showUrlInput
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-line bg-paper text-muted hover:border-ink hover:text-ink"
+                  }`}
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <span>{referenceUrl ? "Reference URL set" : "Add reference URL"}</span>
+                </button>
+                <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-medium text-muted transition hover:border-ink hover:text-ink">
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  <span>Attach image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
             </div>
+
+            {showUrlInput && (
+              <div className="mb-3 flex items-center gap-2 rounded-xl border border-line bg-paper px-3 py-2">
+                <svg className="h-4 w-4 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <input
+                  type="text"
+                  value={referenceUrl}
+                  onChange={(e) => setReferenceUrl(e.target.value)}
+                  placeholder="Paste reference site (e.g. shipper.now, linear.app, stripe.com)"
+                  className="flex-1 bg-transparent text-xs text-ink placeholder:text-muted outline-none"
+                  autoFocus
+                />
+                {referenceUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReferenceUrl("");
+                      setShowUrlInput(false);
+                    }}
+                    className="rounded-full p-1 text-muted hover:text-ink"
+                    title="Clear URL"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
 
             {imagePreview && (
               <div className="mb-3 flex items-center gap-3 rounded-xl border border-line bg-paper p-2">

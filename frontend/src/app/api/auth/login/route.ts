@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     let credits = 3;
     let name = cleanEmail.split("@")[0] || "Creator";
 
-    if (cleanEmail === "abhiram.b@icloud.com") {
+    if (cleanEmail === "abhiram.b@icloud.com" || cleanEmail === "abhiram.b@icloud.om") {
       if (password !== "Abhi60@123") {
         return NextResponse.json({ error: "Invalid password for administrator account." }, { status: 401 });
       }

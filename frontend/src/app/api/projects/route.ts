@@ -25,9 +25,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const { prompt = "", format = "website", imageUrl } = await req.json();
-    if (!prompt.trim() && !imageUrl) {
-      return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });
+    const { prompt = "", format = "website", imageUrl, referenceUrl } = await req.json();
+    if (!prompt.trim() && !imageUrl && !referenceUrl) {
+      return NextResponse.json({ error: "Prompt, reference image, or reference URL is required" }, { status: 400 });
     }
 
     // Rate Limit Check per user plan (Admin bypasses)
@@ -44,7 +44,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const designDoc = await generateWithOpenAI(prompt.trim() || "Design this reference for me.", format, imageUrl);
+    const designDoc = await generateWithOpenAI(
+      prompt.trim() || `Design an original site inspired by ${referenceUrl || "reference"}`,
+      format,
+      imageUrl,
+      referenceUrl
+    );
     const id = `proj_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = new Date().toISOString();
 

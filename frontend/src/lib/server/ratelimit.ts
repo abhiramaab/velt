@@ -53,7 +53,7 @@ export function checkAndConsumeLimit(email: string, plan: string): { allowed: bo
   const cleanEmail = email.toLowerCase().trim();
 
   // Admin Master Account has completely unlimited access
-  if (cleanEmail === "abhiram.b@icloud.com") {
+  if (cleanEmail === "abhiram.b@icloud.com" || cleanEmail === "abhiram.b@icloud.om") {
     return {
       allowed: true,
       remaining: 999999,

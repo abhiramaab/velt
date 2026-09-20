@@ -116,10 +116,10 @@ export const velt = {
   projects: () => api<ProjectSummary[]>("/api/projects"),
   showcase: () => api<ProjectSummary[]>("/api/showcase"),
   project: (id: string) => api<ProjectDetail>(`/api/projects/${id}`),
-  create: (prompt: string, format: string, imageUrl?: string) =>
+  create: (prompt: string, format: string, imageUrl?: string, referenceUrl?: string) =>
     api<{ project: ProjectDetail; creditsRemaining: number }>("/api/projects", {
       method: "POST",
-      body: JSON.stringify({ prompt, format, imageUrl }),
+      body: JSON.stringify({ prompt, format, imageUrl, referenceUrl }),
     }),
   refine: (id: string, message: string) =>
     api<{ project: ProjectDetail; creditsRemaining: number }>(`/api/projects/${id}/refine`, {

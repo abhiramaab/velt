@@ -108,10 +108,49 @@ FINAL QUALITY CHECK before returning (verify every point):
 6. The result would look credible as a real shipped product at shipper.now / v0 quality.
 `;
 
-export async function generateWithOpenAI(prompt: string, format: string, imageUrl?: string): Promise<DesignDoc> {
+export async function generateWithOpenAI(prompt: string, format: string, imageUrl?: string, referenceUrl?: string): Promise<DesignDoc> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Missing OpenAI API Key");
+  }
+
+  // If a reference URL is provided, fetch its title, meta, and key text
+  let siteContext = "";
+  if (referenceUrl && referenceUrl.trim()) {
+    try {
+      let targetUrl = referenceUrl.trim();
+      if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+        targetUrl = "https://" + targetUrl;
+      }
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const siteRes = await fetch(targetUrl, {
+        signal: controller.signal,
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; VeltDesignBot/1.0)" },
+      });
+      clearTimeout(timeout);
+      if (siteRes.ok) {
+        const html = await siteRes.text();
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']/i);
+        const title = titleMatch ? titleMatch[1].trim() : "";
+        const desc = metaDescMatch ? metaDescMatch[1].trim() : "";
+        // Extract top headings
+        const h1s = Array.from(html.matchAll(/<h1[^>]*>([^<]+)<\/h1>/gi)).map((m) => m[1].trim()).slice(0, 3);
+        const h2s = Array.from(html.matchAll(/<h2[^>]*>([^<]+)<\/h2>/gi)).map((m) => m[1].trim()).slice(0, 4);
+
+        siteContext = `\n[LIVE REFERENCE SITE ANALYZED: ${targetUrl}]
+- Page Title: ${title}
+- Meta Description: ${desc}
+- Primary Headings: ${[...h1s, ...h2s].join(" | ")}
+- Design Archetype Note: If the reference is shipper.now / Linear / modern developer tech, generate a pitch-dark, high-velocity developer platform with bold headline, bento cards, monospace micro-badges, and extreme polish.
+- Strictly mirror the sophistication, aesthetic genre, section types, and tone of ${targetUrl} while keeping the brand name original.\n`;
+      }
+    } catch (e) {
+      console.warn("Could not fetch reference URL directly, using URL string hint:", e);
+      siteContext = `\n[REFERENCE SITE HINT: ${referenceUrl}]
+- Strictly design a website whose visual caliber, typography, layout rhythm, and aesthetic match ${referenceUrl} (e.g. if shipper.now, create a cutting-edge dark agentic/developer deployment platform).\n`;
+    }
   }
 
   // Fast triage via TypeSafe AI
@@ -126,6 +165,10 @@ export async function generateWithOpenAI(prompt: string, format: string, imageUr
 - Layout Archetype: ${triage.layoutArchetype || "custom"}
 - Hero Composition: ${triage.heroComposition || "editorial-cover"}
 Respect these triage directives strictly in the theme colors, typography, hero layout, and section choices! Never output generic filler.\n`;
+  }
+
+  if (siteContext) {
+    userInstruction += siteContext;
   }
 
   if (imageUrl) {
