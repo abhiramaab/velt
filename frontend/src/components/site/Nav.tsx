@@ -24,46 +24,92 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
  const onSky = overHero && !scrolled;
  const inverse = onSky || theme === "dark";
 
- return (
- <header className="fixed left-0 right-0 top-0 z-50 flex flex-col items-center px-4 pt-4 sm:px-8 sm:pt-6">
- <nav
- className={`flex w-full max-w-[890px] items-center justify-between gap-3 rounded-full border px-5 py-2.5 shadow-[0_12px_40px_rgba(0,80,160,0.16)] backdrop-blur-xl transition-[background-color,border-color,color] duration-500 sm:px-7 sm:py-3.5 ${
- onSky
- ? "border-white/30 bg-white/20 text-white shadow-[0_10px_35px_rgba(0,60,130,0.18)]"
- : theme === "dark"
- ? "border-white/10 bg-[#141a2c]/85 text-white"
- : "border-black/10 bg-white/90 text-slate-900"
- }`}
- >
- <Link href="/" className="transition-opacity hover:opacity-90">
- <Logo className={`text-[21px] sm:text-[23px] ${inverse ? "text-white" : "text-slate-900"}`} inverse={inverse} />
- </Link>
- <div className={`hidden items-center justify-center gap-6 text-[14px] font-medium sm:flex lg:gap-8 lg:text-[15px] ${inverse ? "text-white/90" : "text-slate-700"}`}>
- <Link href="/#how" className="transition-opacity hover:opacity-100 hover:text-white">
- How it works
- </Link>
- <Link href="/#features" className="transition-opacity hover:opacity-100 hover:text-white">
- Features
- </Link>
- <Link href="/showcase" className="transition-opacity hover:opacity-100 hover:text-white">
- Showcases
- </Link>
- <Link href="/pricing" className="transition-opacity hover:opacity-100 hover:text-white">
- Pricing
- </Link>
- <Link href={signedIn ? "/studio" : "/login"} className="transition-opacity hover:opacity-100 hover:text-white">
- {signedIn ? "Studio" : "Login"}
- </Link>
- </div>
- <div className="flex items-center gap-3">
- <Link
- href={signedIn ? "/studio" : "/signup"}
- className="rounded-full bg-white px-5 py-2 text-[13.5px] font-semibold tracking-tight text-[#008be3] shadow-sm transition-all hover:bg-white/95 hover:scale-[1.02] active:scale-[0.98] sm:px-6 sm:py-2.5 sm:text-[14.5px]"
- >
- Get started
- </Link>
- </div>
- </nav>
- </header>
- );
+  return (
+    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/10 bg-[#0a0c10]/95 backdrop-blur-md transition-all duration-300">
+      <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Left: Brand Logo + Primary Nav Links */}
+        <div className="flex items-center gap-6 lg:gap-8">
+          <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-md shadow-emerald-500/20">
+              <span className="font-lastik text-lg font-bold text-slate-950">V</span>
+            </div>
+          </Link>
+
+          <nav className="hidden items-center gap-5 text-[13px] font-medium text-slate-300 md:flex lg:gap-6">
+            <Link
+              href="/studio"
+              className="flex items-center gap-1.5 font-semibold text-emerald-400 transition hover:text-emerald-300"
+            >
+              <span>Build</span>
+            </Link>
+
+            <Link
+              href="/studio?format=website"
+              className="transition hover:text-white"
+            >
+              Website
+            </Link>
+
+            <Link
+              href="/studio?format=app"
+              className="transition hover:text-white"
+            >
+              Mobile App
+            </Link>
+
+            <Link
+              href="/studio?format=ecommerce"
+              className="transition hover:text-white"
+            >
+              E-Commerce Store
+            </Link>
+
+            <Link
+              href="/showcase"
+              className="flex items-center gap-1.5 transition hover:text-white"
+            >
+              <span>Showcases</span>
+              <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30">
+                NEW
+              </span>
+            </Link>
+
+            <Link
+              href="/pricing"
+              className="transition hover:text-white"
+            >
+              Pricing
+            </Link>
+          </nav>
+        </div>
+
+        {/* Right Controls: Trial Badge, Login, and CTA */}
+        <div className="flex items-center gap-3">
+          {/* Trial / Credits Indicator */}
+          <div className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300 font-medium">
+            <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>2-Day Free Trial</span>
+          </div>
+
+          <div className="h-4 w-px bg-white/15 hidden sm:block" />
+
+          {/* Login / Studio link */}
+          <Link
+            href={signedIn ? "/studio" : "/login"}
+            className="text-xs sm:text-[13px] font-medium text-slate-200 transition hover:text-white px-3 py-1.5"
+          >
+            {signedIn ? "Studio" : "Login"}
+          </Link>
+
+          {/* Get Started Button */}
+          <Link
+            href={signedIn ? "/studio" : "/signup"}
+            className="flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-xs sm:text-[13px] font-semibold text-slate-950 shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-300 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Get Started
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
 }
