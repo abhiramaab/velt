@@ -633,29 +633,52 @@ function MockFor({ index }: { index: number }) {
 }
 
 function ComposeMock() {
+  const [activeChip, setActiveChip] = useState(0);
+  const chips = ["Website", "Editorial", "Warm", "Indigo"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveChip((prev) => (prev + 1) % chips.length);
+    }, 1800);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="vl-pop flex h-full items-center justify-center px-5">
-      <div className="w-full max-w-[280px] rounded-2xl border border-white/70 bg-white/90 p-4 shadow-[0_0_0_1px_rgba(11,27,43,0.04),0_8px_24px_-16px_rgba(11,27,43,0.24)] backdrop-blur-xl">
-        <div className="flex items-center gap-2 text-[12px] font-medium text-[#5b7290]">
-          <Wand2 className="size-3.5 text-[#008be3]" strokeWidth={2} />
-          Prompt
+    <div className="flex h-full items-center justify-center px-5">
+      <div className="group w-full max-w-[290px] rounded-2xl border border-white/80 bg-white/95 p-4 shadow-[0_0_0_1px_rgba(11,27,43,0.04),0_12px_32px_-12px_rgba(0,139,227,0.2)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_20px_40px_-16px_rgba(0,139,227,0.3)]">
+        <div className="flex items-center justify-between text-[12px] font-medium text-[#5b7290]">
+          <span className="flex items-center gap-2">
+            <Wand2 className="size-3.5 text-[#008be3] animate-pulse" strokeWidth={2} />
+            Prompt
+          </span>
+          <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-ping" />
+            Live
+          </span>
         </div>
-        <p className="mt-2 text-[13px] leading-relaxed text-[#0b1b2b]">
+        <p className="mt-2 text-[13px] leading-relaxed text-[#0b1b2b] font-medium">
           &ldquo;A quiet ceramics studio in Kyoto — warm clay, paper, one deep indigo accent.&rdquo;
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {["Website", "Editorial", "Warm", "Indigo"].map((t) => (
-            <span key={t} className="rounded-full bg-[#e9f3ff] px-2.5 py-0.5 text-[11px] font-medium text-[#008be3]">
+          {chips.map((t, idx) => (
+            <span
+              key={t}
+              className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all duration-300 ${
+                activeChip === idx
+                  ? "bg-[#008be3] text-white scale-105 shadow-xs"
+                  : "bg-[#e9f3ff] text-[#008be3] hover:bg-[#d6e8ff]"
+              }`}
+            >
               {t}
             </span>
           ))}
         </div>
         <div className="mt-4 flex items-center gap-2 border-t border-[#e9f3ff] pt-3 text-[11px] text-[#5b7290]">
-          <span className="relative inline-flex size-1.5 text-[#10ce6a]">
-            <span className="vl-ping absolute inset-0 rounded-full" />
-            <span className="size-1.5 rounded-full bg-current" />
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
           </span>
-          Composing layout, type &amp; palette
+          <span className="animate-pulse">Composing layout, type &amp; palette…</span>
         </div>
       </div>
     </div>
@@ -663,33 +686,52 @@ function ComposeMock() {
 }
 
 function FormatsMock() {
+  const [activeIdx, setActiveIdx] = useState(0);
   const rows = [
     { name: "Website", note: "Marketing site", color: "#008be3" },
     { name: "Dashboard", note: "Product surface", color: "#7c7af0" },
     { name: "Poster", note: "Print / editorial", color: "#e85a48" },
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % rows.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex h-full items-center justify-center px-5">
       <div className="w-full max-w-[290px] space-y-2.5">
         {rows.map((r, i) => (
           <div
             key={r.name}
-            className="vl-row flex items-center gap-3 rounded-xl border border-[#d6e6f7] bg-white/90 px-3.5 py-3 shadow-[0_8px_24px_-18px_rgba(11,27,43,0.3)]"
-            style={{ "--vl-row-x": i % 2 === 0 ? "-18px" : "18px", animation: `vl-row-in .5s var(--vl-ease) ${i * 0.07}s both` } as React.CSSProperties}
+            className={`flex items-center gap-3 rounded-xl border bg-white/95 px-3.5 py-3 shadow-[0_8px_24px_-18px_rgba(11,27,43,0.3)] transition-all duration-500 ${
+              activeIdx === i
+                ? "border-[#008be3] scale-[1.04] shadow-md ring-2 ring-[#008be3]/15"
+                : "border-[#d6e6f7] opacity-85 hover:opacity-100"
+            }`}
           >
-            <span className="size-7 shrink-0 rounded-lg" style={{ background: `${r.color}1a`, color: r.color }}>
-              <span className="flex h-full w-full items-center justify-center">
-                <span className="size-2 rounded-[3px] bg-current" />
-              </span>
+            <span
+              className={`size-7 shrink-0 rounded-lg flex items-center justify-center transition-transform duration-300 ${
+                activeIdx === i ? "scale-110" : ""
+              }`}
+              style={{ background: `${r.color}1a`, color: r.color }}
+            >
+              <span className="size-2 rounded-[3px] bg-current" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-medium text-[#0b1b2b]">{r.name}</span>
+              <span className="block truncate text-[13px] font-semibold text-[#0b1b2b]">{r.name}</span>
               <span className="block truncate text-[11px] text-[#5b7290]">{r.note}</span>
             </span>
-            <Check className="size-4 shrink-0 text-[#10ce6a]" strokeWidth={2.4} />
+            <Check
+              className={`size-4 shrink-0 text-[#10ce6a] transition-all duration-300 ${
+                activeIdx === i ? "scale-125 stroke-[3]" : ""
+              }`}
+            />
           </div>
         ))}
-        <div className="pt-1 text-center text-[11px] font-medium text-[#5b7290]">
+        <div className="pt-1 text-center text-[11px] font-semibold text-[#008be3]">
           14 formats · one document
         </div>
       </div>
@@ -698,37 +740,48 @@ function FormatsMock() {
 }
 
 function ExportMock() {
-  const bars = [38, 52, 46, 68, 78, 92];
+  const [pulse, setPulse] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPulse((prev) => !prev);
+    }, 1500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const bars = pulse ? [45, 65, 55, 80, 90, 100] : [38, 52, 46, 68, 78, 92];
+
   return (
-    <div className="vl-pop flex h-full items-center justify-center px-5">
-      <div className="w-full max-w-[290px] rounded-2xl border border-[#d6e6f7] bg-white/95 p-4 shadow-[0_0_0_1px_rgba(11,27,43,0.04),0_8px_24px_-16px_rgba(11,27,43,0.24)]">
+    <div className="flex h-full items-center justify-center px-5">
+      <div className="w-full max-w-[290px] rounded-2xl border border-[#d6e6f7] bg-white/95 p-4 shadow-[0_0_0_1px_rgba(11,27,43,0.04),0_12px_32px_-16px_rgba(0,139,227,0.25)] transition-all duration-300 hover:scale-[1.03]">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#5b7290]">Output</span>
-          <span className="rounded-full bg-[#10ce6a]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0b8f4e]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5b7290]">Output</span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#0b8f4e]">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Ready
           </span>
         </div>
-        <div className="mt-3 flex items-end gap-1.5" style={{ height: 96 }}>
+        <div className="mt-3 flex items-end gap-2" style={{ height: 96 }}>
           {bars.map((h, i) => (
             <span
               key={i}
-              className="vl-bar flex-1 rounded-t-md bg-[#008be3]/25 last:bg-[#008be3]/70"
+              className="flex-1 rounded-t-md transition-all duration-700 ease-out"
               style={{
                 height: `${h}%`,
-                transformOrigin: "bottom",
-                animation: `vl-bar-grow .5s var(--vl-ease) ${0.05 * i}s both`,
+                background: i === bars.length - 1 ? "#008be3" : "rgba(0, 139, 227, 0.28)",
+                boxShadow: i === bars.length - 1 ? "0 0 12px rgba(0, 139, 227, 0.5)" : "none",
               }}
             />
           ))}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[#e9f3ff] pt-3 text-[11px]">
           <div>
-            <div className="text-[#5b7290]">Components</div>
-            <div className="font-mono text-[13px] font-medium text-[#0b1b2b]">142</div>
+            <div className="text-[#5b7290] font-medium">Components</div>
+            <div className="font-mono text-[13px] font-bold text-[#0b1b2b]">142</div>
           </div>
           <div>
-            <div className="text-[#5b7290]">Format</div>
-            <div className="font-mono text-[13px] font-medium text-[#0b1b2b]">React</div>
+            <div className="text-[#5b7290] font-medium">Format</div>
+            <div className="font-mono text-[13px] font-bold text-[#008be3]">React + CSS</div>
           </div>
         </div>
       </div>

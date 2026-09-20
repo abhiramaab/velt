@@ -192,12 +192,21 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
           )}
           <div className="relative z-10 flex items-start justify-between">
             {section.kicker ? (
-              <span className="inline-block rounded-full bg-white/90 backdrop-blur px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black">
+              <span 
+                className="inline-block rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]"
+                style={{
+                  background: heroImage ? "rgba(255,255,255,0.9)" : `${theme.accent}15`,
+                  color: heroImage ? "#000" : theme.accent,
+                }}
+              >
                 {String(section.kicker)}
               </span>
             ) : <span />}
             {Boolean(section.meta) && (
-              <span className="text-[11px] uppercase tracking-widest text-white/80 font-mono">
+              <span 
+                className="text-[11px] uppercase tracking-widest font-mono"
+                style={{ color: heroImage ? "rgba(255,255,255,0.8)" : theme.muted }}
+              >
                 {String(section.meta)}
               </span>
             )}
@@ -207,12 +216,18 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
             <h1
               className={`${
                 isMobile ? "text-[34px]" : "text-[54px] sm:text-[64px]"
-              } leading-[0.96] tracking-[-0.035em] text-white font-medium`}
-              style={{ fontFamily: theme.fontDisplay === "serif" ? "var(--font-fraunces), serif" : "var(--font-figtree), sans-serif" }}
+              } leading-[0.96] tracking-[-0.035em] font-medium`}
+              style={{ 
+                color: heroImage ? "#FFFFFF" : theme.fg,
+                fontFamily: theme.fontDisplay === "serif" ? "var(--font-fraunces), serif" : "var(--font-figtree), sans-serif" 
+              }}
             >
               {String(section.headline || "")}
             </h1>
-            <p className="mt-4 text-[15px] leading-relaxed text-white/85 max-w-lg">
+            <p 
+              className="mt-4 text-[15px] leading-relaxed max-w-lg"
+              style={{ color: heroImage ? "rgba(255,255,255,0.85)" : theme.muted }}
+            >
               {String(section.sub || "")}
             </p>
             <div className="mt-6 flex items-center gap-3">
@@ -227,7 +242,10 @@ function Hero({ section, theme, isMobile }: { section: Section; theme: Theme; is
                 {String(section.cta || "Discover")}
               </span>
               {Boolean(section.secondary) && (
-                <span className="text-[12px] text-white/90 underline underline-offset-4 font-medium cursor-pointer">
+                <span 
+                  className="text-[12px] underline underline-offset-4 font-medium cursor-pointer"
+                  style={{ color: heroImage ? "rgba(255,255,255,0.9)" : theme.fg }}
+                >
                   {String(section.secondary)}
                 </span>
               )}
