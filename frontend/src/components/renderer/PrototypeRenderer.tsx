@@ -90,6 +90,12 @@ function Block({
   isMobile?: boolean;
 }) {
   switch (section.kind) {
+    case "terminal_hero":
+      return <TerminalHero section={section} theme={theme} isMobile={isMobile} />;
+    case "architecture_flow":
+      return <ArchitectureFlow section={section} theme={theme} isMobile={isMobile} />;
+    case "tech_bento":
+      return <TechBento section={section} theme={theme} isMobile={isMobile} />;
     case "hero":
       return <Hero section={section} theme={theme} isMobile={isMobile} />;
     case "stats":
@@ -1766,6 +1772,191 @@ function TypeSpec({ section, theme, doc }: { section: Section; theme: Theme; doc
       </div>
       <div className="text-[16px] mt-3 max-w-[40ch]" style={{ color: theme.muted }}>
         {String(section.sample || "")}
+      </div>
+    </div>
+  );
+}
+
+function TerminalHero({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
+  const command = String(section.command || "npx shipper deploy --prod");
+  const logs = (section.logs as string[]) || [
+    "✓ Verified agentic sandbox environment",
+    "✓ Synthesizing container image: sha256:4f81c9...",
+    "✓ Routing edge mesh across 38 global regions",
+    "→ Deployed to https://edge.production.live (24ms)",
+  ];
+
+  return (
+    <div className={`px-6 sm:px-12 ${isMobile ? "py-10" : "py-16"} flex flex-col items-center text-center`}>
+      {Boolean(section.kicker) && (
+        <span
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase mb-5"
+          style={{ background: theme.surface, border: `1px solid ${theme.line}`, color: theme.accent }}
+        >
+          <span className="size-1.5 rounded-full animate-pulse" style={{ background: theme.accent }} />
+          {String(section.kicker)}
+        </span>
+      )}
+      <h1
+        className={`${isMobile ? "text-[36px]" : "text-[58px] sm:text-[68px]"} tracking-[-0.04em] font-semibold leading-[0.98] max-w-[18ch]`}
+        style={{ color: theme.fg }}
+      >
+        {String(section.headline || "Agentic Infrastructure for Modern Software")}
+      </h1>
+      <p className="mt-5 text-[15px] sm:text-[17px] leading-relaxed max-w-[46ch]" style={{ color: theme.muted }}>
+        {String(section.sub || "Autonomous deployments, self-healing clusters, and sub-millisecond edge orchestration.")}
+      </p>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <span
+          className="px-6 py-3 rounded-full text-xs font-semibold tracking-wide shadow-lg cursor-pointer"
+          style={{ background: theme.accent, color: theme.accentFg }}
+        >
+          {String(section.cta || "Deploy Cluster Now")}
+        </span>
+        {Boolean(section.secondary) && (
+          <span
+            className="px-6 py-3 rounded-full text-xs font-medium cursor-pointer"
+            style={{ background: theme.surface, border: `1px solid ${theme.line}`, color: theme.fg }}
+          >
+            {String(section.secondary)}
+          </span>
+        )}
+      </div>
+
+      {/* Modern Developer Terminal / Console Window */}
+      <div
+        className="mt-12 w-full max-w-3xl rounded-2xl border text-left overflow-hidden shadow-2xl backdrop-blur-md"
+        style={{ background: theme.surface, borderColor: theme.line }}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: theme.line }}>
+          <div className="flex items-center gap-2">
+            <span className="size-3 rounded-full bg-red-500/80" />
+            <span className="size-3 rounded-full bg-yellow-500/80" />
+            <span className="size-3 rounded-full bg-green-500/80" />
+            <span className="ml-2 font-mono text-[11px]" style={{ color: theme.muted }}>
+              sh — 80x24
+            </span>
+          </div>
+          <span
+            className="font-mono text-[10px] px-2 py-0.5 rounded"
+            style={{ background: theme.bg, color: theme.accent, border: `1px solid ${theme.line}` }}
+          >
+            LIVE CONTAINER
+          </span>
+        </div>
+        <div className="p-5 font-mono text-xs space-y-2">
+          <div className="flex items-center gap-2 text-[13px]">
+            <span style={{ color: theme.accent }}>$</span>
+            <span className="font-semibold" style={{ color: theme.fg }}>{command}</span>
+          </div>
+          <div className="pt-2 space-y-1.5" style={{ color: theme.muted }}>
+            {logs.map((log, i) => (
+              <p key={i} className="flex items-center gap-2">
+                <span className="text-emerald-400">›</span> {log}
+              </p>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArchitectureFlow({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
+  const steps = (section.steps as { title: string; desc: string; metric?: string }[]) || [
+    { title: "Inference Stream", desc: "Incoming requests routed through edge proxy.", metric: "12ms" },
+    { title: "Agent Sandbox", desc: "Stateless micro-VM spun up in microsecond latency.", metric: "99.99%" },
+    { title: "State Persistence", desc: "Atomic commit to distributed storage clusters.", metric: "Zero drift" },
+  ];
+
+  return (
+    <div className={`px-6 sm:px-12 ${isMobile ? "py-10" : "py-14"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
+      <div className="mb-10 text-center">
+        {Boolean(section.kicker) && (
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] mb-2 block" style={{ color: theme.accent }}>
+            {String(section.kicker)}
+          </span>
+        )}
+        <h2 className="text-[28px] sm:text-[36px] font-semibold tracking-tight" style={{ color: theme.fg }}>
+          {String(section.title || "How the Execution Pipeline Works")}
+        </h2>
+      </div>
+
+      <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "grid-cols-3 gap-6"} relative`}>
+        {steps.map((s, idx) => (
+          <div
+            key={idx}
+            className="p-6 rounded-2xl border transition-all duration-300 hover:border-accent/40"
+            style={{ background: theme.surface, borderColor: theme.line }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span
+                className="size-8 rounded-full flex items-center justify-center font-mono text-xs font-bold"
+                style={{ background: theme.bg, color: theme.accent, border: `1px solid ${theme.line}` }}
+              >
+                0{idx + 1}
+              </span>
+              {s.metric && (
+                <span
+                  className="font-mono text-[10px] px-2 py-0.5 rounded-full"
+                  style={{ background: theme.bg, color: theme.fg, border: `1px solid ${theme.line}` }}
+                >
+                  {s.metric}
+                </span>
+              )}
+            </div>
+            <h3 className="text-base font-semibold mb-2" style={{ color: theme.fg }}>{s.title}</h3>
+            <p className="text-xs leading-relaxed" style={{ color: theme.muted }}>{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TechBento({ section, theme, isMobile }: { section: Section; theme: Theme; isMobile?: boolean }) {
+  const cards = (section.cards as { title: string; subtitle: string; tag?: string; highlight?: string }[]) || [
+    { title: "Sub-millisecond Global Mesh", subtitle: "Anycast network peering across 300+ PoPs directly with Tier 1 backbones.", tag: "Networking", highlight: "< 1ms" },
+    { title: "Deterministic Sandboxes", subtitle: "Instant container spinup with isolated V8 runtimes.", tag: "Compute", highlight: "Micro-VMs" },
+    { title: "Live Agent Telemetry", subtitle: "Continuous tracing, audit logs, and cost governance at scale.", tag: "Observability", highlight: "100% Trace" },
+  ];
+
+  return (
+    <div className={`px-6 sm:px-12 ${isMobile ? "py-10" : "py-14"}`} style={{ borderTop: `1px solid ${theme.line}` }}>
+      <div className="mb-8">
+        <h2 className="text-[26px] sm:text-[32px] font-semibold tracking-tight" style={{ color: theme.fg }}>
+          {String(section.title || "Engineered for Extreme Velocity")}
+        </h2>
+      </div>
+
+      <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "grid-cols-3 gap-6"}`}>
+        {cards.map((c, i) => (
+          <div
+            key={i}
+            className={`p-6 rounded-2xl border flex flex-col justify-between ${i === 0 && !isMobile ? "col-span-2" : ""}`}
+            style={{ background: theme.surface, borderColor: theme.line }}
+          >
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: theme.accent }}>
+                  {c.tag || "Feature"}
+                </span>
+                {c.highlight && (
+                  <span className="font-mono text-xs font-semibold" style={{ color: theme.fg }}>
+                    {c.highlight}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: theme.fg }}>{c.title}</h3>
+              <p className="text-xs leading-relaxed max-w-md" style={{ color: theme.muted }}>{c.subtitle}</p>
+            </div>
+            <div className="mt-8 pt-4 border-t flex items-center justify-between text-[11px] font-mono" style={{ borderColor: theme.line, color: theme.muted }}>
+              <span>ACTIVE SYSTEM</span>
+              <span style={{ color: theme.accent }}>LEARN MORE →</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

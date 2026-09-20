@@ -48,17 +48,22 @@ Return ONLY a valid JSON object matching this schema:
   },
   "sections": [
     // Include 4 to 6 relevant, varied sections matching the requested format:
-    // For WEBSITE / LANDING / PORTFOLIO / ARCHITECTURE / FASHION:
-    // - {"kind": "hero", "layout": "editorial-cover|split|centered|bento", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "ui-mockup|device-mockup|architecture|swiss|waveform|audio-card|product|gradient|grid|bento", "meta": "Vol. 04 // 2026"}
-    //   * Use "ui-mockup" or "device-mockup" when the product is software/SaaS/app — it renders a real interface frame.
-    //   * Use "architecture", "product", "bento", or "gradient" for physical/editorial brands.
-    //   * NEVER put an "image" field anywhere. The renderer draws all visuals from structure + theme.
-    // - {"kind": "features", "layout": "cards|minimal-cols|bento", "title": "...", "items": [{"title": "...", "body": "...", "tag": "..."}]}
-    // - {"kind": "gallery", "title": "Selected Works / Monograph", "subtitle": "...", "layout": "grid-2|grid-3", "items": [{"title": "Project Name", "tag": "Architecture|Fashion|Creative", "meta": "2026", "caption": "..."}]}
+    // For WEBSITE / LANDING (CHOOSE DIVERSE LAYOUT ARCHETYPES! DO NOT DEFAULT TO THE SAME TEMPLATE!):
+    // Archetype A: Developer / Agentic / Cloud Tech (like shipper.now, Modal, Vercel, Linear):
+    // - {"kind": "terminal_hero", "kicker": "v2.4 Production Ready", "headline": "...", "sub": "...", "cta": "Deploy in 60s", "secondary": "Read Docs", "command": "npx shipper deploy --prod", "logs": ["✓ Provisioned isolated micro-VM", "✓ Edge routing active across 38 regions"]}
+    // - {"kind": "tech_bento", "title": "...", "cards": [{"title": "Sub-millisecond Global Mesh", "subtitle": "...", "tag": "Network", "highlight": "< 1ms"}, {"title": "State Persistence", "subtitle": "...", "tag": "Storage", "highlight": "Zero Drift"}]}
+    // - {"kind": "architecture_flow", "kicker": "Pipeline", "title": "Autonomous Execution Stream", "steps": [{"title": "Event Ingest", "desc": "...", "metric": "4ms"}, {"title": "Agent Sandbox", "desc": "...", "metric": "99.99%"}, {"title": "Mesh Distribution", "desc": "...", "metric": "Global"}]}
+    // Archetype B: Editorial / Luxury / Studio / Fashion:
+    // - {"kind": "hero", "layout": "editorial-cover", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "secondary": "...", "visual": "editorial"}
+    // - {"kind": "stats", "items": [{"value": "...", "label": "..."}]}
+    // - {"kind": "gallery", "title": "...", "subtitle": "...", "layout": "grid-2|grid-3", "items": [{"title": "...", "tag": "...", "meta": "2026", "caption": "..."}]}
+    // Archetype C: Conversion / SaaS / Product:
+    // - {"kind": "hero", "layout": "split|centered", "kicker": "...", "headline": "...", "sub": "...", "cta": "...", "visual": "bento|gradient|grid|product"}
+    // - {"kind": "features", "layout": "cards|minimal-cols", "title": "...", "items": [{"title": "...", "body": "..."}]}
+    // - {"kind": "pricing", "title": "...", "plans": [{"name": "...", "price": "...", "period": "/mo", "features": ["..."]}]}
     // - {"kind": "testimonials", "title": "...", "items": [{"quote": "...", "name": "...", "role": "..."}]}
-    // - {"kind": "pricing", "title": "...", "plans": [{"name": "Starter", "price": "$19", "period": "/mo", "features": ["..."]}]}
     // - {"kind": "cta", "headline": "...", "body": "...", "cta": "..."}
-    // - {"kind": "footer", "copy": "...", "links": ["Privacy", "Terms", "Twitter"]}
+    // - {"kind": "footer", "copy": "...", "links": ["Docs", "GitHub", "Twitter", "Security"]}
 
     // For POSTER / FLYER:
     // - {"kind": "poster", "layout": "swiss|brutalist|techno|minimal", "kicker": "...", "title": "...", "subtitle": "...", "meta": "...", "place": "...", "lineup": ["Artist A", "Artist B", "Artist C"]}
@@ -69,20 +74,20 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "list", "title": "...", "items": [{"title": "...", "sub": "...", "meta": "..."}]}
     // - {"kind": "tabbar", "active": 0, "tabs": ["Home", "Activity", "Profile"]}
 
-    // For DASHBOARD (Tailor strictly to domain! Never use the same template for crypto vs ecommerce vs b2b):
+    // For DASHBOARD:
     // - Common Nav: {"kind": "dashnav", "brand": "...", "links": ["Trade", "Markets", "Portfolio"] or ["Orders", "Inventory", "Analytics"]}
     // - For TRADING / CRYPTO / FINTECH:
     //   * {"kind": "trading_terminal", "pair": "BTC/USDT", "price": "$67,420.50", "change": "+4.85%", "high": "$68,120.00", "low": "$64,890.00", "volume": "1.42B", "candles": [{"open": 64, "close": 68, "high": 70, "low": 63}, ...]}
     //   * {"kind": "order_book", "asks": [{"price": "67,480.00", "amount": "1.42", "total": "95.8k"}], "bids": [{"price": "67,410.00", "amount": "1.12", "total": "75.4k"}]}
-    //   * {"kind": "kpis", "items": [{"label": "24H VOLUME", "value": "$1.42B", "delta": "+12.4%"}, {"label": "OPEN INTEREST", "value": "$420.8M", "delta": "+5.2%"}, {"label": "FUNDING RATE", "value": "0.0100%", "delta": "Next 4h"}, {"label": "INDEX PRICE", "value": "$67,415.00", "delta": "Fair"}]}
+    //   * {"kind": "kpis", "items": [{"label": "24H VOLUME", "value": "$1.42B", "delta": "+12.4%"}, {"label": "OPEN INTEREST", "value": "$420.8M", "delta": "+5.2%"}]}
     // - For E-COMMERCE / STORE ADMIN:
-    //   * {"kind": "bento_analytics", "cards": [{"title": "Net Revenue", "metric": "$84,200", "detail": "+24% vs last week", "tag": "Sales"}, {"title": "Conversion Rate", "metric": "3.8%", "detail": "Top tier traffic", "tag": "Funnel"}, {"title": "Avg Order Value", "metric": "$112.50", "detail": "+$8.20 growth", "tag": "AOV"}, {"title": "Pending Fulfilment", "metric": "42 orders", "detail": "All ready to ship", "tag": "Ops"}]}
+    //   * {"kind": "bento_analytics", "cards": [{"title": "Net Revenue", "metric": "$84,200", "detail": "+24% vs last week", "tag": "Sales"}, {"title": "Conversion Rate", "metric": "3.8%", "detail": "Top tier traffic", "tag": "Funnel"}]}
     //   * {"kind": "products_grid", "title": "Top Selling Products", "items": [{"name": "Product Name", "category": "Category", "sales": "1,420", "revenue": "$85,200", "stock": "In Stock (84)", "trend": "+24%"}]}
-    //   * {"kind": "table", "title": "Recent Customer Orders", "headers": ["Order ID", "Customer", "Items", "Total", "Status"], "rows": [["#1094", "Elena Vance", "2x Wool Coat", "$340", "Paid"], ["#1093", "Marcus Wei", "1x Desk Pad", "$85", "Shipped"]]}
+    //   * {"kind": "table", "title": "Recent Customer Orders", "headers": ["Order ID", "Customer", "Items", "Total", "Status"], "rows": [["#1094", "Elena Vance", "2x Wool Coat", "$340", "Paid"]]}
     // - For B2B SAAS / TELEMETRY:
-    //   * {"kind": "bento_analytics", "cards": [{"title": "MRR", "metric": "$48.2k", "detail": "+14% MoM", "tag": "Revenue"}, {"title": "Active Seats", "metric": "3,420", "detail": "+8% growth", "tag": "Usage"}, {"title": "Churn Rate", "metric": "0.8%", "detail": "Negative net churn", "tag": "Retention"}, {"title": "API P99 Latency", "metric": "42ms", "detail": "Edge optimal", "tag": "Infra"}]}
+    //   * {"kind": "bento_analytics", "cards": [{"title": "MRR", "metric": "$48.2k", "detail": "+14% MoM", "tag": "Revenue"}, {"title": "P99 Latency", "metric": "14ms", "detail": "Edge optimal", "tag": "Infra"}]}
     //   * {"kind": "chart", "title": "Traffic & Ingestion Velocity", "caption": "Live event stream across 4 global regions", "series": [32, 45, 58, 62, 75, 89, 94, 110, 105, 128]}
-    //   * {"kind": "table", "title": "Audit Log & Access Events", "headers": ["Actor", "Resource", "IP Address", "Status"], "rows": [["api-gateway", "/v1/auth", "10.0.4.12", "Success"], ["admin@corp", "/settings/keys", "172.16.0.4", "Success"]]}
+    //   * {"kind": "table", "title": "Audit Log & Access Events", "headers": ["Actor", "Resource", "IP Address", "Status"], "rows": [["api-gateway", "/v1/auth", "10.0.4.12", "Success"]]}
 
     // For BRAND KIT:
     // - {"kind": "brandmark", "mark": "Single letter or geometric glyph", "name": "..."}
@@ -90,14 +95,16 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "type", "display": "Fraunces Serif", "body": "Figtree Sans"}
   ]
 }
-Design Diversity Rules:
-- NEVER repeat identical templates!
-  * A crypto prompt MUST use trading_terminal and order_book.
-  * An e-commerce prompt MUST use products_grid and customer orders table.
-  * An event/rave/techno poster MUST use layout="brutalist" with artist lineups and ticketed doors.
-  * A high-end architectural site MUST use layout="editorial-cover" with gallery monographs.
-  * A SaaS/product prompt SHOULD lead with a "split" or "centered" hero using visual="ui-mockup".
-- Ensure high contrast, specific human copy, and tailored aesthetics without repetitive filler.
+LAYOUT DIVERSITY MANDATE (STRICT):
+- NEVER generate the same sequential sections twice!
+- FOR DEVELOPER/AI/CLOUD/INFRASTRUCTURE PROMPTS:
+  * MUST USE terminal_hero, tech_bento, and architecture_flow!
+  * DO NOT use the generic 'ui-mockup' browser frame or 'gallery' cards for developer infrastructure!
+  * Color palette MUST use deep carbons/blacks (#000000, #0a0a0a, #111111) with crisp electric accents (cyan, neon violet, lime, or pure white), never washed-out pink or generic grays.
+- FOR EDITORIAL/FASHION/CERAMICS:
+  * Lead with editorial-cover hero and gallery monographs.
+- FOR APPS:
+  * Use mobile headers, interactive action chips, and bottom tab bar.
 
 FINAL QUALITY CHECK before returning (verify every point):
 1. Every string is real, specific, domain-correct copy. Zero lorem ipsum, zero "Feature One", zero "Company".
