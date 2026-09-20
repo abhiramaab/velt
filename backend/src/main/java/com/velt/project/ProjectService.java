@@ -67,7 +67,10 @@ public class ProjectService {
         spend(user, 2);
         String format = LayoutService.normalizeFormat(request.format());
         String prompt = request.prompt().trim();
-        JsonNode document = layouts.generate(prompt, format);
+        JsonNode document = layouts.generate(prompt, format, request.imageUrl());
+        String actualFormat = document.has("format") && !document.path("format").asText().isBlank()
+                ? document.path("format").asText()
+                : format;
         String title = request.title() != null && !request.title().isBlank()
                 ? request.title().trim()
                 : document.path("name").asText("Untitled draft");
@@ -75,7 +78,7 @@ public class ProjectService {
         Project project = new Project();
         project.setOwner(user);
         project.setTitle(title);
-        project.setFormat(format);
+        project.setFormat(actualFormat);
         project.setPrompt(prompt);
         project.setStatus("ready");
         project.setUpdatedAt(Instant.now());

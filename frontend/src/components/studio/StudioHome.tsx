@@ -57,11 +57,38 @@ export function StudioHome() {
     };
   }, []);
 
-  async function composeWith(text: string, fmt: string) {
-    if (!text.trim()) return;
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  function handleFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      setError("Please drop or select an image file (PNG, JPG, WebP).");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (typeof e.target?.result === "string") {
+        setImagePreview(e.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  }
+
+  async function composeWith(text: string, fmt: string, img?: string | null) {
+    if (!text.trim() && !img) return;
     setBusy(true);
     setError("");
-    const stages = ["Consulting ChatGPT", "Setting type", "Mixing a palette", "Composing the grid"];
+    const stages = img
+      ? ["Analyzing reference image...", "Discovering layout & medium...", "Mixing palette from visual DNA...", "Composing the grid"]
+      : ["Consulting ChatGPT", "Setting type", "Mixing a palette", "Composing the grid"];
     let i = 0;
     setStage(stages[0]);
     const tick = setInterval(() => {
@@ -69,7 +96,7 @@ export function StudioHome() {
       setStage(stages[i]);
     }, 700);
     try {
-      const res = await velt.create(text.trim(), fmt);
+      const res = await velt.create(text.trim() || "Design this reference for me.", fmt, img || undefined);
       saveSession(getToken()!, { ...res.project.owner, credits: res.creditsRemaining });
       router.push(`/studio/${res.project.id}`);
     } catch (err) {
@@ -82,7 +109,7 @@ export function StudioHome() {
   }
 
   async function compose() {
-    await composeWith(prompt, format);
+    await composeWith(prompt, format, imagePreview);
   }
 
   return (
@@ -93,29 +120,81 @@ export function StudioHome() {
         <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-8 sm:py-10">
           <p className="text-[12px] uppercase tracking-[0.2em] text-muted">New composition</p>
           <h1 className="font-display mt-2 text-3xl tracking-tight sm:text-4xl">What are we making?</h1>
-          <div className="prompt-ring mt-6 rounded-2xl border border-line bg-paper-2 p-3.5 sm:rounded-[28px] sm:p-4">
-            <div className="mb-3 flex flex-wrap gap-1.5">
-              {FORMATS.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setFormat(f.id)}
-                  className={`rounded-full px-3 py-1 text-[11px] ${
-                    format === f.id ? "bg-ink text-paper" : "text-muted hover:text-ink"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            className={`prompt-ring mt-6 rounded-2xl border transition-all ${
+              isDragging ? "border-accent bg-accent/5 ring-2 ring-accent/30" : "border-line bg-paper-2"
+            } p-3.5 sm:rounded-[28px] sm:p-4`}
+          >
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-1.5">
+                {FORMATS.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFormat(f.id)}
+                    className={`rounded-full px-3 py-1 text-[11px] ${
+                      format === f.id ? "bg-ink text-paper" : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-medium text-muted transition hover:border-ink hover:text-ink">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                <span>Attach reference</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFile(e.target.files[0]);
+                    }
+                  }}
+                />
+              </label>
             </div>
+
+            {imagePreview && (
+              <div className="mb-3 flex items-center gap-3 rounded-xl border border-line bg-paper p-2">
+                <img src={imagePreview} alt="Reference preview" className="h-12 w-12 rounded-lg object-cover border border-line" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-ink">Reference Attached</p>
+                  <p className="text-[11px] text-muted truncate">AI will discover the format (poster, web, app) & palette</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setImagePreview(null)}
+                  className="rounded-full p-1 text-muted hover:bg-paper-2 hover:text-ink"
+                  title="Remove image"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
-              placeholder="A quiet ceramic studio in Kyoto. Wabi-sabi, paper, warm clay."
+              placeholder={imagePreview ? "Design like this reference for me. Keep the visual rhythm and feel..." : "A quiet ceramic studio in Kyoto. Wabi-sabi, paper, warm clay."}
               className="w-full resize-none bg-transparent text-[15px] outline-none"
             />
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <span className="text-[12px] text-muted">{user ? `${user.credits} credits · 2 to compose` : ""}</span>
+              <span className="text-[12px] text-muted">
+                {user ? `${user.credits} credits · 2 to compose` : ""}
+                {isDragging && <span className="ml-2 text-accent font-medium">Drop screenshot to attach</span>}
+              </span>
               <button
                 onClick={compose}
                 disabled={busy}

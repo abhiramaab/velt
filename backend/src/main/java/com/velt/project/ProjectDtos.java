@@ -13,7 +13,8 @@ public class ProjectDtos {
     public record CreateProjectRequest(
             @NotBlank @Size(max = 4000) String prompt,
             String format,
-            String title
+            String title,
+            String imageUrl
     ) {}
 
     public record RefineRequest(

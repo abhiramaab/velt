@@ -35,17 +35,31 @@ public class XaiClient {
     }
 
     public Optional<JsonNode> completeJson(String system, String user) {
+        return completeWithVisionJson(system, user, null);
+    }
+
+    public Optional<JsonNode> completeWithVisionJson(String system, String user, String imageUrl) {
         if (!enabled()) {
             return Optional.empty();
         }
         try {
+            Object userContent;
+            if (imageUrl != null && !imageUrl.isBlank()) {
+                userContent = List.of(
+                        Map.of("type", "text", "text", user),
+                        Map.of("type", "image_url", "image_url", Map.of("url", imageUrl.trim()))
+                );
+            } else {
+                userContent = user;
+            }
+
             Map<String, Object> body = Map.of(
                     "model", model,
                     "temperature", 0.7,
                     "response_format", Map.of("type", "json_object"),
                     "messages", List.of(
                             Map.of("role", "system", "content", system),
-                            Map.of("role", "user", "content", user)
+                            Map.of("role", "user", "content", userContent)
                     )
             );
             String raw = http.post()

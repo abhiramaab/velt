@@ -18,15 +18,48 @@ public class LayoutService {
     }
 
     public JsonNode generate(String prompt, String format) {
+        return generate(prompt, format, null);
+    }
+
+    public JsonNode generate(String prompt, String format, String imageUrl) {
         String fmt = normalizeFormat(format);
-        Optional<JsonNode> llm = xai.completeJson(systemPrompt(), """
-                Format: %s
-                Prompt: %s
-                Return a complete design document JSON.
-                """.formatted(fmt, prompt));
+        String userMessage;
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            userMessage = """
+                    Reference Image Attached.
+                    IMPORTANT DISCOVERY TASK:
+                    1. First, examine the attached reference image carefully to discover what medium/type it actually is:
+                       - If it is an ad poster, event flyer, graphic print, or promo graphic -> format MUST be "poster" or "social" / "facebook" / "instagram". DO NOT design a website if the reference is a poster or print ad!
+                       - If it is a web page, SaaS landing page, or site mockup -> format should be "website" or "landing".
+                       - If it is a mobile application screen -> format should be "app".
+                       - If it is an admin dashboard or analytics table -> format should be "dashboard".
+                       - Only override this discovery if the user's explicit requested format was NOT "website" (e.g. if user specifically picked something else).
+                    2. Extract the visual DNA from the reference:
+                       - Dominant background, text, muted, surface, and accent hex colors.
+                       - Typography feel (serif vs sans, high contrast vs understated).
+                       - Spacing, border radius, rhythm, and layout structure.
+                    3. Compose an original design document honoring the reference's composition type and palette.
+
+                    Requested/Default Format: %s
+                    Prompt: %s
+                    Return a complete design document JSON.
+                    """.formatted(fmt, prompt);
+        } else {
+            userMessage = """
+                    Format: %s
+                    Prompt: %s
+                    Return a complete design document JSON.
+                    """.formatted(fmt, prompt);
+        }
+
+        Optional<JsonNode> llm = xai.completeWithVisionJson(systemPrompt(), userMessage, imageUrl);
         if (llm.isPresent() && llm.get().has("sections")) {
             ObjectNode node = (ObjectNode) llm.get();
-            node.put("format", fmt);
+            // If the LLM discovered a specific medium like poster or app from the reference image, honor it
+            String detectedFormat = node.has("format") && !node.get("format").asText().isBlank()
+                    ? normalizeFormat(node.get("format").asText())
+                    : fmt;
+            node.put("format", detectedFormat);
             if (!node.has("name")) {
                 node.put("name", brandName(prompt));
             }
