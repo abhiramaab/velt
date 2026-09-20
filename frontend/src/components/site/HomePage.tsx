@@ -30,6 +30,7 @@ import {
 import { FORMATS as ALL_FORMATS } from "@/lib/design";
 import { SAMPLES } from "@/lib/samples";
 import { ScaledMockup } from "@/components/renderer/Mockup";
+import { WEBSITE_SHOWCASES } from "@/lib/websiteShowcases";
 import { getToken } from "@/lib/api";
 import { Nav } from "./Nav";
 import { Footer } from "./Footer";
@@ -534,21 +535,45 @@ function Showcase() {
       </Reveal>
 
       <Reveal delay={2} className="vl-marquee-mask relative left-1/2 right-1/2 mt-12 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
-        <div className="vl-marquee flex w-max items-stretch gap-4">
-          {[...SHOWCASES, ...SHOWCASES].map((item, i) => {
-            const doc = SAMPLES[item.index % SAMPLES.length];
+        <div className="vl-marquee flex w-max items-stretch gap-6">
+          {[...WEBSITE_SHOWCASES, ...WEBSITE_SHOWCASES].map((item, i) => {
             return (
               <figure
-                key={`${doc.name}-${i}`}
-                className="group relative w-[76vw] max-w-[420px] shrink-0 overflow-hidden rounded-2xl border border-[#d6e6f7] bg-white sm:w-[460px]"
+                key={`${item.id}-${i}`}
+                className="group relative w-[82vw] max-w-[540px] shrink-0 overflow-hidden rounded-[24px] border border-slate-200/90 bg-white shadow-lg transition-all duration-300 hover:shadow-2xl sm:w-[540px]"
               >
-                <div className="relative isolate aspect-[4/3] overflow-hidden bg-[#eef6ff]">
+                {/* Browser Titlebar */}
+                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-3 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="size-2 rounded-full bg-rose-400" />
+                    <div className="size-2 rounded-full bg-amber-400" />
+                    <div className="size-2 rounded-full bg-emerald-400" />
+                  </div>
+                  <div className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white px-2.5 py-0.5 text-[10px] font-mono text-slate-500">
+                    <span className="size-1 rounded-full bg-emerald-500" />
+                    <span>https://{item.id}.com</span>
+                  </div>
+                  <div className="w-8" />
+                </div>
+
+                {/* Real Website Homepage Mockup */}
+                <div className="relative isolate aspect-[16/10] overflow-hidden bg-white">
                   <div className="pointer-events-none absolute inset-0">
-                    <ScaledMockup doc={doc} fit="width" maxScale={0.34} />
+                    <ScaledMockup doc={item.doc} device="desktop" fit="width" maxScale={0.38} />
                   </div>
                 </div>
-                <figcaption className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#06203a]/80 to-transparent px-4 pb-3 pt-12 text-[12px] font-medium text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                  {item.caption}
+
+                <figcaption className="border-t border-slate-100 bg-white px-4 py-3 flex items-center justify-between">
+                  <div>
+                    <div className="font-lastik text-sm font-semibold text-slate-900">{item.title}</div>
+                    <div className="text-[11px] text-slate-500 line-clamp-1">"{item.prompt}"</div>
+                  </div>
+                  <Link
+                    href={`/studio?prompt=${encodeURIComponent(item.prompt)}&format=website`}
+                    className="shrink-0 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-slate-800"
+                  >
+                    Remix
+                  </Link>
                 </figcaption>
               </figure>
             );
