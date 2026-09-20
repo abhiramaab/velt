@@ -6,8 +6,9 @@ import { Code2, Download, MessageSquare, Monitor, Smartphone, Tablet } from "luc
 import { Sidebar } from "./Sidebar";
 import { ComposingOverlay } from "./StudioHome";
 import { ScaledMockup } from "@/components/renderer/Mockup";
-import { getToken, saveSession, velt, type ProjectDetail } from "@/lib/api";
+import { getToken, getStoredUser, saveSession, velt, type ProjectDetail } from "@/lib/api";
 import { generateExportBundle } from "@/lib/exportBundle";
+import { UpgradeModal } from "./UpgradeModal";
 
 export function Editor({ id }: { id: string }) {
   const router = useRouter();
@@ -18,6 +19,7 @@ export function Editor({ id }: { id: string }) {
   const [error, setError] = useState("");
   const [stage, setStage] = useState("");
   const [pane, setPane] = useState<"preview" | "chat">("preview");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,6 +48,13 @@ export function Editor({ id }: { id: string }) {
   async function refine(e: React.FormEvent) {
     e.preventDefault();
     if (!message.trim() || !project) return;
+
+    const storedUser = getStoredUser();
+    if (storedUser && storedUser.credits <= 0 && storedUser.plan !== "Max Lifetime VIP" && !storedUser.email.includes("abhiram")) {
+      setShowUpgrade(true);
+      return;
+    }
+
     setBusy(true);
     setError("");
     setStage("Listening, then moving type");
@@ -54,8 +63,12 @@ export function Editor({ id }: { id: string }) {
       setProject(res.project);
       saveSession(getToken()!, { ...res.project.owner, credits: res.creditsRemaining });
       setMessage("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not refine.");
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : "Could not refine.";
+      setError(msg);
+      if (msg.toLowerCase().includes("limit") || msg.toLowerCase().includes("upgrade")) {
+        setShowUpgrade(true);
+      }
     } finally {
       setBusy(false);
       setStage("");
@@ -222,6 +235,13 @@ export function Editor({ id }: { id: string }) {
           <MessageSquare size={15} /> Refine
         </button>
       </div>
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        title="Upgrade to Refine Further"
+        description="You've used your free design trial. Upgrade your plan to unlock unlimited refinements, more designs, and exports."
+      />
     </div>
   );
 }

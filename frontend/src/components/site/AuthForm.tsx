@@ -46,20 +46,6 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
   }
 
-  async function demo() {
-    setBusy(true);
-    setError("");
-    try {
-      const res = await velt.login("studio@velt.app", "veltstudio");
-      saveSession(res.token, res.user);
-      router.push(nextQuery());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Demo login failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <main className="relative grid min-h-screen md:grid-cols-2">
       <div className="hero-sky relative hidden overflow-hidden md:block">
@@ -132,23 +118,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
               placeholder="Password"
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-sky-400"
             />
-            {error ? <p className="text-sm text-red-500">{error}</p> : null}
-            <button
-              disabled={busy}
-              className="w-full rounded-full bg-sky-500 py-3 text-sm font-semibold text-white hover:bg-sky-600 disabled:opacity-60"
-            >
-              {busy ? "Opening…" : mode === "signup" ? "Create account" : "Login"}
-            </button>
-          </form>
-          <button
-            onClick={demo}
-            disabled={busy}
-            className="mt-3 w-full rounded-full border border-slate-200 py-3 text-sm text-slate-600"
-          >
-            Continue as demo studio
-          </button>
+              {error ? <p className="text-sm text-red-500">{error}</p> : null}
+              <button
+                disabled={busy}
+                className="w-full rounded-full bg-sky-500 py-3 text-sm font-semibold text-white hover:bg-sky-600 disabled:opacity-60"
+              >
+                {busy ? "Opening…" : mode === "signup" ? "Create account" : "Login"}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </main>
-  );
-}
+      </main>
+    );
+  }

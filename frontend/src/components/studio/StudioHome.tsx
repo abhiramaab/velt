@@ -6,6 +6,7 @@ import { Sidebar } from "./Sidebar";
 import { FORMATS, SAMPLE_PROMPTS } from "@/lib/design";
 import { getToken, saveSession, velt, type ProjectSummary, type User } from "@/lib/api";
 import { ScaledMockup } from "@/components/renderer/Mockup";
+import { UpgradeModal } from "./UpgradeModal";
 
 export function StudioHome() {
   const router = useRouter();
@@ -59,17 +60,16 @@ export function StudioHome() {
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   function handleFile(file: File) {
     if (!file.type.startsWith("image/")) {
-      setError("Please drop or select an image file (PNG, JPG, WebP).");
+      setError("Please drop an image file (PNG, JPG, WebP).");
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => {
-      if (typeof e.target?.result === "string") {
-        setImagePreview(e.target.result);
-      }
+    reader.onload = () => {
+      setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
   }
@@ -87,6 +87,12 @@ export function StudioHome() {
 
   async function composeWith(text: string, fmt: string, img?: string | null, refUrl?: string | null) {
     if (!text.trim() && !img && !refUrl) return;
+
+    if (user && user.credits <= 0 && user.plan !== "Max Lifetime VIP (Admin)" && !user.email.includes("abhiram")) {
+      setShowUpgrade(true);
+      return;
+    }
+
     setBusy(true);
     setError("");
     const stages = refUrl
@@ -109,8 +115,12 @@ export function StudioHome() {
       );
       saveSession(getToken()!, { ...res.project.owner, credits: res.creditsRemaining });
       router.push(`/studio/${res.project.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not compose.");
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : "Could not compose.";
+      setError(msg);
+      if (msg.toLowerCase().includes("limit") || msg.toLowerCase().includes("upgrade")) {
+        setShowUpgrade(true);
+      }
     } finally {
       clearInterval(tick);
       setBusy(false);
@@ -249,7 +259,19 @@ export function StudioHome() {
             />
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[12px] text-muted">
-                {user ? `${user.credits} credits · 2 to compose` : ""}
+                {user ? (
+                  user.credits <= 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowUpgrade(true)}
+                      className="font-medium text-amber-600 dark:text-amber-400 underline hover:opacity-80"
+                    >
+                      0 designs remaining · Upgrade to Pro
+                    </button>
+                  ) : (
+                    `${user.credits} ${user.credits === 1 ? "design" : "credits"} remaining · 1 to compose`
+                  )
+                ) : ""}
                 {isDragging && <span className="ml-2 text-accent font-medium">Drop screenshot to attach</span>}
               </span>
               <button
@@ -274,35 +296,37 @@ export function StudioHome() {
             ))}
           </div>
 
-          <h2 className="mt-14 font-display text-2xl">Your drafts</h2>
-          {projects.length === 0 ? (
-            <p className="mt-3 text-sm text-muted">Nothing yet. Write a sentence above.</p>
-          ) : (
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-5">
-              {projects.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => router.push(`/studio/${p.id}`)}
-                  className="overflow-hidden rounded-[22px] border border-line bg-paper-2 text-left transition hover:border-accent/40"
-                >
-                  <div className="relative isolate aspect-[16/10] overflow-hidden bg-paper-2">
-                    <div className="pointer-events-none absolute inset-0">
-                      <ScaledMockup doc={p.preview} fit="width" maxScale={0.4} />
+          <div className="mt-12">
+            <h2 className="text-sm font-medium text-muted">Recent drafts</h2>
+            {projects.length === 0 ? (
+              <div className="mt-4 rounded-3xl border border-dashed border-line p-10 text-center text-sm text-muted">
+                No compositions yet. Start one above.
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {projects.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => router.push(`/studio/${p.id}`)}
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-paper-2 text-left transition hover:border-ink"
+                  >
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-paper">
+                      <div className="pointer-events-none absolute inset-0 origin-top-left scale-[0.38]">
+                        <ScaledMockup doc={p.preview} device="desktop" fit="height" maxScale={1} />
+                      </div>
                     </div>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate font-display text-lg">{p.title}</span>
-                      <span className="shrink-0 text-[10px] uppercase tracking-[0.14em] text-muted">{p.format}</span>
+                    <div className="p-3">
+                      <p className="font-display truncate text-sm">{p.title}</p>
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-muted">{p.format}</p>
                     </div>
-                    <p className="mt-1 line-clamp-1 text-[12px] text-muted">{p.prompt}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>
   );
 }

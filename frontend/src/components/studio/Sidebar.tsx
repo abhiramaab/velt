@@ -106,12 +106,21 @@ export function Sidebar() {
           <div className="truncate text-[12px] text-muted">{user?.email}</div>
           <div className="mt-1 flex items-center justify-between text-sm">
             <span>
-              {user?.credits ?? "—"} <span className="text-muted">credits</span>
+              {user?.credits ?? "—"} <span className="text-muted">{user?.credits === 1 ? "design" : "credits"}</span>
             </span>
             <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em]">
               {user?.plan || "free"}
             </span>
           </div>
+          {user && user.plan !== "Max Lifetime VIP" && !user.email.includes("abhiram") && (
+            <Link
+              href="/pricing"
+              className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-center text-xs font-medium text-paper transition hover:opacity-90"
+            >
+              <Sparkles size={12} />
+              Upgrade Plan
+            </Link>
+          )}
           <button
             onClick={() => {
               clearSession();

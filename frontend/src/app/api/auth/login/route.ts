@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     // Master Admin account: abhiram.b@icloud.com with Abhi60@123
     let plan = "Free Trial";
-    let credits = 3;
+    let credits = 1;
     let name = cleanEmail.split("@")[0] || "Creator";
 
     if (cleanEmail === "abhiram.b@icloud.com" || cleanEmail === "abhiram.b@icloud.om") {

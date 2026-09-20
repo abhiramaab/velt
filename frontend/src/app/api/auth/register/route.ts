@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       email: cleanEmail,
       name: cleanName,
       plan: "Free Trial",
-      credits: 3,
+      credits: 1,
     };
 
     const token = signJwt({
