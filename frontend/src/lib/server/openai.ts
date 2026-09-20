@@ -108,7 +108,7 @@ FINAL QUALITY CHECK before returning (verify every point):
 6. The result would look credible as a real shipped product at shipper.now / v0 quality.
 `;
 
-export async function generateWithOpenAI(prompt: string, format: string): Promise<DesignDoc> {
+export async function generateWithOpenAI(prompt: string, format: string, imageUrl?: string): Promise<DesignDoc> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("Missing OpenAI API Key");
@@ -127,7 +127,30 @@ export async function generateWithOpenAI(prompt: string, format: string): Promis
 - Hero Composition: ${triage.heroComposition || "editorial-cover"}
 Respect these triage directives strictly in the theme colors, typography, hero layout, and section choices! Never output generic filler.\n`;
   }
+
+  if (imageUrl) {
+    userInstruction += `\n[REFERENCE IMAGE ATTACHED - STRICT DISCOVERY & FAITHFULNESS]:
+1. DISCOVER THE TRUE MEDIUM:
+   - Carefully examine what the image actually is.
+   - If it is dark tech infrastructure, AI software, developer tooling, or terminal -> KEEP IT PITCH DARK (#000000 or deep carbon/noir), sleek, with neon/white typography, geometric/minimalist aesthetics, high-contrast buttons, and tech/infrastructure vocabulary!
+   - If it is an ad poster, event flyer, graphic print, or promo -> format MUST be "poster" or "social". DO NOT make an ecommerce or irrelevant site if the image is tech infrastructure or a poster!
+   - Never turn a dark AI/cloud/developer tool into a light ecommerce clothing store like "LuxeCart".
+2. EXTRACT THE EXACT VISUAL DNA:
+   - Background: match the reference image background exactly (e.g. if the image is black/dark, theme.bg MUST be black/dark like #000000 or #0a0a0a).
+   - Accents and text: match the reference lighting, typography style, and button styling.
+   - Hero and composition: mimic the visual weight, layout arrangement, and focal point seen in the reference image.
+`;
+  }
+
   userInstruction += `Compose a stunning, structurally unique design document JSON.`;
+
+  let userContent: any = userInstruction;
+  if (imageUrl) {
+    userContent = [
+      { type: "text", text: userInstruction },
+      { type: "image_url", image_url: { url: imageUrl.trim() } },
+    ];
+  }
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -137,13 +160,13 @@ Respect these triage directives strictly in the theme colors, typography, hero l
     },
     body: JSON.stringify({
       model: "gpt-4o",
-      temperature: 0.85,
+      temperature: 0.7,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: userInstruction,
+          content: userContent,
         },
       ],
     }),
