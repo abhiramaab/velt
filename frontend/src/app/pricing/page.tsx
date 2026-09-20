@@ -19,23 +19,26 @@ const PLANS = [
     id: "starter",
     name: "Starter",
     monthly: 6,
-    note: "Perfect for getting started.",
+    note: "Free 2-day trial included (200 credits), then $6/mo.",
     items: [
-      "85 images / month",
-      "Website Design generations",
-      "Graphic Design generations",
-      "Chat-based refinements",
+      "2-Day Free Trial (up to 200 credits)",
+      "85 high-res designs / month",
+      "Website & Landing Page generator",
+      "Full Code (Tailwind + HTML) & PNG Export",
+      "Chat-based AI refinements",
     ],
   },
   {
     id: "pro",
     name: "Pro",
     monthly: 19,
-    note: "For creators who want more.",
+    note: "Free 2-day trial included (200 credits), then $19/mo.",
     items: [
-      "250 images / month",
+      "2-Day Free Trial (up to 200 credits)",
+      "250 high-res designs / month",
       "Everything in Starter",
-      "Advanced Reasoning",
+      "Advanced Reasoning & Layout Extraction",
+      "Clone from URL (e.g. shipper.now)",
       "Priority rendering queue",
     ],
   },
@@ -43,12 +46,14 @@ const PLANS = [
     id: "max",
     name: "Max",
     monthly: 26,
-    note: "Built for power users.",
+    note: "Free 2-day trial included (200 credits), then $26/mo.",
     items: [
-      "450 images / month",
+      "2-Day Free Trial (up to 200 credits)",
+      "450 high-res designs / month",
       "Everything in Pro",
-      "Long-context memory",
-      "Priority support",
+      "Long-context memory & unlimited revisions",
+      "Priority VIP generation engine",
+      "Direct designer support",
     ],
   },
 ];
@@ -179,6 +184,13 @@ export default function PricingPage() {
         <p className="mt-4 max-w-xl text-slate-500">
           Flexible plans for generating polished UI, graphics, mockups, and design iterations with a clean workflow.
         </p>
+
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+          <Sparkles className="size-5 shrink-0 text-sky-600" />
+          <span>
+            <strong>Free 2-Day Trial on All Plans:</strong> Get started immediately with up to <strong>200 credits</strong>. Cancel anytime with no commitments.
+          </span>
+        </div>
 
         {errorMessage && (
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">

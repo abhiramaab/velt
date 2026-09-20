@@ -95,12 +95,14 @@ Return ONLY a valid JSON object matching this schema:
     // - {"kind": "type", "display": "Fraunces Serif", "body": "Figtree Sans"}
   ]
 }
-LAYOUT DIVERSITY MANDATE (STRICT):
-- NEVER generate the same sequential sections twice!
+- STRICT THEME MANDATE: LIGHT THEME ONLY!
+  * Every generated design MUST be in a crisp, ultra-clean LIGHT THEME (#FFFFFF, #FAFAFA, #F8F9FA, #F6F4F0, or #F0F0F0 page background).
+  * Absolutely NO dark theme backgrounds (#000000, #0a0a0a, #111111).
+  * Typography must be deep, sharp ink (#0F172A, #111827, #171411, or #18181B) with refined muted subtexts (#64748B, #6B7280) and subtle hairline borders (#E2E8F0, #E5E7EB, #E2DDD6).
+  * High-end tech pages (like shipper.now, linear.app, stripe) achieve their punch through crisp glass cards, vibrant electric pill badges, and interactive gradient accents ON CRISP WHITE/LIGHT CANVASES.
 - FOR DEVELOPER/AI/CLOUD/INFRASTRUCTURE PROMPTS:
-  * MUST USE terminal_hero, tech_bento, and architecture_flow!
+  * MUST USE terminal_hero, tech_bento, and architecture_flow with light canvas and dark terminal preview/cards!
   * DO NOT use the generic 'ui-mockup' browser frame or 'gallery' cards for developer infrastructure!
-  * Color palette MUST use deep carbons/blacks (#000000, #0a0a0a, #111111) with crisp electric accents (cyan, neon violet, lime, or pure white), never washed-out pink or generic grays.
 - FOR EDITORIAL/FASHION/CERAMICS:
   * Lead with editorial-cover hero and gallery monographs.
 - FOR APPS:

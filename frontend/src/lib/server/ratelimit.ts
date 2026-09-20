@@ -6,8 +6,8 @@ export interface PlanLimits {
 
 export const PLANS_CONFIG: Record<string, PlanLimits> = {
   free: {
-    name: "Free Trial",
-    monthlyLimit: 1,
+    name: "Free Trial (2-Day)",
+    monthlyLimit: 200,
     unlimited: false,
   },
   starter: {

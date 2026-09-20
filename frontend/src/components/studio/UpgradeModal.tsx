@@ -13,8 +13,8 @@ interface UpgradeModalProps {
 export function UpgradeModal({
   isOpen,
   onClose,
-  title = "You've used your 1 free design",
-  description = "New accounts include 1 complimentary design. Upgrade to any plan to unlock unlimited potential, instant exports, and priority generations.",
+  title = "Free Trial Limit Reached",
+  description = "Your 2-day free trial (up to 200 credits) has ended or reached its limit. Upgrade to Starter, Pro, or Max to continue generating and exporting production-grade layouts.",
 }: UpgradeModalProps) {
   if (!isOpen) return null;
 

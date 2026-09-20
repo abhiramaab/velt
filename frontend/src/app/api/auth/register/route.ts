@@ -24,8 +24,8 @@ export async function POST(req: Request) {
       id: `usr_${Buffer.from(cleanEmail).toString("hex").slice(0, 16)}`,
       email: cleanEmail,
       name: cleanName,
-      plan: "Free Trial",
-      credits: 1,
+      plan: "Free Trial (2-Day)",
+      credits: 200,
     };
 
     const token = signJwt({

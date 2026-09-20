@@ -19,8 +19,8 @@ export async function POST(req: Request) {
     const cleanEmail = email.trim().toLowerCase();
 
     // Master Admin account: abhiram.b@icloud.com with Abhi60@123
-    let plan = "Free Trial";
-    let credits = 1;
+    let plan = "Free Trial (2-Day)";
+    let credits = 200;
     let name = cleanEmail.split("@")[0] || "Creator";
 
     if (cleanEmail === "abhiram.b@icloud.com" || cleanEmail === "abhiram.b@icloud.om") {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       credits = 999999;
       name = "Abhiram (Admin)";
     } else {
-      const usage = getUserUsage(cleanEmail, "Free Trial");
+      const usage = getUserUsage(cleanEmail, "Free Trial (2-Day)");
       credits = usage.remaining;
     }
 

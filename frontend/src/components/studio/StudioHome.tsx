@@ -269,7 +269,7 @@ export function StudioHome() {
                       0 designs remaining · Upgrade to Pro
                     </button>
                   ) : (
-                    `${user.credits} ${user.credits === 1 ? "design" : "credits"} remaining · 1 to compose`
+                    `${user.credits} credits remaining (2-Day Trial) · 1 to compose`
                   )
                 ) : ""}
                 {isDragging && <span className="ml-2 text-accent font-medium">Drop screenshot to attach</span>}
