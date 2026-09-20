@@ -414,31 +414,100 @@ function Visual({
     );
   }
 
-  // 2. Architecture / Swiss Grid Frame
+  // 2. Architecture / Swiss Grid Frame — generated geometry, no photo assets
   if (kind === "architecture" || kind === "swiss") {
+    const panels = [
+      { label: "Form", ratio: "col-span-2 row-span-2" },
+      { label: "Light", ratio: "" },
+      { label: "Mass", ratio: "" },
+      { label: "Site", ratio: "col-span-2" },
+    ];
     return (
       <div
-        className="relative overflow-hidden p-6"
+        className="relative overflow-hidden p-5"
         style={{
           background: theme.surface,
           border: `1px solid ${theme.line}`,
           borderRadius: theme.radius || "4px",
         }}
       >
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] mb-4 text-slate-500 font-mono">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] mb-4" style={{ color: theme.muted }}>
           <span>Plate 01 // Section</span>
-          <span className="font-bold text-red-600">PMS 185</span>
+          <span className="font-bold" style={{ color: theme.accent }}>01 / 04</span>
         </div>
-        <div className="grid grid-cols-3 gap-2 h-36">
-          <div className="col-span-2 rounded bg-slate-200 overflow-hidden relative">
-            <img src="/showcases/s3.jpg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-0.5 text-[9px] font-mono text-white">
-              Gstaad Library
+        <div className="grid grid-cols-4 grid-rows-2 gap-2 h-44">
+          {panels.map((p, i) => (
+            <div
+              key={p.label}
+              className={`relative overflow-hidden rounded ${p.ratio}`}
+              style={{
+                background: i === 0 ? theme.accent : i === 3 ? theme.fg : theme.bg,
+                border: `1px solid ${theme.line}`,
+                color: i === 0 ? theme.accentFg : i === 3 ? theme.bg : theme.fg,
+              }}
+            >
+              <span className="absolute bottom-2 left-2 text-[9px] font-mono uppercase tracking-[0.18em] opacity-80">
+                {p.label}
+              </span>
+              {i === 0 && (
+                <div className="absolute inset-0 opacity-30">
+                  <div className="absolute left-1/2 top-0 h-full w-px bg-current" />
+                  <div className="absolute top-1/2 left-0 h-px w-full bg-current" />
+                  <div className="absolute right-4 top-4 h-10 w-10 rounded-full border-2 border-current" />
+                </div>
+              )}
             </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Browser / product UI mockup — a real interface wireframe in the theme
+  if (kind === "ui-mockup" || kind === "browser") {
+    const rows = [72, 88, 60, 94, 78];
+    return (
+      <div
+        className="overflow-hidden shadow-sm"
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.line}`,
+          borderRadius: theme.radius || "12px",
+        }}
+      >
+        <div className="flex items-center gap-2 px-3.5 py-2.5" style={{ borderBottom: `1px solid ${theme.line}` }}>
+          <span className="size-2 rounded-full" style={{ background: theme.line }} />
+          <span className="size-2 rounded-full" style={{ background: theme.line }} />
+          <span className="size-2 rounded-full" style={{ background: theme.line }} />
+          <span className="ml-2 flex-1 truncate rounded px-2 py-0.5 text-[9px]" style={{ background: theme.bg, color: theme.muted }}>
+            app.preview
+          </span>
+        </div>
+        <div className="grid grid-cols-[88px_1fr] min-h-[210px]">
+          <div className="p-3 space-y-2" style={{ borderRight: `1px solid ${theme.line}`, background: theme.bg }}>
+            <div className="h-2 w-full rounded-full" style={{ background: theme.accent, opacity: 0.9 }} />
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-1.5 rounded-full" style={{ background: theme.line, width: `${80 - i * 12}%` }} />
+            ))}
           </div>
-          <div className="flex flex-col justify-between p-3 rounded" style={{ background: theme.accent, color: theme.accentFg }}>
-            <span className="text-[10px] uppercase font-bold tracking-widest">Est. 2011</span>
-            <span className="font-mono text-xs font-semibold">ZÜRICH</span>
+          <div className="p-3.5">
+            <div className="flex items-center justify-between">
+              <div className="h-2.5 w-24 rounded-full" style={{ background: theme.fg, opacity: 0.85 }} />
+              <div className="h-5 w-14 rounded-full" style={{ background: theme.accent }} />
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="rounded p-2" style={{ background: theme.bg, border: `1px solid ${theme.line}` }}>
+                  <div className="h-1.5 w-8 rounded-full" style={{ background: theme.muted, opacity: 0.5 }} />
+                  <div className="mt-1.5 h-2.5 w-12 rounded-full" style={{ background: theme.fg, opacity: 0.8 }} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex items-end gap-1.5 h-16 rounded p-2" style={{ background: theme.bg }}>
+              {rows.map((h, i) => (
+                <div key={i} className="flex-1 rounded-t" style={{ height: `${h}%`, background: i === rows.length - 1 ? theme.accent : theme.fg, opacity: i === rows.length - 1 ? 1 : 0.25 }} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -528,24 +597,39 @@ function Visual({
     );
   }
 
+  // Default: an abstract but composed product frame in the theme palette
   return (
-    <div className="relative min-h-[200px]">
-      <div
-        className="absolute inset-4"
-        style={{ background: theme.fg, opacity: 0.92, borderRadius: theme.radius }}
-      />
-      <div
-        className="absolute right-0 top-0 w-[55%] h-[70%]"
-        style={{ background: theme.accent, borderRadius: theme.radius }}
-      />
-      <div
-        className="absolute left-0 bottom-0 w-[48%] h-[42%]"
-        style={{
-          background: theme.surface,
-          border: `1px solid ${theme.line}`,
-          borderRadius: theme.radius,
-        }}
-      />
+    <div
+      className="relative min-h-[220px] overflow-hidden p-5 flex flex-col justify-between"
+      style={{
+        background: theme.surface,
+        border: `1px solid ${theme.line}`,
+        borderRadius: theme.radius || "16px",
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="size-7 rounded-lg" style={{ background: theme.accent }} />
+          <span className="h-2 w-20 rounded-full" style={{ background: theme.fg, opacity: 0.8 }} />
+        </div>
+        <span className="h-5 w-14 rounded-full" style={{ background: theme.bg, border: `1px solid ${theme.line}` }} />
+      </div>
+      <div className="my-4 space-y-2.5">
+        <div className="h-3 w-3/4 rounded-full" style={{ background: theme.fg, opacity: 0.85 }} />
+        <div className="h-2 w-1/2 rounded-full" style={{ background: theme.line }} />
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="rounded-lg p-2.5"
+            style={{ background: theme.bg, border: `1px solid ${theme.line}` }}
+          >
+            <span className="block size-4 rounded" style={{ background: i === 1 ? theme.accent : theme.fg, opacity: i === 1 ? 1 : 0.25 }} />
+            <span className="mt-2 block h-1.5 w-10 rounded-full" style={{ background: theme.line }} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1095,12 +1179,18 @@ function Actions({ section, theme }: { section: Section; theme: Theme }) {
   const items = (section.items as { label: string }[]) || [];
   return (
     <div className="px-6 py-4 grid grid-cols-4 gap-3">
-      {items.map((item) => (
+      {items.map((item, i) => (
         <div key={item.label} className="text-center">
           <div
-            className="w-12 h-12 mx-auto mb-2 rounded-full"
-            style={{ background: theme.surface, border: `1px solid ${theme.line}` }}
-          />
+            className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center"
+            style={{
+              background: i === 0 ? theme.accent : theme.surface,
+              color: i === 0 ? theme.accentFg : theme.accent,
+              border: `1px solid ${i === 0 ? theme.accent : theme.line}`,
+            }}
+          >
+            <span className="block size-4 rounded-[4px] border-2 border-current opacity-80" />
+          </div>
           <div className="text-[10px]" style={{ color: theme.muted }}>
             {item.label}
           </div>
@@ -1118,14 +1208,21 @@ function List({ section, theme }: { section: Section; theme: Theme }) {
         {String(section.title || "")}
       </div>
       <div className="space-y-2">
-        {items.map((item) => (
+        {items.map((item, i) => (
           <div
             key={item.title}
-            className="flex items-center justify-between px-4 py-3"
+            className="flex items-center gap-3 px-4 py-3"
             style={{ background: theme.surface, borderRadius: theme.radius }}
           >
-            <span className="text-[13px]">{item.title}</span>
-            <span className="text-[11px]" style={{ color: theme.muted }}>
+            <span
+              className="size-9 shrink-0 rounded-lg"
+              style={{
+                background: i % 2 === 0 ? theme.accent : theme.fg,
+                opacity: i % 2 === 0 ? 0.9 : 0.14,
+              }}
+            />
+            <span className="min-w-0 flex-1 truncate text-[13px]">{item.title}</span>
+            <span className="shrink-0 text-[11px]" style={{ color: theme.muted }}>
               {item.meta}
             </span>
           </div>

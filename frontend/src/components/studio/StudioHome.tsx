@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { FORMATS, SAMPLE_PROMPTS } from "@/lib/design";
 import { getToken, saveSession, velt, type ProjectSummary, type User } from "@/lib/api";
-import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
+import { ScaledMockup } from "@/components/renderer/Mockup";
 
 export function StudioHome() {
   const router = useRouter();
@@ -149,12 +149,9 @@ export function StudioHome() {
                   onClick={() => router.push(`/studio/${p.id}`)}
                   className="overflow-hidden rounded-[22px] border border-line bg-paper-2 text-left transition hover:border-accent/40"
                 >
-                  <div className="preview-frame relative aspect-[16/10] overflow-hidden">
-                    <div
-                      className="pointer-events-none absolute left-0 top-0 origin-top-left"
-                      style={{ width: 1280, transform: "scale(calc(100cqw / 1280))" }}
-                    >
-                      <PrototypeRenderer doc={p.preview} />
+                  <div className="relative isolate aspect-[16/10] overflow-hidden bg-paper-2">
+                    <div className="pointer-events-none absolute inset-0">
+                      <ScaledMockup doc={p.preview} fit="width" maxScale={0.4} />
                     </div>
                   </div>
                   <div className="px-4 py-3">

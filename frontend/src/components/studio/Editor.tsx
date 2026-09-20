@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Code2, Download, MessageSquare, Monitor, Smartphone, Tablet } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ComposingOverlay } from "./StudioHome";
-import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
+import { ScaledMockup } from "@/components/renderer/Mockup";
 import { getToken, saveSession, velt, type ProjectDetail } from "@/lib/api";
 import { generateExportBundle } from "@/lib/exportBundle";
 
@@ -18,12 +18,7 @@ export function Editor({ id }: { id: string }) {
   const [error, setError] = useState("");
   const [stage, setStage] = useState("");
   const [pane, setPane] = useState<"preview" | "chat">("preview");
-  const [frameScale, setFrameScale] = useState(0.58);
-  const [frameHeight, setFrameHeight] = useState(0);
-  const width = device === "mobile" ? 390 : device === "tablet" ? 768 : 1280;
   const endRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const docRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -47,30 +42,6 @@ export function Editor({ id }: { id: string }) {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [project?.messages.length]);
-
-  useEffect(() => {
-    const stage = stageRef.current;
-    const doc = docRef.current;
-    if (!stage) return;
-    const measure = () => {
-      const natural = width;
-      const isNarrow = window.innerWidth < 1024;
-      const maxScale = device === "mobile" ? 1 : device === "tablet" ? 0.75 : 0.58;
-      const available = Math.max(200, stage.clientWidth - (isNarrow ? 24 : 64));
-      const next = Math.min(maxScale, available / natural);
-      setFrameScale(next);
-      setFrameHeight(doc ? doc.scrollHeight * next : 0);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(stage);
-    if (doc) ro.observe(doc);
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [width, project?.design.document, device]);
 
   async function refine(e: React.FormEvent) {
     e.preventDefault();
@@ -171,27 +142,19 @@ export function Editor({ id }: { id: string }) {
               </button>
             </div>
           </header>
-          <div
-            ref={stageRef}
-            className="flex flex-1 items-start justify-center overflow-auto bg-[linear-gradient(#d8d0c4_1px,transparent_1px),linear-gradient(90deg,#d8d0c4_1px,transparent_1px)] bg-[size:28px_28px] p-3 pb-16 sm:p-6 lg:p-8 lg:pb-8"
-          >
+          <div className="flex flex-1 items-start justify-center overflow-auto bg-[linear-gradient(#d8d0c4_1px,transparent_1px),linear-gradient(90deg,#d8d0c4_1px,transparent_1px)] bg-[size:28px_28px] p-3 pb-16 sm:p-6 lg:p-8 lg:pb-8">
             {project ? (
               <div
-                className={`frame-shadow overflow-hidden rounded-[24px] border border-line bg-paper ${
-                  device === "mobile" ? "max-h-[78dvh] overflow-y-auto" : ""
+                className={`relative isolate w-full overflow-hidden rounded-[24px] border border-line bg-paper frame-shadow ${
+                  device === "mobile" ? "max-w-[402px]" : device === "tablet" ? "max-w-[900px]" : "max-w-[1440px]"
                 }`}
-                style={{
-                  width: width * frameScale,
-                  height: frameHeight ? frameHeight : undefined,
-                }}
               >
-                <div
-                  ref={docRef}
-                  className="origin-top-left"
-                  style={{ width, transform: `scale(${frameScale})` }}
-                >
-                  <PrototypeRenderer doc={project.design.document} device={device} />
-                </div>
+                <ScaledMockup
+                  doc={project.design.document}
+                  device={device}
+                  fit="height"
+                  maxScale={1}
+                />
               </div>
             ) : (
               <p className="text-sm text-muted">Loading draft…</p>

@@ -37,7 +37,6 @@ export const SAMPLES: DesignDoc[] = [
       {
         kind: "hero",
         layout: "editorial-cover",
-        image: "/showcases/s3.jpg",
         kicker: "Zurich · Milano · Est. 2014",
         meta: "Volume IX // Edition 2026",
         headline: "Architecture of silence and enduring weight.",
@@ -60,9 +59,9 @@ export const SAMPLES: DesignDoc[] = [
         subtitle: "Monographs 2022—2026 across Switzerland, Northern Italy, and the Engadin Valley.",
         layout: "grid-3",
         items: [
-          { title: "Haus am Rigi", tag: "Alpine Pavilion", meta: "Küssnacht · 2024", image: "/showcases/s3.jpg" },
-          { title: "Gstaad Library & Archive", tag: "Civic", meta: "Bernese Oberland · 2025", image: "/showcases/s1.jpg" },
-          { title: "Schaffhausen Concrete Villa", tag: "Residential", meta: "Rhine Valley · 2026", image: "/showcases/s2.jpg" },
+          { title: "Haus am Rigi", tag: "Alpine Pavilion", meta: "Küssnacht · 2024" },
+          { title: "Gstaad Library & Archive", tag: "Civic", meta: "Bernese Oberland · 2025" },
+          { title: "Schaffhausen Concrete Villa", tag: "Residential", meta: "Rhine Valley · 2026" },
         ],
       },
       {
@@ -99,7 +98,6 @@ export const SAMPLES: DesignDoc[] = [
       {
         kind: "hero",
         layout: "editorial-cover",
-        image: "/showcases/s2.jpg",
         kicker: "Art Direction & Spatial Design",
         meta: "London · Berlin · Tokyo",
         headline: "We shape culture through precision and chaos.",
@@ -113,9 +111,9 @@ export const SAMPLES: DesignDoc[] = [
         subtitle: "Recent identities, editorial books, and immersive brand stages.",
         layout: "grid-3",
         items: [
-          { title: "Futura 2024 Identity", tag: "Global Campaign", meta: "Nike Art Direction", image: "/showcases/s2.jpg" },
-          { title: "Quiet Luxury Autumn", tag: "Editorial Lookbook", meta: "Lumen Paris", image: "/showcases/s1.jpg" },
-          { title: "Material Memory Monograph", tag: "Fashion & Film", meta: "Stella Voss London", image: "/showcases/s6.jpg" },
+          { title: "Futura 2024 Identity", tag: "Global Campaign", meta: "Nike Art Direction" },
+          { title: "Quiet Luxury Autumn", tag: "Editorial Lookbook", meta: "Lumen Paris" },
+          { title: "Material Memory Monograph", tag: "Fashion & Film", meta: "Stella Voss London" },
         ],
       },
     ],

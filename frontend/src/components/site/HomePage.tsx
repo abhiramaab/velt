@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 
 import { FORMATS as ALL_FORMATS } from "@/lib/design";
+import { SAMPLES } from "@/lib/samples";
+import { ScaledMockup } from "@/components/renderer/Mockup";
 import { getToken } from "@/lib/api";
 import { Nav } from "./Nav";
 import { Footer } from "./Footer";
@@ -54,14 +56,14 @@ const FORMAT_GROUPS = ["Web", "Product", "Marketing", "Brand"] as const;
 const FORMATS = ALL_FORMATS.map((f) => ({ ...f, icon: FORMAT_ICONS[f.id] ?? PanelTop }));
 
 const SHOWCASES = [
-  { src: "/showcases/s1.jpg", caption: "a quiet luxury fashion house, cream and silk" },
-  { src: "/showcases/s2.jpg", caption: "dark creative studio site for an art direction team" },
-  { src: "/showcases/s3.jpg", caption: "swiss architecture landing page, one red accent" },
-  { src: "/showcases/s4.jpg", caption: "coastal hotel with long lunches and tiled floors" },
-  { src: "/showcases/s5.jpg", caption: "soft skincare brand, blush and cream" },
-  { src: "/showcases/s6.jpg", caption: "editorial portfolio for a fashion photographer" },
-  { src: "/showcases/s7.jpg", caption: "agency poster series, bold type and color blocks" },
-  { src: "/showcases/s8.jpg", caption: "writing app landing page, literary not neon" },
+  { index: 0, caption: "a quiet ceramic studio in Kyoto, warm clay" },
+  { index: 1, caption: "dark creative studio site for an art direction team" },
+  { index: 2, caption: "swiss architecture landing page, one red accent" },
+  { index: 3, caption: "writing app landing page, literary not neon" },
+  { index: 4, caption: "morning bakery mobile app, warm and playful" },
+  { index: 5, caption: "editorial poster for a late brass set" },
+  { index: 6, caption: "boutique hotel, tiled floors and long lunches" },
+  { index: 7, caption: "soft skincare brand, blush and cream" },
 ];
 
 const HOW_STEPS = [
@@ -533,23 +535,24 @@ function Showcase() {
 
       <Reveal delay={2} className="vl-marquee-mask relative left-1/2 right-1/2 mt-12 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
         <div className="vl-marquee flex w-max items-stretch gap-4">
-          {[...SHOWCASES, ...SHOWCASES].map((item, i) => (
-            <figure
-              key={item.src + i}
-              className="group relative w-[76vw] max-w-[420px] shrink-0 overflow-hidden rounded-2xl border border-[#d6e6f7] bg-white sm:w-[460px]"
-            >
-              <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={item.src}
-                  alt=""
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                />
-              </div>
-              <figcaption className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#06203a]/80 to-transparent px-4 pb-3 pt-12 text-[12px] font-medium text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                {item.caption}
-              </figcaption>
-            </figure>
-          ))}
+          {[...SHOWCASES, ...SHOWCASES].map((item, i) => {
+            const doc = SAMPLES[item.index % SAMPLES.length];
+            return (
+              <figure
+                key={`${doc.name}-${i}`}
+                className="group relative w-[76vw] max-w-[420px] shrink-0 overflow-hidden rounded-2xl border border-[#d6e6f7] bg-white sm:w-[460px]"
+              >
+                <div className="relative isolate aspect-[4/3] overflow-hidden bg-[#eef6ff]">
+                  <div className="pointer-events-none absolute inset-0">
+                    <ScaledMockup doc={doc} fit="width" maxScale={0.34} />
+                  </div>
+                </div>
+                <figcaption className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#06203a]/80 to-transparent px-4 pb-3 pt-12 text-[12px] font-medium text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  {item.caption}
+                </figcaption>
+              </figure>
+            );
+          })}
         </div>
       </Reveal>
     </section>
@@ -1276,14 +1279,19 @@ function Closing() {
 
         <Reveal delay={1} className="vl-marquee-mask relative left-1/2 right-1/2 mt-14 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden">
           <div className="vl-marquee vl-marquee-reverse flex w-max items-stretch gap-4">
-            {[...SHOWCASES, ...SHOWCASES].map((item, i) => (
-              <figure key={`c-${item.src}-${i}`} className="w-[70vw] max-w-[380px] shrink-0 overflow-hidden rounded-2xl border border-[#d6e6f7] bg-white sm:w-[420px]">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={item.src} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
-                </div>
-                <figcaption className="px-4 py-3 text-[12px] text-[#5b7290]">{item.caption}</figcaption>
-              </figure>
-            ))}
+            {[...SHOWCASES, ...SHOWCASES].map((item, i) => {
+              const doc = SAMPLES[(item.index + 3) % SAMPLES.length];
+              return (
+                <figure key={`c-${doc.name}-${i}`} className="w-[70vw] max-w-[380px] shrink-0 overflow-hidden rounded-2xl border border-[#d6e6f7] bg-white sm:w-[420px]">
+                  <div className="relative isolate aspect-[4/3] overflow-hidden bg-[#eef6ff]">
+                    <div className="pointer-events-none absolute inset-0">
+                      <ScaledMockup doc={doc} fit="width" maxScale={0.32} />
+                    </div>
+                  </div>
+                  <figcaption className="px-4 py-3 text-[12px] text-[#5b7290]">{item.caption}</figcaption>
+                </figure>
+              );
+            })}
           </div>
         </Reveal>
       </div>

@@ -4,5 +4,8 @@ frontend/.env.local
 backend/target
 backend/data
 backend/.idea
+marketing/video/node_modules
+marketing/video/out
+marketing/output
 *.log
 .DS_Store

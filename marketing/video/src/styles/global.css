@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/*
+  Tell Tailwind v4 where to scan for used classes. The video renders components
+  from the real Velt source tree, so those files must be part of the content
+  graph or every className in them would be purged.
+*/
+@source "../../../../frontend/src";
+@source "../../";
+
+/*
+  Import the real Velt design system. This gives us the exact Tailwind v4
+  @theme tokens (paper, ink, line, accent, sky, muted, font-display, font-sans)
+  plus the studio helpers (.prompt-ring, .frame-shadow, .preview-frame) so every
+  rendered screen is pixel-for-pixel the live application.
+*/
+@import "../../../../frontend/src/app/globals.css";
+
+/*
+  Font aliases.
+  Velt loads EB Garamond (--font-lastik) and Instrument Sans (--font-instrument)
+  via next/font in layout.tsx. The shared <PrototypeRenderer> asks for
+  --font-fraunces / --font-figtree. In the video runtime we point those names at
+  the real Velt typefaces so the renderer resolves to the same fonts the live app
+  uses, instead of silently falling back.
+*/
+:root {
+  --font-fraunces: var(--font-lastik), "EB Garamond", "Times New Roman", Times, serif;
+  --font-figtree: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
