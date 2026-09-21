@@ -25,7 +25,11 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
  const inverse = onSky || theme === "dark";
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 w-full border-b border-white/10 bg-[#0a0c10]/95 backdrop-blur-md transition-all duration-300">
+    <header className={`fixed left-0 right-0 top-0 z-50 w-full transition-all duration-300 ${
+      onSky
+        ? "border-b border-transparent bg-transparent backdrop-blur-none"
+        : "border-b border-white/10 bg-[#0a0c10]/95 backdrop-blur-md"
+    }`}>
       <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Brand Logo + Primary Nav Links */}
         <div className="flex items-center gap-6 lg:gap-8">
