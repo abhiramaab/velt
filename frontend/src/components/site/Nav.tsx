@@ -34,9 +34,10 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
         {/* Left: Brand Logo + Primary Nav Links */}
         <div className="flex items-center gap-6 lg:gap-8">
           <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-md shadow-emerald-500/20">
-              <span className="font-lastik text-lg font-bold text-slate-950">V</span>
-            </div>
+            <Logo
+              inverse={inverse}
+              className="text-[15px] font-bold text-white"
+            />
           </Link>
 
           <nav className="hidden items-center gap-5 text-[13px] font-medium text-slate-300 md:flex lg:gap-6">
@@ -108,7 +109,7 @@ export function Nav({ overHero = false }: { overHero?: boolean }) {
           {/* Get Started Button */}
           <Link
             href={signedIn ? "/studio" : "/signup"}
-            className="flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-xs sm:text-[13px] font-semibold text-slate-950 shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-300 hover:scale-[1.02] active:scale-[0.98]"
+            className="flex items-center justify-center rounded-xl bg-white px-4 py-2 text-xs sm:text-[13px] font-semibold text-slate-950 shadow-sm transition-all hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98]"
           >
             Get Started
           </Link>
