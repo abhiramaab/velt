@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Dynamic modern paper plane for Velt -->
+  <path d="M42 6L6 23.5L21.5 28.5L34 14.5L24 31.5L38 42L42 6Z" fill="#00a5ef" stroke="#0f172a" />
+  <path d="M21.5 28.5V38L26.5 33" stroke="#0f172a" stroke-width="2.5" />
+  <path d="M21.5 28.5L34 14.5L24 31.5" fill="#38bdf8" />
+</svg>
