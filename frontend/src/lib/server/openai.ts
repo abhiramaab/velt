@@ -120,7 +120,8 @@ export async function generateWithOpenAI(prompt: string, format: string, imageUr
     throw new Error("Missing OpenAI API Key");
   }
 
-  // If a reference URL is provided, fetch its title, meta, and key text
+  try {
+    // If a reference URL is provided, fetch its title, meta, and key text
   let siteContext = "";
   if (referenceUrl && referenceUrl.trim()) {
     try {

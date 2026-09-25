@@ -28,8 +28,13 @@ import {
   Ratio,
   Palette,
   Loader2,
-  X
+  X,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Plus
 } from "lucide-react";
+import type { DesignDoc } from "@/lib/design";
 import { ScaledMockup } from "@/components/renderer/Mockup";
 import { getToken, getStoredUser, saveSession, velt, type ProjectDetail, type User } from "@/lib/api";
 import { generateExportBundle } from "@/lib/exportBundle";
@@ -45,6 +50,19 @@ export function Editor({ id }: { id: string }) {
   const [mode, setMode] = useState<"manual" | "agentic">("agentic");
   const [showGrid, setShowGrid] = useState(false);
   const [zoom, setZoom] = useState(100);
+
+  // Undo / Redo history stack
+  const [history, setHistory] = useState<DesignDoc[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
+  // Tool popover menus
+  const [showFrameMenu, setShowFrameMenu] = useState(false);
+  const [showShapesMenu, setShowShapesMenu] = useState(false);
+
+  // Panning state for Hand tool
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+  const mainScrollRef = useRef<HTMLDivElement>(null);
 
   // Prompt and generation
   const [promptInput, setPromptInput] = useState("");
@@ -76,7 +94,13 @@ export function Editor({ id }: { id: string }) {
     setUser(getStoredUser());
 
     velt.project(id).then((p) => {
-      if (active) setProject(p);
+      if (active) {
+        setProject(p);
+        if (p.design?.document) {
+          setHistory([JSON.parse(JSON.stringify(p.design.document))]);
+          setHistoryIndex(0);
+        }
+      }
     }).catch(() => {
       if (active) router.replace("/studio");
     });
@@ -85,6 +109,180 @@ export function Editor({ id }: { id: string }) {
       active = false;
     };
   }, [id, router]);
+
+  // Push new state to undo/redo history
+  function pushDocumentState(newDoc: DesignDoc) {
+    if (!project) return;
+    const cloned = JSON.parse(JSON.stringify(newDoc));
+    const nextHistory = history.slice(0, historyIndex + 1);
+    nextHistory.push(cloned);
+    setHistory(nextHistory);
+    setHistoryIndex(nextHistory.length - 1);
+
+    const updatedProject = {
+      ...project,
+      design: {
+        ...project.design,
+        document: cloned,
+      },
+    };
+    setProject(updatedProject);
+
+    // Persist changes asynchronously to backend
+    velt.update(project.id, cloned).catch((err) => {
+      console.warn("Auto-save update note:", err);
+    });
+  }
+
+  function handleUndo() {
+    if (historyIndex > 0 && project) {
+      const prevIndex = historyIndex - 1;
+      const prevDoc = history[prevIndex];
+      setHistoryIndex(prevIndex);
+      setProject({
+        ...project,
+        design: {
+          ...project.design,
+          document: JSON.parse(JSON.stringify(prevDoc)),
+        },
+      });
+      velt.update(project.id, prevDoc).catch(() => {});
+    }
+  }
+
+  function handleRedo() {
+    if (historyIndex < history.length - 1 && project) {
+      const nextIndex = historyIndex + 1;
+      const nextDoc = history[nextIndex];
+      setHistoryIndex(nextIndex);
+      setProject({
+        ...project,
+        design: {
+          ...project.design,
+          document: JSON.parse(JSON.stringify(nextDoc)),
+        },
+      });
+      velt.update(project.id, nextDoc).catch(() => {});
+    }
+  }
+
+  // Component library insertion (Shapes tool)
+  function handleInsertComponent(kind: string) {
+    if (!project?.design?.document) return;
+    const currentDoc = project.design.document;
+    let newSection: any = null;
+
+    if (kind === "features") {
+      newSection = {
+        kind: "features",
+        layout: "minimal-cols",
+        title: "Key Capabilities",
+        subtitle: "Built with extreme precision and high-throughput execution.",
+        items: [
+          { title: "Deterministic Flow", body: "Guaranteed consistency across every interaction without latency spikes." },
+          { title: "Global Mesh", body: "Edge distribution configured for sub-millisecond propagation worldwide." },
+          { title: "Modular Architecture", body: "Composable blocks designed to scale seamlessly with your systems." },
+        ],
+      };
+    } else if (kind === "stats") {
+      newSection = {
+        kind: "stats",
+        items: [
+          { value: "99.99%", label: "Uptime Reliability" },
+          { value: "12ms", label: "Global Edge Latency" },
+          { value: "50M+", label: "Monthly Executions" },
+          { value: "100%", label: "Zero-Downtime Deploys" },
+        ],
+      };
+    } else if (kind === "pricing") {
+      newSection = {
+        kind: "pricing",
+        title: "Transparent & Scalable Tiers",
+        subtitle: "Select the execution capacity tailored for your team.",
+        plans: [
+          { name: "Starter", price: "$0", period: "/forever", features: ["1,000 requests/mo", "Community support", "Standard speed"] },
+          { name: "Pro", price: "$49", period: "/month", popular: true, features: ["Unlimited requests", "Priority edge routing", "Dedicated support", "Custom domains"] },
+          { name: "Enterprise", price: "Custom", period: "", features: ["Dedicated cluster", "99.99% SLA", "Audit logging", "24/7 incident response"] },
+        ],
+      };
+    } else if (kind === "testimonials") {
+      newSection = {
+        kind: "testimonials",
+        title: "Trusted by Industry Leaders",
+        items: [
+          { quote: "Velt transformed our design-to-production cadence by 10x.", author: "Elena Rostova", role: "VP of Product, ArchTech" },
+          { quote: "The architectural fidelity and speed are unmatched in the ecosystem.", author: "Marcus Vance", role: "Founding Engineer, HyperFlow" },
+        ],
+      };
+    } else if (kind === "cta") {
+      newSection = {
+        kind: "cta",
+        headline: "Ready to accelerate your workflow?",
+        sub: "Join thousands of teams shipping world-class digital experiences today.",
+        cta: "Start Free Today",
+        secondary: "Schedule a Demo",
+      };
+    }
+
+    if (newSection) {
+      const updatedDoc: DesignDoc = {
+        ...currentDoc,
+        sections: [...(currentDoc.sections || []), newSection],
+      };
+      pushDocumentState(updatedDoc);
+    }
+    setShowShapesMenu(false);
+    setActiveTool("select");
+  }
+
+  // Insert headline & text block (Text tool)
+  function handleInsertText() {
+    if (!project?.design?.document) return;
+    const currentDoc = project.design.document;
+    const newSection = {
+      kind: "features",
+      layout: "minimal-cols",
+      title: "Editorial Statement",
+      subtitle: "Click and edit to articulate your core philosophy and mission.",
+      items: [
+        {
+          title: "Purpose-Driven Design",
+          body: "Every typographic choice, negative space, and interface cadence is crafted to communicate clear purpose.",
+        },
+      ],
+    };
+    const updatedDoc: DesignDoc = {
+      ...currentDoc,
+      sections: [...(currentDoc.sections || []), newSection],
+    };
+    pushDocumentState(updatedDoc);
+    setActiveTool("select");
+  }
+
+  // Pan canvas drag handlers
+  function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
+    if (activeTool !== "hand") return;
+    if (!mainScrollRef.current) return;
+    setIsPanning(true);
+    setPanStart({
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: mainScrollRef.current.scrollLeft,
+      scrollTop: mainScrollRef.current.scrollTop,
+    });
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!isPanning || activeTool !== "hand" || !mainScrollRef.current) return;
+    const dx = e.clientX - panStart.x;
+    const dy = e.clientY - panStart.y;
+    mainScrollRef.current.scrollLeft = panStart.scrollLeft - dx;
+    mainScrollRef.current.scrollTop = panStart.scrollTop - dy;
+  }
+
+  function handleMouseUp() {
+    setIsPanning(false);
+  }
 
   // Refine / Generate with Agentic Prompt
   async function handleSendPrompt(e?: React.FormEvent) {
@@ -255,62 +453,211 @@ export function Editor({ id }: { id: string }) {
       {/* 2. MAIN WORKSPACE CANVAS AREA */}
       <div className="relative flex flex-1 overflow-hidden">
         {/* LEFT FLOATING TOOL DOCK (Matching Screenshot 1) */}
-        <aside className="absolute left-4 top-4 z-20 hidden sm:flex flex-col items-center gap-1 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-md">
+        {/* LEFT FLOATING TOOL DOCK (Matching Make / Figma) */}
+        <aside className="absolute left-4 top-4 z-30 hidden sm:flex flex-col items-center gap-1 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-md">
+          {/* Select / Pointer tool */}
           <button
-            onClick={() => setActiveTool("select")}
-            title="Select tool"
+            onClick={() => {
+              setActiveTool("select");
+              setShowFrameMenu(false);
+              setShowShapesMenu(false);
+            }}
+            title="Select tool (V)"
             className={`rounded-xl p-2 transition ${activeTool === "select" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
           >
             <MousePointer2 size={16} />
           </button>
+
+          {/* Hand / Pan tool */}
           <button
-            onClick={() => setActiveTool("hand")}
-            title="Hand tool"
+            onClick={() => {
+              setActiveTool("hand");
+              setShowFrameMenu(false);
+              setShowShapesMenu(false);
+            }}
+            title="Hand / Pan canvas tool (H)"
             className={`rounded-xl p-2 transition ${activeTool === "hand" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
           >
             <Hand size={16} />
           </button>
+
+          {/* Shapes & Components palette */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowShapesMenu(!showShapesMenu);
+                setShowFrameMenu(false);
+                setActiveTool("shapes");
+              }}
+              title="Insert Component / Shapes (S)"
+              className={`rounded-xl p-2 transition ${activeTool === "shapes" || showShapesMenu ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
+            >
+              <Shapes size={16} />
+            </button>
+
+            {showShapesMenu && (
+              <div className="absolute left-full top-0 ml-2 z-50 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95">
+                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Insert Component
+                </div>
+                <div className="mt-1 flex flex-col gap-1">
+                  <button
+                    onClick={() => handleInsertComponent("features")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Feature Bento</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("stats")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Stat Metric Bar</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("pricing")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Pricing Grid</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("testimonials")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Testimonial Wall</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("cta")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Call to Action Block</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Screen Frame preset tool */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowFrameMenu(!showFrameMenu);
+                setShowShapesMenu(false);
+                setActiveTool("frame");
+              }}
+              title="Screen Frame Presets (F)"
+              className={`rounded-xl p-2 transition ${activeTool === "frame" || showFrameMenu ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
+            >
+              <Frame size={16} />
+            </button>
+
+            {showFrameMenu && (
+              <div className="absolute left-full top-0 ml-2 z-50 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95">
+                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Screen Frames
+                </div>
+                <div className="mt-1 flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setDevice("desktop");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "desktop" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Monitor size={14} /> Desktop (1440)
+                    </span>
+                    {device === "desktop" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("tablet");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "tablet" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Tablet size={14} /> Tablet (860)
+                    </span>
+                    {device === "tablet" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("mobile");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "mobile" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Smartphone size={14} /> Mobile (402)
+                    </span>
+                    {device === "mobile" && <Check size={13} />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Text block tool */}
           <button
-            onClick={() => setActiveTool("shapes")}
-            title="Shapes & Components"
-            className={`rounded-xl p-2 transition ${activeTool === "shapes" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-          >
-            <Shapes size={16} />
-          </button>
-          <button
-            onClick={() => setActiveTool("frame")}
-            title="Screen Frame"
-            className={`rounded-xl p-2 transition ${activeTool === "frame" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-          >
-            <Frame size={16} />
-          </button>
-          <button
-            onClick={() => setActiveTool("text")}
-            title="Text Block"
+            onClick={() => {
+              setActiveTool("text");
+              setShowFrameMenu(false);
+              setShowShapesMenu(false);
+              handleInsertText();
+            }}
+            title="Insert Text Section (T)"
             className={`rounded-xl p-2 transition ${activeTool === "text" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
           >
             <Type size={16} />
           </button>
+
           <div className="my-1 h-px w-4 bg-slate-200" />
+
+          {/* Undo Action */}
           <button
-            onClick={() => {}}
-            title="Undo"
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+            onClick={handleUndo}
+            disabled={historyIndex <= 0}
+            title="Undo (Ctrl+Z)"
+            className="rounded-xl p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <Undo2 size={15} />
           </button>
+
+          {/* Redo Action */}
           <button
-            onClick={() => {}}
-            title="Redo"
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+            onClick={handleRedo}
+            disabled={historyIndex >= history.length - 1}
+            title="Redo (Ctrl+Y)"
+            className="rounded-xl p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <Redo2 size={15} />
           </button>
         </aside>
 
         {/* CENTER VIEWPORT CANVAS */}
-        <main 
+        <main
+          ref={mainScrollRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
           className={`relative flex flex-1 items-start justify-center overflow-auto p-4 sm:p-8 ${
+            activeTool === "hand" ? (isPanning ? "cursor-grabbing select-none" : "cursor-grab") : ""
+          } ${
             showGrid ? "bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] bg-[size:16px_16px]" : "bg-[#F0F0F0]"
           }`}
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: "center top" }}

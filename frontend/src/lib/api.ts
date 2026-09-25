@@ -126,4 +126,9 @@ export const velt = {
       method: "POST",
       body: JSON.stringify({ message }),
     }),
+  update: (id: string, document: unknown) =>
+    api<{ ok: boolean; project: ProjectDetail }>(`/api/projects/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ document }),
+    }),
 };
