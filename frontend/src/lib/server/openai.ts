@@ -2,11 +2,8 @@ import type { DesignDoc } from "../design";
 import { SAMPLES } from "../samples";
 import { triageDesignPrompt } from "./typesafe";
 
-const DEFAULT_KEY =
-  "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";
-
 export function getApiKey(): string {
-  return (process.env.OPENAI_API_KEY || DEFAULT_KEY).trim();
+  return (process.env.OPENAI_API_KEY || "").trim();
 }
 
 const SYSTEM_PROMPT = `
