@@ -93,8 +93,9 @@ export async function POST(req: Request) {
       project,
       creditsRemaining: Math.max(0, currentUser.credits - 1),
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to compose project:", err);
-    return NextResponse.json({ error: "Failed to generate design." }, { status: 500 });
+    const detail = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: detail || "Failed to generate design." }, { status: 500 });
   }
 }
