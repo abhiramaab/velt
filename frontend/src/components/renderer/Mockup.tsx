@@ -4,22 +4,43 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { PrototypeRenderer } from "@/components/renderer/PrototypeRenderer";
 import type { DesignDoc } from "@/lib/design";
 
-export type DeviceKind = "desktop" | "tablet" | "mobile" | "poster" | "square";
+export type DeviceKind =
+  | "desktop"
+  | "tablet"
+  | "mobile"
+  | "poster"
+  | "square"
+  | "youtube"
+  | "story"
+  | "banner"
+  | "facebook";
 
 const NATURAL_WIDTH: Record<DeviceKind, number> = {
   desktop: 1440,
   tablet: 900,
   mobile: 402,
   poster: 720,
-  square: 720,
+  square: 1080,
+  youtube: 1920,
+  story: 1080,
+  banner: 1500,
+  facebook: 1200,
 };
 
 export function deviceFor(doc: DesignDoc): DeviceKind {
   switch (doc.format) {
     case "app":
-    case "story":
       return "mobile";
+    case "story":
+      return "story";
+    case "youtube":
+      return "youtube";
+    case "banner":
+      return "banner";
+    case "facebook":
+      return "facebook";
     case "poster":
+      return "poster";
     case "brand":
     case "social":
     case "instagram":

@@ -32,10 +32,13 @@ import {
   Monitor,
   Tablet,
   Smartphone,
-  Plus
+  Plus,
+  Video,
+  Square,
+  LayoutTemplate
 } from "lucide-react";
 import type { DesignDoc } from "@/lib/design";
-import { ScaledMockup } from "@/components/renderer/Mockup";
+import { ScaledMockup, type DeviceKind } from "@/components/renderer/Mockup";
 import { getToken, getStoredUser, saveSession, velt, type ProjectDetail, type User } from "@/lib/api";
 import { generateExportBundle } from "@/lib/exportBundle";
 import { UpgradeModal } from "./UpgradeModal";
@@ -45,7 +48,7 @@ export function Editor({ id }: { id: string }) {
   const router = useRouter();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [device, setDevice] = useState<DeviceKind>("desktop");
   const [activeTool, setActiveTool] = useState<"select" | "hand" | "shapes" | "frame" | "text">("select");
   const [mode, setMode] = useState<"manual" | "agentic">("agentic");
   const [showGrid, setShowGrid] = useState(false);
@@ -221,6 +224,29 @@ export function Editor({ id }: { id: string }) {
         sub: "Join thousands of teams shipping world-class digital experiences today.",
         cta: "Start Free Today",
         secondary: "Schedule a Demo",
+      };
+    } else if (kind === "youtube") {
+      newSection = {
+        kind: "youtube",
+        kicker: "DEEP DIVE MASTERCLASS",
+        title: "HOW WE SCALED TO 10M USERS IN 90 DAYS",
+        subtitle: "WATCH NOW",
+        duration: "18:42",
+      };
+    } else if (kind === "banner") {
+      newSection = {
+        kind: "banner",
+        brand: "SPECIAL ANNOUNCEMENT",
+        headline: "Velt 2.0 Studio Is Live",
+        sub: "Synthesize production digital documents and marketing assets in seconds.",
+      };
+    } else if (kind === "instagram") {
+      newSection = {
+        kind: "instagram",
+        kicker: "SPRING COLLECTION",
+        headline: "Architectural Essentials",
+        caption: "Crafted for durability, tactile comfort, and minimalist aesthetics.",
+        tags: ["#design", "#minimalism", "#studio", "#essentials"],
       };
     }
 
@@ -537,6 +563,34 @@ export function Editor({ id }: { id: string }) {
                     <Plus size={13} className="text-slate-400" />
                   </button>
                 </div>
+
+                <div className="my-1.5 h-px bg-slate-100" />
+                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Marketing Blocks
+                </div>
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => handleInsertComponent("youtube")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>YouTube 16:9 Hero</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("banner")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Promo Header Banner</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                  <button
+                    onClick={() => handleInsertComponent("instagram")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Instagram Carousel Card</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -558,7 +612,7 @@ export function Editor({ id }: { id: string }) {
             {showFrameMenu && (
               <div className="absolute left-full top-0 ml-2 z-50 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95">
                 <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Screen Frames
+                  Web & Screens
                 </div>
                 <div className="mt-1 flex flex-col gap-1">
                   <button
@@ -605,6 +659,88 @@ export function Editor({ id }: { id: string }) {
                       <Smartphone size={14} /> Mobile (402)
                     </span>
                     {device === "mobile" && <Check size={13} />}
+                  </button>
+                </div>
+
+                <div className="my-1.5 h-px bg-slate-100" />
+                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Social & Marketing
+                </div>
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setDevice("square");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "square" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Square size={14} /> Instagram Post (1:1)
+                    </span>
+                    {device === "square" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("youtube");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "youtube" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Video size={14} /> YouTube 16:9 (1920)
+                    </span>
+                    {device === "youtube" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("story");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "story" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Smartphone size={14} /> Story / Reel (9:16)
+                    </span>
+                    {device === "story" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("banner");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "banner" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <LayoutTemplate size={14} /> Banner / Header (3:1)
+                    </span>
+                    {device === "banner" && <Check size={13} />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDevice("facebook");
+                      setShowFrameMenu(false);
+                      setActiveTool("select");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                      device === "facebook" ? "bg-sky-50 text-sky-600 font-semibold" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Square size={14} /> Feed Ad (1.91:1)
+                    </span>
+                    {device === "facebook" && <Check size={13} />}
                   </button>
                 </div>
               </div>
@@ -666,7 +802,19 @@ export function Editor({ id }: { id: string }) {
             <div 
               ref={canvasRef}
               className={`relative isolate w-full overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-2xl transition-all duration-300 ${
-                device === "mobile" ? "max-w-[402px]" : device === "tablet" ? "max-w-[860px]" : "max-w-[1240px]"
+                device === "mobile" || device === "story"
+                  ? "max-w-[402px]"
+                  : device === "tablet"
+                  ? "max-w-[860px]"
+                  : device === "square"
+                  ? "max-w-[680px]"
+                  : device === "youtube"
+                  ? "max-w-[1080px]"
+                  : device === "banner"
+                  ? "max-w-[1100px]"
+                  : device === "facebook"
+                  ? "max-w-[960px]"
+                  : "max-w-[1240px]"
               }`}
             >
               <ScaledMockup
