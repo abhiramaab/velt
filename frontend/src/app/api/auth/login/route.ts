@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { DEMO_USER } from "@/lib/server/storage";
 import { signJwt } from "@/lib/server/jwt";
-import { getUserUsage } from "@/lib/server/ratelimit";
+import { getUserUsage, checkAuthIpRateLimit, getClientIp } from "@/lib/server/ratelimit";
 
 export async function POST(req: Request) {
   try {
+    const clientIp = getClientIp(req);
+    const ipCheck = checkAuthIpRateLimit(clientIp, 5, 60000);
+    if (!ipCheck.allowed) {
+      return NextResponse.json(
+        { error: `Too many login attempts. Please wait ${ipCheck.retryAfterSeconds} seconds before trying again.` },
+        { status: 429, headers: { "Retry-After": String(ipCheck.retryAfterSeconds) } }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const email = body.email;
     const password = body.password;

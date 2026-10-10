@@ -33,6 +33,16 @@ export async function POST(req: Request) {
     // Rate Limit Check per user plan (Admin bypasses)
     const rateStatus = checkAndConsumeLimit(authUser.email, authUser.plan || "free");
     if (!rateStatus.allowed) {
+      if (rateStatus.reason === "PER_MINUTE_BURST") {
+        return NextResponse.json(
+          {
+            error: `Rate limit exceeded for your ${rateStatus.planName} plan. Please wait ${rateStatus.retryAfterSeconds} seconds before requesting again.`,
+            code: "BURST_RATE_LIMIT_EXCEEDED",
+            retryAfter: rateStatus.retryAfterSeconds,
+          },
+          { status: 429, headers: { "Retry-After": String(rateStatus.retryAfterSeconds) } }
+        );
+      }
       return NextResponse.json(
         {
           error: `Monthly generation limit reached for your ${rateStatus.planName} plan (${rateStatus.limit} designs/mo). Please upgrade your plan to continue generating.`,
