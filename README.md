@@ -42,6 +42,7 @@
   - [3. Conversational Direction & Real-Time Refinement](#3-conversational-direction--real-time-refinement)
   - [4. Automated Design Token Extraction](#4-automated-design-token-extraction)
   - [5. Dual-Tier Service Layer: Auth & Workspace State](#5-dual-tier-service-layer-auth--workspace-state)
+- [SOLID Principles & Architecture](#solid-principles--architecture)
 - [Design Document Schema Specification](#design-document-schema-specification)
 - [Technology Stack](#technology-stack)
 - [Quickstart Guide](#quickstart-guide)
@@ -131,6 +132,22 @@ Key capabilities include:
 ### 5. Dual-Tier Service Layer: Auth & Workspace State
 * **Next.js 15 Client Layer**: Serverless execution optimized for high interactivity, instant preview rendering, and edge delivery.
 * **Spring Boot 3.5 Enterprise Layer**: Java 21 backend providing stateless JWT authorization, relational persistence via Spring Data JPA, and user workspace isolation.
+
+---
+
+## SOLID Principles & Architecture
+
+Velt applies SOLID object-oriented principles across both its Spring Boot enterprise layer and Next.js design studio:
+
+| Principle | Architectural Implementation in Velt |
+|---|---|
+| **Single Responsibility (SRP)** | Clear boundaries between subsystems: `LayoutService` handles prompt normalization and format constraints; `XaiClient` executes inference requests; `ProjectService` manages workspace state and revision trees; `JwtAuthFilter` validates cryptographic tokens; `RateLimitInterceptor` throttles requests; frontend canvas views solely render their respective AST node hierarchy. |
+| **Open/Closed (OCP)** | Pluggable design layout architecture: Velt supports 14 layout formats and can scale to new canvas layouts (e.g., Email Newsletters, Decks) by adding layout renderer strategies without altering the prompt normalizer or persistence schemas. Design token compiler supports adding new token categories without touching AST diffing logic. |
+| **Liskov Substitution (LSP)** | Format-specific canvas renderers implement the shared `CanvasRendererProps` contract, enabling the client studio to mount, hot-swap, and render any layout format interchangeably without violating zoom, pan, export, or tree-patching contracts. |
+| **Interface Segregation (ISP)** | Granular DTO boundaries separate read and write flows: client mutations consume dedicated input DTOs (`CreateProjectRequest`, `RefineRequest`), while queries return lean projection DTOs (`ProjectSummary`, `ProjectDetail`, `DesignResponse`). Spring Data repositories are isolated per aggregate root. |
+| **Dependency Inversion (DIP)** | High-level orchestrators (`ProjectController`, `AuthController`) depend upon domain abstractions rather than concrete driver implementations. Dependencies are provided via Spring Boot constructor injection, allowing isolated testing and model provider flexibility. |
+
+*(For complete architectural breakdown, see [Velt Architecture Documentation](./docs/ARCHITECTURE.md#6-solid-principles--low-level-design-lld)).*
 
 ---
 
