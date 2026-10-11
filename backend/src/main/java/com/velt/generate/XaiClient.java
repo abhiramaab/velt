@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class XaiClient {
+public class XaiClient implements AiInferenceClient {
     private final RestClient http;
     private final ObjectMapper mapper;
     private final String apiKey;

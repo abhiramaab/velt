@@ -10,9 +10,9 @@ import java.util.*;
 @Service
 public class LayoutService {
     private final ObjectMapper mapper;
-    private final XaiClient xai;
+    private final AiInferenceClient xai;
 
-    public LayoutService(ObjectMapper mapper, XaiClient xai) {
+    public LayoutService(ObjectMapper mapper, AiInferenceClient xai) {
         this.mapper = mapper;
         this.xai = xai;
     }
