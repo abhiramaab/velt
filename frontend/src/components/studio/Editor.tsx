@@ -35,7 +35,8 @@ import {
   Plus,
   Video,
   Square,
-  LayoutTemplate
+  LayoutTemplate,
+  MoveRight
 } from "lucide-react";
 import type { DesignDoc } from "@/lib/design";
 import { ScaledMockup, type DeviceKind } from "@/components/renderer/Mockup";
@@ -49,7 +50,7 @@ export function Editor({ id }: { id: string }) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [device, setDevice] = useState<DeviceKind>("desktop");
-  const [activeTool, setActiveTool] = useState<"select" | "hand" | "shapes" | "frame" | "text">("select");
+  const [activeTool, setActiveTool] = useState<"select" | "hand" | "shapes" | "frame" | "text" | "arrow">("select");
   const [mode, setMode] = useState<"manual" | "agentic">("agentic");
   const [showGrid, setShowGrid] = useState(false);
   const [zoom, setZoom] = useState(100);
@@ -248,6 +249,17 @@ export function Editor({ id }: { id: string }) {
         caption: "Crafted for durability, tactile comfort, and minimalist aesthetics.",
         tags: ["#design", "#minimalism", "#studio", "#essentials"],
       };
+    } else if (kind === "architecture_flow") {
+      newSection = {
+        kind: "architecture_flow",
+        kicker: "EXECUTION PIPELINE",
+        title: "How the Workflow Operates",
+        steps: [
+          { title: "Client Dispatch", desc: "Incoming requests routed through edge proxy.", metric: "12ms" },
+          { title: "Agent Sandbox", desc: "Stateless micro-VM spun up in microsecond latency.", metric: "99.99%" },
+          { title: "State Persistence", desc: "Atomic commit written to distributed storage clusters.", metric: "Zero drift" },
+        ],
+      };
     }
 
     if (newSection) {
@@ -284,6 +296,82 @@ export function Editor({ id }: { id: string }) {
     pushDocumentState(updatedDoc);
     setActiveTool("select");
   }
+
+  // Global Keyboard Shortcuts (Figma / Canvas parity)
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Don't trigger shortcuts if user is typing in an input or textarea
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const isMac = typeof window !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Undo: Ctrl+Z / Cmd+Z (without shift)
+      if (isCmdOrCtrl && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      // Redo: Ctrl+Y / Cmd+Y or Ctrl+Shift+Z / Cmd+Shift+Z
+      if (
+        (isCmdOrCtrl && e.key.toLowerCase() === "y") ||
+        (isCmdOrCtrl && e.key.toLowerCase() === "z" && e.shiftKey)
+      ) {
+        e.preventDefault();
+        handleRedo();
+        return;
+      }
+
+      // Tool switches & Arrow navigation (when no modifier key is held)
+      if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.key.toLowerCase() === "v") {
+          setActiveTool("select");
+          setShowFrameMenu(false);
+          setShowShapesMenu(false);
+        } else if (e.key.toLowerCase() === "h") {
+          setActiveTool("hand");
+          setShowFrameMenu(false);
+          setShowShapesMenu(false);
+        } else if (e.key.toLowerCase() === "s") {
+          setShowShapesMenu((prev) => !prev);
+          setShowFrameMenu(false);
+          setActiveTool("shapes");
+        } else if (e.key.toLowerCase() === "f") {
+          setShowFrameMenu((prev) => !prev);
+          setShowShapesMenu(false);
+          setActiveTool("frame");
+        } else if (e.key.toLowerCase() === "t") {
+          handleInsertText();
+        } else if (e.key.toLowerCase() === "a") {
+          handleInsertComponent("architecture_flow");
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          mainScrollRef.current?.scrollBy({ left: -60, behavior: "smooth" });
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          mainScrollRef.current?.scrollBy({ left: 60, behavior: "smooth" });
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          mainScrollRef.current?.scrollBy({ top: -60, behavior: "smooth" });
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          mainScrollRef.current?.scrollBy({ top: 60, behavior: "smooth" });
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [historyIndex, history.length, project]);
 
   // Pan canvas drag handlers
   function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
@@ -590,6 +678,13 @@ export function Editor({ id }: { id: string }) {
                     <span>Instagram Carousel Card</span>
                     <Plus size={13} className="text-slate-400" />
                   </button>
+                  <button
+                    onClick={() => handleInsertComponent("architecture_flow")}
+                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-600 transition"
+                  >
+                    <span>Architecture Flow (→)</span>
+                    <Plus size={13} className="text-slate-400" />
+                  </button>
                 </div>
               </div>
             )}
@@ -759,6 +854,20 @@ export function Editor({ id }: { id: string }) {
             className={`rounded-xl p-2 transition ${activeTool === "text" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
           >
             <Type size={16} />
+          </button>
+
+          {/* Flow Arrow / Pipeline Connector tool */}
+          <button
+            onClick={() => {
+              setActiveTool("arrow");
+              setShowFrameMenu(false);
+              setShowShapesMenu(false);
+              handleInsertComponent("architecture_flow");
+            }}
+            title="Insert Flow Pipeline / Arrows (A)"
+            className={`rounded-xl p-2 transition ${activeTool === "arrow" ? "bg-slate-100 text-sky-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
+          >
+            <MoveRight size={16} />
           </button>
 
           <div className="my-1 h-px w-4 bg-slate-200" />

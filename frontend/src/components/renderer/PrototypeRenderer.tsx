@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { MoveRight } from "lucide-react";
 import type { DesignDoc, Section, Theme } from "@/lib/design";
 
 type Props = {
@@ -1948,32 +1949,41 @@ function ArchitectureFlow({ section, theme, isMobile }: { section: Section; them
 
       <div className={`grid ${isMobile ? "grid-cols-1 gap-4" : "grid-cols-3 gap-6"} relative`}>
         {steps.map((s, idx) => (
-          <motion.div
-            key={idx}
-            whileHover={{ y: -4, scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            className="p-6 rounded-2xl border transition-all duration-300 hover:border-accent/40 hover:shadow-lg cursor-default"
-            style={{ background: theme.surface, borderColor: theme.line }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span
-                className="size-8 rounded-full flex items-center justify-center font-mono text-xs font-bold"
-                style={{ background: theme.bg, color: theme.accent, border: `1px solid ${theme.line}` }}
-              >
-                0{idx + 1}
-              </span>
-              {s.metric && (
+          <div key={idx} className="relative">
+            <motion.div
+              whileHover={{ y: -4, scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+              className="p-6 rounded-2xl border transition-all duration-300 hover:border-accent/40 hover:shadow-lg cursor-default h-full"
+              style={{ background: theme.surface, borderColor: theme.line }}
+            >
+              <div className="flex items-center justify-between mb-4">
                 <span
-                  className="font-mono text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: theme.bg, color: theme.fg, border: `1px solid ${theme.line}` }}
+                  className="size-8 rounded-full flex items-center justify-center font-mono text-xs font-bold"
+                  style={{ background: theme.bg, color: theme.accent, border: `1px solid ${theme.line}` }}
                 >
-                  {s.metric}
+                  0{idx + 1}
                 </span>
-              )}
-            </div>
-            <h3 className="text-base font-semibold mb-2" style={{ color: theme.fg }}>{s.title}</h3>
-            <p className="text-xs leading-relaxed" style={{ color: theme.muted }}>{s.desc}</p>
-          </motion.div>
+                {s.metric && (
+                  <span
+                    className="font-mono text-[10px] px-2 py-0.5 rounded-full"
+                    style={{ background: theme.bg, color: theme.fg, border: `1px solid ${theme.line}` }}
+                  >
+                    {s.metric}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-base font-semibold mb-2" style={{ color: theme.fg }}>{s.title}</h3>
+              <p className="text-xs leading-relaxed" style={{ color: theme.muted }}>{s.desc}</p>
+            </motion.div>
+            {!isMobile && idx < steps.length - 1 && (
+              <div
+                className="absolute -right-5 top-1/2 -translate-y-1/2 z-10 hidden lg:flex size-7 items-center justify-center rounded-full shadow-sm"
+                style={{ background: theme.bg, border: `1px solid ${theme.line}`, color: theme.accent }}
+              >
+                <MoveRight size={13} />
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>
